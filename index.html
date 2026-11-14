@@ -283,6 +283,18 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 .payment-identity{display:none;margin:14px 0;padding:16px;border:1px solid #d9b45f99;border-radius:17px;background:linear-gradient(145deg,#342a19,#14243a 72%);box-shadow:0 5px 0 #111b2a,0 12px 25px #0006,inset 0 1px 0 #fff2}
 .payment-identity.visible{display:block}.payment-identity .pay-kicker{font-size:10px;letter-spacing:1.8px;font-weight:900;color:#ffe2a0}.payment-identity .pay-token{font-size:27px;font-weight:950;color:#fff0c2;margin:5px 0;text-shadow:0 2px 14px #eab84d44}.payment-identity .pay-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid #ffffff18;font-size:12px}.payment-identity .pay-row span{color:#b8c7da}.payment-identity .pay-row b{text-align:right;color:#fff}.payment-identity .pay-warning{margin-top:10px;padding:10px;border-radius:10px;background:#0a1728;color:#f3dba6;font-size:11px;line-height:1.5}
 #initialBuyUpiPayNow{width:100%;text-align:center;padding:15px!important;font-size:15px;color:#fff!important;background:linear-gradient(135deg,#315b88,#142d49)!important;border:1px solid #8eb6dc88!important;text-shadow:0 1px 3px #0008;box-shadow:0 4px 0 #091a2b,0 9px 20px #0007,inset 0 1px 0 #ffffff35!important}#initialBuyUpiPayNow:hover{filter:brightness(1.15);color:#fff!important}
+
+/* Clear buyer and resale rules */
+.rules-panel{margin:16px 0 20px;border:1px solid #8a7044;background:linear-gradient(135deg,#1d2b40,#111d2d);border-radius:18px;padding:20px;box-shadow:0 8px 24px #0004}
+.rules-panel h3{margin:0 0 8px;color:#ffe2a0;font-size:18px}
+.rules-intro{margin:0 0 14px;color:#c2d0e1;font-size:13px;line-height:1.6}
+.rules-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rule-card{padding:14px;border:1px solid #354c68;border-radius:13px;background:#091729}
+.rule-card b{display:block;color:#f4d58f;margin-bottom:7px;font-size:13px}
+.rule-card ol,.rule-card ul{margin:0;padding-left:18px;color:#c3d0df;font-size:12px;line-height:1.7}
+.rules-foot{margin:13px 0 0;padding:11px;border-radius:10px;background:#2b2518;border:1px solid #806536;color:#f4dca7;font-size:12px;line-height:1.6}
+@media(max-width:650px){.rules-panel{padding:16px}.rules-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -302,6 +314,52 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
   <div class="stat"><span id="nextPriceLabel">Next Price</span><strong id="nextPrice">₹4</strong></div>
   <div class="stat"><span id="supplyLabel">Total Token Supply</span><strong>100</strong></div>
   <div class="stat"><span id="tokenIdsLabel">Token IDs</span><strong style="font-size:19px">001 – 100</strong></div>
+</section>
+
+
+<section class="rules-panel" id="buyerResaleRules" aria-labelledby="buyerResaleRulesTitle">
+  <h3 id="buyerResaleRulesTitle">How Buying &amp; Resale Work</h3>
+  <p class="rules-intro">QZIX has 100 fixed token IDs (001–100). This is a manual, admin-reviewed process — payments and ownership changes are not automatic.</p>
+  <div class="rules-grid">
+    <div class="rule-card">
+      <b>1. Initial purchase from QZIX</b>
+      <ol>
+        <li>Log in and select an available token ID.</li>
+        <li>Create a request to reserve that token and lock the displayed amount.</li>
+        <li>Pay the exact amount using a UPI app only after checking the token ID, amount, UPI ID and recipient name.</li>
+        <li>Tap “I Have Paid”. The admin checks the actual bank/UPI credit before approving.</li>
+        <li>The token appears in your account only after approval.</li>
+      </ol>
+    </div>
+    <div class="rule-card">
+      <b>2. Buyer-to-buyer resale transfer</b>
+      <ol>
+        <li>Choose a token that is currently owned by another buyer.</li>
+        <li>Check the token ID and locked resale amount before paying.</li>
+        <li>Pay only to the verified QZIX payment details shown in the payment instructions, then submit the transaction reference.</li>
+        <li>The admin matches the actual incoming bank/UPI credit — a typed reference or screenshot alone is not proof.</li>
+        <li>After approval, ownership transfers to the new buyer.</li>
+      </ol>
+    </div>
+    <div class="rule-card">
+      <b>3. Resale amount split</b>
+      <ul>
+        <li>Previous owner: 80% of the verified gross resale amount is credited to their QZIX wallet.</li>
+        <li>QZIX company fee: 20% of the verified gross resale amount.</li>
+        <li>Any wallet withdrawal is a separate request and is manually paid/marked paid after the actual payout.</li>
+      </ul>
+    </div>
+    <div class="rule-card">
+      <b>4. Important account rules</b>
+      <ul>
+        <li>There is no direct SELL button. A resale transfer is processed through the buyer request and admin review.</li>
+        <li>Never share your password, OTP or UPI PIN with anyone.</li>
+        <li>Do not pay if the recipient name or payment details do not match the official details you have independently confirmed.</li>
+        <li>Do not pay twice for one request. Contact the admin if a payment is unclear or pending.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="rules-foot"><b>Risk notice:</b> QZIX does not guarantee profit, resale, a buyer, future token prices or withdrawal timing. A displayed price is not a promise that someone will buy your token. Review all rules and obtain appropriate legal advice before making a real payment.</p>
 </section>
 
 <div class="grid">
@@ -399,7 +457,7 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
   </div>
   <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
   <h3>Admin — Initial Company Purchase UPI Review</h3>
-  <p class="muted">Approve only after matching the exact amount, payer details and payment time against an actual incoming Paytm/bank credit. If you cannot confidently identify this payment, do not approve. Approval assigns the token and credits the company wallet.</p>
+  <p class="muted">Approve only after matching the exact amount, payer details and payment time against an actual incoming bank/UPI credit. If you cannot confidently identify this payment, do not approve. Approval assigns the token and credits the company wallet.</p>
   <button class="secondary" id="refreshInitialManualQueue">Refresh Initial Purchase Queue</button>
   <div class="status" id="initialManualAdminStatus" aria-live="polite"></div>
   <div id="initialManualPaymentQueue" class="muted">No initial purchase requests loaded.</div>
@@ -848,7 +906,7 @@ function qzixNotifyAdminPayment(table,row){
  qzixAlertedRequests.add(table+":"+id);
  const token="QZIX-"+String(row.token_number||"").padStart(3,"0");
  const amount=money(row.amount);
- const msg=token+" · "+amount+" · Verify actual Paytm/bank credit before accepting.";
+ const msg=token+" · "+amount+" · Verify actual bank/UPI credit before accepting.";
  $("qzixAlertStatus").textContent="Buyer marked payment as sent: "+msg;
  $("manualAdminStatus").textContent="New buyer payment request received. Verify the actual incoming credit before approval.";
  if(table==="qzix_initial_manual_purchase_requests"){
@@ -905,10 +963,10 @@ async function refreshInitialManualQueue(){
  if(error){$("initialManualAdminStatus").textContent="Queue error: "+error.message;return}
  if(!data?.length){$("initialManualPaymentQueue").textContent="No pending initial company purchase requests.";$("initialManualAdminStatus").textContent="Queue updated.";return}
  $("initialManualPaymentQueue").innerHTML=data.map(r=>"<div style='padding:12px 0;border-bottom:1px solid var(--line)'><b>QZIX-"+String(r.token_number).padStart(3,"0")+"</b> · "+money(r.amount)+"<br><small>Buyer: "+safeText(r.buyer_id)+"<br>Payment marked sent: "+safeText(r.payment_confirmed_at?new Date(r.payment_confirmed_at).toLocaleString():"Time unavailable")+"</small><div class='actions' style='margin-top:8px'><button data-initial-review='approve' data-id='"+safeText(r.id)+"'>Approve & Assign</button><button class='secondary' data-initial-review='reject' data-id='"+safeText(r.id)+"'>Reject</button></div></div>").join("");
- $("initialManualAdminStatus").textContent="Verify exact amount, payer details and payment time in the actual Paytm/bank transaction history before approving. Never approve based only on the buyer tapping “I Have Paid”.";
+ $("initialManualAdminStatus").textContent="Verify exact amount, payer details and payment time in the actual bank/UPI transaction history before approving. Never approve based only on the buyer tapping “I Have Paid”.";
 }
 async function reviewInitialManualPayment(id,decision){
- const message=decision==="approve"?"Approve only after you personally match the exact amount, payer details and payment time to an actual incoming Paytm/bank credit. Never approve only because the buyer tapped “I Have Paid”. This assigns the token and credits the company wallet.":"Reject this initial purchase request?";
+ const message=decision==="approve"?"Approve only after you personally match the exact amount, payer details and payment time to an actual incoming bank/UPI credit. Never approve only because the buyer tapped “I Have Paid”. This assigns the token and credits the company wallet.":"Reject this initial purchase request?";
  if(!confirm(message))return;
  $("initialManualAdminStatus").textContent="Processing initial purchase review…";
  const {data,error}=await supabase.rpc("qzix_admin_review_initial_manual_payment",{p_request_id:id,p_decision:decision,p_admin_note:null});
