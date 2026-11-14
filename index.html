@@ -89,6 +89,150 @@ button.secondary{background:#172b45;border:1px solid #385575;box-shadow:none}
 #noticeText{font-size:11px;line-height:1.5}
 @media(max-width:600px){.simple-steps{grid-template-columns:1fr}.simple-guide{padding:16px}.wrap{padding:16px 12px 35px}}
 .about-link{display:inline-block;text-decoration:none;color:#f5c66d;border:1px solid #f4c76b66;background:#f4c76b12;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:800;white-space:nowrap}.about-link:hover{background:#f4c76b22}@media(max-width:520px){.about-link{padding:8px 10px;font-size:12px}}
+
+/* QZIX 3D premium visual layer */
+:root{
+ --qzix-gold:#ffd77d;
+ --qzix-glow:#eab84d55;
+ --qzix-glass:rgba(17,31,52,.82);
+}
+body{
+ background:
+  radial-gradient(ellipse at 50% -12%,rgba(66,111,166,.36),transparent 42%),
+  radial-gradient(ellipse at 100% 48%,rgba(189,137,48,.10),transparent 35%),
+  radial-gradient(ellipse at 0% 78%,rgba(42,91,145,.15),transparent 38%),
+  #050b15;
+ background-attachment:fixed;
+}
+.wrap{perspective:1400px}
+.top{transform-style:preserve-3d}
+.coin{
+ position:relative;
+ background:linear-gradient(145deg,#fff1b9 0%,#f5cb68 22%,#b77a20 58%,#ffe7a0 78%,#a66a19 100%);
+ border:2px solid #ffe9ad;
+ box-shadow:
+  0 7px 0 #80551d,
+  0 12px 24px #0008,
+  0 0 30px #f5c66d38,
+  inset 0 2px 5px #fff;
+ text-shadow:0 1px 0 #fff8;
+ transform:translateZ(18px);
+ animation:qzixCoinFloat 5s ease-in-out infinite;
+}
+.coin:before{
+ content:"";
+ position:absolute;inset:5px;border-radius:50%;
+ border:1px solid #8b5d1d99;
+ box-shadow:inset 0 2px 5px #fff8,inset 0 -3px 6px #75460c55;
+ pointer-events:none;
+}
+@keyframes qzixCoinFloat{
+ 0%,100%{transform:translateY(0) rotateY(-8deg)}
+ 50%{transform:translateY(-4px) rotateY(8deg)}
+}
+.hero{
+ isolation:isolate;
+ transform:translateZ(0);
+ background:
+  radial-gradient(ellipse at 90% 0%,#36547766,transparent 42%),
+  linear-gradient(130deg,#1b3556 0%,#101e33 52%,#172b46 100%);
+ border:1px solid #6e8bad88;
+ box-shadow:
+  0 3px 0 #091321,
+  0 15px 0 #0a1422,
+  0 25px 55px #0009,
+  inset 0 1px 0 #ffffff30,
+  inset 0 -1px 0 #0005;
+}
+.hero:before{
+ content:"";
+ position:absolute;inset:0;
+ background:linear-gradient(115deg,#ffffff0b,transparent 34%,transparent 72%,#ffffff08);
+ pointer-events:none;z-index:0;
+}
+.hero:after{filter:drop-shadow(0 8px 20px #0005)}
+.stat,.panel{
+ position:relative;
+ background:linear-gradient(145deg,rgba(25,45,71,.96),rgba(9,20,36,.97));
+ border:1px solid #49617e88;
+ box-shadow:
+  0 3px 0 #07111f,
+  0 8px 0 #0a1727,
+  0 15px 30px #0006,
+  inset 0 1px 0 #ffffff17;
+ transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+.stat{transform:translateZ(8px)}
+.stat:hover,.panel:hover{
+ transform:translateY(-3px) translateZ(12px);
+ border-color:#d9b56899;
+ box-shadow:0 4px 0 #07111f,0 10px 0 #0a1727,0 22px 38px #0008,inset 0 1px 0 #ffffff22;
+}
+.stat:before,.panel:before{
+ content:"";
+ position:absolute;left:12px;right:12px;top:1px;height:1px;
+ background:linear-gradient(90deg,transparent,#ffffff38,transparent);
+ pointer-events:none;
+}
+.stat strong{color:#ffe0a0;text-shadow:0 2px 14px #eab84d28}
+button,.button{
+ position:relative;
+ border:1px solid #fff2;
+ box-shadow:0 4px 0 #8b6427,0 8px 16px #0005,inset 0 1px 0 #fff9;
+ transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+}
+button:hover,.button:hover{
+ transform:translateY(-2px);
+ box-shadow:0 6px 0 #8b6427,0 12px 20px #0006,inset 0 1px 0 #fff9;
+}
+button:active,.button:active{
+ transform:translateY(2px);
+ box-shadow:0 1px 0 #8b6427,0 3px 8px #0006,inset 0 1px 0 #fff7;
+}
+button.secondary{
+ box-shadow:0 4px 0 #0a1422,0 8px 16px #0005,inset 0 1px 0 #ffffff20;
+}
+button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
+.token{
+ position:relative;
+ transform:perspective(700px) rotateX(1deg);
+ box-shadow:0 3px 0 #07111f,0 7px 13px #0005,inset 0 1px 0 #ffffff16;
+}
+.token:hover{
+ transform:perspective(700px) translateY(-4px) rotateX(5deg) scale(1.025);
+ box-shadow:0 5px 0 #07111f,0 13px 22px #0008,inset 0 1px 0 #ffffff25;
+}
+.token.bought{
+ background:linear-gradient(145deg,#123c35,#0a211f);
+ border-color:#328e70;
+ box-shadow:0 3px 0 #061713,0 7px 13px #0005,inset 0 1px 0 #ffffff18;
+}
+.token.available{cursor:pointer}
+.field input,.field select{
+ box-shadow:inset 0 2px 8px #0007,0 1px 0 #ffffff0b;
+}
+.notice{
+ box-shadow:0 4px 0 #17140e,0 9px 20px #0005,inset 0 1px 0 #ffffff12;
+}
+.price-step{
+ box-shadow:0 3px 0 #07111f,0 7px 12px #0005,inset 0 1px 0 #ffffff15;
+ transition:transform .2s ease,border-color .2s ease;
+}
+.price-step:hover{transform:translateY(-3px);border-color:#d9b568}
+.price-step.active{
+ border-color:#e7bd65;
+ box-shadow:0 3px 0 #5c421d,0 8px 18px #0006,inset 0 1px 0 #fff4,0 0 18px #eab84d20;
+}
+@media(max-width:650px){
+ .stat:hover,.panel:hover{transform:none}
+ .token:hover{transform:translateY(-2px)}
+ .hero{box-shadow:0 3px 0 #091321,0 10px 0 #0a1422,0 18px 35px #0008}
+}
+@media(prefers-reduced-motion:reduce){
+ .coin{animation:none}
+ .stat,.panel,.token,button,.button,.price-step{transition:none}
+}
+
 </style>
 </head>
 <body>
