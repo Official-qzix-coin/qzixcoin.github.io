@@ -278,6 +278,11 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
  .hero,.stat,.panel,.token,.about-link{scroll-behavior:auto}
 }
 
+
+/* Buyer payment identity card */
+.payment-identity{display:none;margin:14px 0;padding:16px;border:1px solid #d9b45f99;border-radius:17px;background:linear-gradient(145deg,#342a19,#14243a 72%);box-shadow:0 5px 0 #111b2a,0 12px 25px #0006,inset 0 1px 0 #fff2}
+.payment-identity.visible{display:block}.payment-identity .pay-kicker{font-size:10px;letter-spacing:1.8px;font-weight:900;color:#ffe2a0}.payment-identity .pay-token{font-size:27px;font-weight:950;color:#fff0c2;margin:5px 0;text-shadow:0 2px 14px #eab84d44}.payment-identity .pay-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid #ffffff18;font-size:12px}.payment-identity .pay-row span{color:#b8c7da}.payment-identity .pay-row b{text-align:right;color:#fff}.payment-identity .pay-warning{margin-top:10px;padding:10px;border-radius:10px;background:#0a1728;color:#f3dba6;font-size:11px;line-height:1.5}
+#initialBuyUpiPayNow{width:100%;text-align:center;padding:15px!important;font-size:15px}
 </style>
 </head>
 <body>
@@ -355,6 +360,14 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
   <div class="muted" id="initialBuyAvailability" style="margin:12px 0">Choose a LEFT token above.</div>
   <label class="field hidden"><span>Selected token</span><select id="initialBuyToken"><option value="">Loading…</option></select></label>
   <div class="muted" id="initialBuyPrice">Current price: loading…</div>
+  <div class="payment-identity" id="initialPaymentIdentity" aria-live="polite">
+    <div class="pay-kicker">PAYMENT SUMMARY · PLEASE CHECK</div>
+    <div class="pay-token" id="paymentTokenName">QZIX-001</div>
+    <div class="pay-row"><span>Paying for</span><b id="paymentPurpose">Initial token purchase</b></div>
+    <div class="pay-row"><span>Exact amount</span><b id="paymentExactAmount">₹0</b></div>
+    <div class="pay-row"><span>Pay to (UPI ID)</span><b id="paymentRecipient">Not configured</b></div>
+    <div class="pay-warning">Paytm kholn ton pehlan token ID, amount te UPI ID check karo. Paytm screen te recipient name vi verify karo. Galat details hon te payment na karo.</div>
+  </div>
   <button id="createInitialManualRequest" class="hidden">Create Paytm Payment Request</button>
   <a id="initialBuyUpiPayNow" class="button secondary hidden" href="#" style="display:inline-block;text-decoration:none;margin:12px 0" rel="nofollow">Open Paytm / UPI App to Pay</a>
   <div id="initialManualConfirmArea" class="hidden">
@@ -716,8 +729,15 @@ async function initializeInitialBuy(){
 function updateInitialManualUpiLink(tokenNumber,amount){
  const link=$("initialBuyUpiPayNow");
  if(!link||!QZIX_UPI_ID.trim()||!Number.isInteger(Number(tokenNumber))||!Number.isFinite(Number(amount))||Number(amount)<=0)return;
- const params=new URLSearchParams({pa:QZIX_UPI_ID,pn:"QZIX COIN",am:Number(amount).toFixed(2),cu:"INR",tn:"QZIX-INITIAL-"+String(tokenNumber).padStart(3,"0")});
+ const tokenId="QZIX-"+String(tokenNumber).padStart(3,"0");
+ const exactAmount=Number(amount).toFixed(2);
+ const params=new URLSearchParams({pa:QZIX_UPI_ID,pn:"QZIX COIN",am:exactAmount,cu:"INR",tn:"QZIX-INITIAL-"+String(tokenNumber).padStart(3,"0")});
  link.href="upi://pay?"+params.toString();
+ link.textContent="Pay "+money(amount)+" for "+tokenId+" · Open Paytm / UPI";
+ $("paymentTokenName").textContent=tokenId;
+ $("paymentExactAmount").textContent=money(amount);
+ $("paymentRecipient").textContent=QZIX_UPI_ID;
+ $("initialPaymentIdentity").classList.add("visible");
  link.classList.remove("hidden");
 }
 async function createInitialManualRequest(){
