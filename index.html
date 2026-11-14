@@ -298,8 +298,8 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 </section>
 
 <section class="stats">
-  <div class="stat"><span id="priceLabel">Current Price</span><strong class="gold" id="price">₹1</strong></div>
-  <div class="stat"><span id="nextPriceLabel">Next Price</span><strong id="nextPrice">₹2</strong></div>
+  <div class="stat"><span id="priceLabel">Current Price</span><strong class="gold" id="price">₹2</strong></div>
+  <div class="stat"><span id="nextPriceLabel">Next Price</span><strong id="nextPrice">₹4</strong></div>
   <div class="stat"><span id="supplyLabel">Total Token Supply</span><strong>100</strong></div>
   <div class="stat"><span id="tokenIdsLabel">Token IDs</span><strong style="font-size:19px">001 – 100</strong></div>
 </section>
@@ -458,7 +458,7 @@ hi:{language:"भाषा",fixedTag:"100 निश्चित टोकन",he
 };
 let currentLang="en";
 
-const QZIX_PRICE_LEVELS=[1,2,3,4,5,6,7,8,9,10,12,14,16,18,20];
+const QZIX_PRICE_LEVELS=[2,4,6,8,10,12,14,16,18,20,22,24,26,28,30];
 function renderPricePlan(level,sales){
  const ladder=$("pricePlanLadder");
  if(!ladder)return;
@@ -468,7 +468,7 @@ function renderPricePlan(level,sales){
  }).join("");
  const current=QZIX_PRICE_LEVELS[Math.max(0,Math.min(QZIX_PRICE_LEVELS.length-1,Number(level||1)-1))];
  const next=QZIX_PRICE_LEVELS[Number(level)]||null;
- $("pricePlanStatus").textContent="Current round: "+Number(level||1)+" · Display price: ₹"+current+" · Confirmed initial company purchases in this round: "+Number(sales||0)+"/100. "+(next?"Next planned price: ₹"+next+".":"Round 15 reaches ₹20; later pricing requires a separately announced plan.")+" Only confirmed initial purchases from the company advance the price level; buyer-to-buyer resales do not. No profit or future price is guaranteed.";
+ $("pricePlanStatus").textContent="Current round: "+Number(level||1)+" · Display price: ₹"+current+" · Confirmed initial company purchases in this round: "+Number(sales||0)+"/100. "+(next?"Next planned price: ₹"+next+".":"Round 15 reaches ₹30; later pricing requires a separately announced plan.")+" Only confirmed initial purchases from the company advance the price level; buyer-to-buyer resales do not. No profit or future price is guaranteed.";
 }
 
 function tr(key){return translations[currentLang][key]||translations.en[key]||key}
