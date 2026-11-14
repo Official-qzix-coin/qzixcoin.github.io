@@ -233,6 +233,51 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
  .stat,.panel,.token,button,.button,.price-step{transition:none}
 }
 
+
+/* QZIX visual polish — premium depth, glow and mobile finish */
+:root{--qzix-edge:#6f8eaf;--qzix-softgold:#ffe8ad}
+.wrap{isolation:isolate}
+.top{position:relative}
+.top:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,#d9b56888,transparent)}
+.brand h1{background:linear-gradient(110deg,#fff4cf 0%,#f5c66d 48%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+.hero{border-radius:25px;min-height:190px}
+.hero .eyebrow{box-shadow:0 0 22px #f4c76b12,inset 0 1px 0 #fff2}
+.hero h2{text-shadow:0 4px 22px #0006}
+.hero p{color:#c2d0e1}
+.stats{align-items:stretch}
+.stat{border-radius:19px;backdrop-filter:blur(12px)}
+.stat:first-child{border-color:#b38c4d99;background:linear-gradient(145deg,#3b301f 0%,#18253a 72%,#0c192b 100%)}
+.stat:first-child strong{color:#ffe2a0}
+.panel{backdrop-filter:blur(12px);border-radius:19px}
+.panel h3{color:#f7e5bf}
+.token-list{perspective:900px}
+.token{border-radius:11px;min-height:48px}
+.token b{color:#f4d58f}
+.token.bought b{color:#8af0c6}
+.token.available:focus-visible{outline-offset:3px}
+.about-link{box-shadow:0 4px 0 #684d25,0 8px 18px #0004,inset 0 1px 0 #fff2}
+.about-link:active{transform:translateY(2px);box-shadow:0 1px 0 #684d25,0 3px 8px #0005}
+.notice{backdrop-filter:blur(8px)}
+.status{line-height:1.55}
+::selection{background:#d9ad58;color:#081321}
+@media(min-width:900px){
+ .wrap{padding-top:32px}
+ .hero{padding:39px 40px}
+ .stats{gap:16px}
+ .stat{min-height:122px}
+ .panel{padding:25px}
+}
+@media(max-width:650px){
+ .hero{min-height:0;border-radius:20px}
+ .hero h2{max-width:100%;font-size:clamp(25px,7vw,34px)}
+ .stats .stat{min-height:95px;padding:16px 14px}
+ .stat strong{font-size:26px}
+ .panel{border-radius:16px}
+}
+@media(prefers-reduced-motion:reduce){
+ .hero,.stat,.panel,.token,.about-link{scroll-behavior:auto}
+}
+
 </style>
 </head>
 <body>
