@@ -359,6 +359,9 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
   <h3 style="margin-top:18px">My Tokens</h3>
   <div id="myOwnedTokens" class="muted">Log in to view tokens owned by your account.</div>
 
+  <h3 style="margin-top:18px">Ownership History</h3>
+  <p class="muted">Confirmed token purchases and ownership transfers connected to your account.</p>
+  <div id="ownershipHistory" class="muted">Log in to view your ownership history.</div>
   <h3 style="margin-top:18px">Withdrawal Requests</h3>
   <div id="withdrawalHistory" class="muted">No requests loaded.</div>
 </section>
@@ -579,6 +582,7 @@ async function checkUser(){
    await refreshWallet();
    await initializeInitialBuy();
    await refreshMyOwnedTokens();
+   await refreshOwnershipHistory();
    await initializeManualPayments();
  }else{
    $("userInfo").textContent=tr("noUser");
@@ -618,6 +622,26 @@ async function refreshMyOwnedTokens(){
  if(error){target.textContent="Your tokens could not be loaded: "+error.message;return}
  if(!data?.length){target.textContent="No tokens are assigned to your account yet. After admin approves your payment, your token will appear here.";return}
  target.innerHTML=data.map(t=>"<div style='padding:10px 0;border-bottom:1px solid var(--line)'><b>QZIX-"+String(t.token_number).padStart(3,"0")+"</b><br><small>Owner account: "+safeText(currentQzixUser.email||"Your account")+"<br>Purchase amount: "+money(t.acquisition_cost||0)+" · "+(t.acquisition_cost_verified_at?"Admin verified":"Verification pending")+"</small></div>").join("");
+}
+async function refreshOwnershipHistory(){
+ const target=$("ownershipHistory");
+ if(!target)return;
+ if(!supabase||!currentQzixUser){target.textContent="Log in to view your ownership history.";return}
+ target.textContent="Loading ownership history…";
+ const uid=currentQzixUser.id;
+ const {data,error}=await supabase.from("qzix_v2_trades")
+  .select("token_number,trade_price,seller_amount,trade_type,status,created_at,previous_owner,new_owner")
+  .eq("status","confirmed")
+  .or("previous_owner.eq."+uid+",new_owner.eq."+uid)
+  .order("created_at",{ascending:false}).limit(30);
+ if(error){target.textContent="Ownership history could not be loaded: "+error.message;return}
+ if(!data?.length){target.textContent="No confirmed ownership transfers are recorded for your account yet.";return}
+ target.innerHTML=data.map(row=>{
+  const acquired=row.new_owner===uid;
+  const action=acquired?(row.trade_type==="initial"?"Initial purchase":"Token received"):"Ownership transferred";
+  const amount=acquired?row.trade_price:(row.seller_amount??row.trade_price);
+  return "<div style='padding:11px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start'><span><b>QZIX-"+String(row.token_number).padStart(3,"0")+"</b><br><small>"+safeText(action)+" · "+safeText(new Date(row.created_at).toLocaleString())+"</small></span><span style='text-align:right'><b>"+money(amount)+"</b><br><small>"+(acquired?"Recorded purchase":"Recorded seller proceeds")+"</small></span></div>";
+ }).join("");
 }
 async function refreshWallet(){
  if(!supabase)return;
