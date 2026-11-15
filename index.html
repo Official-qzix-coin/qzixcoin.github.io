@@ -361,11 +361,6 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 
 <section class="panel hidden" id="initialBuyPanel" style="margin-top:16px">
   <h3 id="selectedTokenHeading">Buy Selected QZIX Token</h3>
-  <p class="muted">Your selected token is reserved and the payment amount is locked when the request is created. Pay only after checking the recipient name. Ownership changes only after admin verifies the actual payment.</p>
-  <div class="notice" id="initialBuyNotice">UPI ID: 7814244038@ptyes. Pay using any UPI app (Paytm, PhonePe, Google Pay, BHIM, etc.). Before paying, verify the recipient's registered name and the exact token ID and amount. Do not rely on a screenshot or typed UTR as proof.</div>
-  <div class="muted" id="initialBuyAvailability" style="margin:12px 0">Choose a LEFT token above.</div>
-  <label class="field hidden"><span>Selected token</span><select id="initialBuyToken"><option value="">Loading…</option></select></label>
-  <div class="muted" id="initialBuyPrice">Current price: loading…</div>
   <div class="payment-identity" id="initialPaymentIdentity" aria-live="polite">
     <div class="pay-kicker">PAYMENT SUMMARY · PLEASE CHECK</div>
     <div class="pay-token" id="paymentTokenName">QZIX-001</div>
@@ -373,6 +368,12 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
     <div class="pay-row"><span>Exact amount</span><b id="paymentExactAmount">₹0</b></div>
     <div class="pay-row"><span>Pay to (UPI ID)</span><b id="paymentRecipient">Not configured</b></div>
     <div class="pay-warning">Kise vi UPI app vich payment ton pehlan Token ID, amount te UPI ID check karo. Recipient name vi verify karo. Galat details hon te payment na karo.</div>
+  <p class="muted">Your selected token is reserved and the payment amount is locked when the request is created. Pay only after checking the recipient name. Ownership changes only after admin verifies the actual payment.</p>
+  <div class="notice" id="initialBuyNotice">UPI ID: 7814244038@ptyes. Pay using any UPI app (Paytm, PhonePe, Google Pay, BHIM, etc.). Before paying, verify the recipient's registered name and the exact token ID and amount. Do not rely on a screenshot or typed UTR as proof.</div>
+  <div class="muted" id="initialBuyAvailability" style="margin:12px 0">Choose a LEFT token above.</div>
+  <label class="field hidden"><span>Selected token</span><select id="initialBuyToken"><option value="">Loading…</option></select></label>
+  <div class="muted" id="initialBuyPrice">Current price: loading…</div>
+  
   </div>
   <button id="createInitialManualRequest" class="hidden">Create UPI Payment Request</button>
   <a id="initialBuyUpiPayNow" class="button secondary hidden" href="#" style="display:inline-block;text-decoration:none;margin:12px 0" rel="nofollow">Open any UPI App to Pay</a>
