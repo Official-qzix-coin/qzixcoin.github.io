@@ -714,6 +714,7 @@ if(verifyParam){const tokenNum=Number(verifyParam);if(Number.isInteger(tokenNum)
 
 const QZIX_UPI_ID = "7814244038@ptyes"; // Owner-provided Paytm UPI ID; verify recipient account ownership before accepting live payments.
 let activeInitialManualRequestId = null;
+let initialUpiOpenedForRequest = false;
 function showUpiInstructions(){
  const box=$("upiInstructions");
  if(QZIX_UPI_ID.trim()){
@@ -743,10 +744,12 @@ async function refreshMyInitialOrders(){
  if(active){
    activeInitialManualRequestId=active.id;
    updateInitialManualUpiLink(active.token_number,active.amount);
-   $("initialManualConfirmArea").classList.remove("hidden");
+   initialUpiOpenedForRequest=false;
+   $("initialManualConfirmArea").classList.add("hidden");
    $("initialBuyPrice").textContent="Locked amount for QZIX-"+String(active.token_number).padStart(3,"0")+": "+money(active.amount);
  }else{
    activeInitialManualRequestId=null;
+   initialUpiOpenedForRequest=false;
    $("initialManualConfirmArea").classList.add("hidden");
    $("initialBuyUpiPayNow").classList.add("hidden");
  }
@@ -783,9 +786,10 @@ async function createInitialManualRequest(){
    if(error)throw error;
    activeInitialManualRequestId=data.request_id;
    updateInitialManualUpiLink(tokenNumber,data.amount);
-   $("initialManualConfirmArea").classList.remove("hidden");
+   initialUpiOpenedForRequest=false;
+   $("initialManualConfirmArea").classList.add("hidden");
    $("initialBuyPrice").textContent="Locked payment amount: "+money(data.amount)+" for QZIX-"+String(tokenNumber).padStart(3,"0");
-   $("initialBuyStatus").textContent="Request created. Pay the exact amount to "+QZIX_UPI_ID+" only after verifying the registered recipient name in your UPI app. Tap “I Have Paid” before the 20-minute reservation expires. Admin verifies actual credit before token assignment.";
+   $("initialBuyStatus").textContent="Request created. First open your UPI app using the payment button below. Verify the recipient name and exact amount, complete the payment, then return here to unlock the confirmation button. Admin will only be notified after you tap “I Have Paid”.";
    await refreshMyInitialOrders();
    await refreshInitialBuyOptions();
  }catch(e){
@@ -797,6 +801,7 @@ async function createInitialManualRequest(){
 async function confirmInitialPayment(){
  if(!supabase||!currentQzixUser){$("initialBuyStatus").textContent="Please log in first.";return}
  if(!activeInitialManualRequestId){$("initialBuyStatus").textContent="Create a UPI payment request first.";return}
+ if(!initialUpiOpenedForRequest){$("initialBuyStatus").textContent="First tap “Open any UPI App to Pay”. After completing payment, return here to confirm.";return}
  const button=$("confirmInitialPayment");
  button.disabled=true;
  $("initialBuyStatus").textContent="Sending your payment confirmation to admin…";
@@ -811,6 +816,12 @@ async function confirmInitialPayment(){
  await refreshInitialManualQueue();
 }
 $("createInitialManualRequest").addEventListener("click",createInitialManualRequest);
+$("initialBuyUpiPayNow").addEventListener("click",()=>{
+ if(!activeInitialManualRequestId)return;
+ initialUpiOpenedForRequest=true;
+ $("initialManualConfirmArea").classList.remove("hidden");
+ $("initialBuyStatus").textContent="UPI app opened. Complete the payment there, verify the recipient and amount, then return here and tap “I Have Paid”. Opening the app alone does not confirm payment.";
+});
 $("confirmInitialPayment").addEventListener("click",confirmInitialPayment);
 
 async function refreshBuyTokens(){
