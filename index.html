@@ -521,7 +521,7 @@ async function startGridTokenPurchase(tokenNumber){
  if(activeInitialManualRequestId){
    const activeLink=$("initialBuyUpiPayNow");
    const activeText=activeLink?.textContent||"";
-   const activeToken=Number((activeText.match(/QZIX-(\\d{3})/)||[])[1]||0);
+   const activeToken=Number((activeText.match(/QZIX-(\d{3})/)||[])[1]||0);
    if(activeToken&&activeToken!==tokenNumber){
      $("initialBuyStatus").textContent="You already have an active request for QZIX-"+String(activeToken).padStart(3,"0")+". Complete that payment first; a second request cannot be created.";
    }else if(activeLink&&!activeLink.classList.contains("hidden")){
