@@ -515,9 +515,27 @@ async function startGridTokenPurchase(tokenNumber){
  select.value=String(tokenNumber);
  $("selectedTokenHeading").textContent="Buy QZIX-"+String(tokenNumber).padStart(3,"0");
  $("initialBuyPanel").classList.remove("hidden");
- $("initialBuyStatus").textContent="Creating your payment request for QZIX-"+String(tokenNumber).padStart(3,"0")+"…";
+ $("initialBuyStatus").textContent="Checking your existing payment request…";
  $("initialBuyPanel").scrollIntoView({behavior:"smooth",block:"center"});
- await createInitialManualRequest();
+ await refreshMyInitialOrders();
+ if(activeInitialManualRequestId){
+   const activeLink=$("initialBuyUpiPayNow");
+   const activeText=activeLink?.textContent||"";
+   const activeToken=Number((activeText.match(/QZIX-(\\d{3})/)||[])[1]||0);
+   if(activeToken&&activeToken!==tokenNumber){
+     $("initialBuyStatus").textContent="You already have an active request for QZIX-"+String(activeToken).padStart(3,"0")+". Complete that payment first; a second request cannot be created.";
+   }else if(activeLink&&!activeLink.classList.contains("hidden")){
+     $("initialBuyStatus").textContent="Opening your UPI app for the existing QZIX-"+String(tokenNumber).padStart(3,"0")+" request…";
+     window.location.href=activeLink.href;
+   }
+ }else{
+   await createInitialManualRequest();
+   const payLink=$("initialBuyUpiPayNow");
+   if(activeInitialManualRequestId&&payLink&&!payLink.classList.contains("hidden")){
+     $("initialBuyStatus").textContent="Opening your UPI app. Verify QZIX token ID, exact amount and recipient before paying.";
+     window.location.href=payLink.href;
+   }
+ }
  await refreshTokenStatus();
 }
 $("tokens").addEventListener("click",e=>{
