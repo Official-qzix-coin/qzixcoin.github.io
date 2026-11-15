@@ -539,14 +539,14 @@ async function refreshTokenStatus(){
  if(!supabase)return;
  const summary=$("tokenAvailabilitySummary");
  if(summary)summary.textContent="Updating token status…";
- const {data,error}=await supabase.from("qzix_v2_tokens").select("token_number,owner_id").order("token_number",{ascending:true});
+ const {data,error}=await supabase.rpc("qzix_public_token_list");
  if(error){if(summary)summary.textContent="Token status unavailable: "+error.message;return}
  const rows=Array.isArray(data)?data:[];
  let bought=0;
  for(const row of rows){
   const number=Number(row.token_number);
   if(!Number.isInteger(number)||number<1||number>100)continue;
-  const isBought=!!row.owner_id;
+  const isBought=!!row.is_assigned;
   if(isBought)bought++;
   const card=$("qzix-token-"+number);
   if(card){
@@ -615,10 +615,7 @@ async function refreshMyOwnedTokens(){
  if(!target)return;
  if(!supabase||!currentQzixUser){target.textContent="Log in to view tokens owned by your account.";return}
  target.textContent="Loading your tokens…";
- const {data,error}=await supabase.from("qzix_v2_tokens")
-   .select("token_number,token_code,acquisition_cost,acquisition_cost_verified_at")
-   .eq("owner_id",currentQzixUser.id)
-   .order("token_number",{ascending:true});
+ const {data,error}=await supabase.rpc("qzix_my_tokens");
  if(error){target.textContent="Your tokens could not be loaded: "+error.message;return}
  if(!data?.length){target.textContent="No tokens are assigned to your account yet. After admin approves your payment, your token will appear here.";return}
  target.innerHTML=data.map(t=>"<div style='padding:10px 0;border-bottom:1px solid var(--line)'><b>QZIX-"+String(t.token_number).padStart(3,"0")+"</b><br><small>Owner account: "+safeText(currentQzixUser.email||"Your account")+"<br>Purchase amount: "+money(t.acquisition_cost||0)+" · "+(t.acquisition_cost_verified_at?"Admin verified":"Verification pending")+"</small></div>").join("");
@@ -693,10 +690,11 @@ async function verifyToken(tokenNumber){
  if(!supabase){details.textContent="Verification service is not configured.";return}
  await refreshMarket();
  if(Number(window.qzixCurrentPrice||0)<7000){details.textContent="QR verification is not launched yet. It will become available only after the live database market price reaches ₹7,000 through verified activity.";return}
- const {data:token,error}=await supabase.from("qzix_v2_tokens").select("token_number,token_code,owner_id").eq("token_number",tokenNumber).maybeSingle();
+ const {data:tokenRows,error}=await supabase.rpc("qzix_public_token_status",{p_token_number:tokenNumber});
+ const token=Array.isArray(tokenRows)?tokenRows[0]:null;
  if(error||!token){details.textContent="Token record could not be verified. "+(error?error.message:"");return}
  const price=Number(window.qzixCurrentPrice||0),milestone=price>=7000;
- const rows=[["Token ID","QZIX-"+String(token.token_number).padStart(3,"0")],["Token Code",token.token_code||"Not available"],["Ownership Status",token.owner_id?"Assigned to a registered account":"Not assigned"],["Owner Account ID",token.owner_id||"No owner recorded"],["Current Market Display Price","₹"+price.toLocaleString("en-IN")],["₹7,000 Milestone",milestone?"REACHED — special milestone active":"Not reached yet"]];
+ const rows=[["Token ID","QZIX-"+String(token.token_number).padStart(3,"0")],["Ownership Status",token.is_assigned?"Assigned":"Not assigned"],["Current Market Display Price","₹"+price.toLocaleString("en-IN")],["₹7,000 Milestone",milestone?"REACHED — special milestone active":"Not reached yet"]];
  details.innerHTML=rows.map(([k,v])=>"<div style='display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)'><b>"+k+"</b><span style='text-align:right;overflow-wrap:anywhere'>"+String(v).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]))+"</span></div>").join("")+"<p style='margin-top:12px'>This confirms the current database record only. It is not proof of payment, investment value, or guaranteed profit.</p>";
 }
 async function generateTokenQR(){
@@ -704,13 +702,14 @@ async function generateTokenQR(){
  const number=Number($("verifyToken").value);
  if(!Number.isInteger(number)||number<1||number>100){$("qrStatus").textContent="Enter a whole token number from 1 to 100.";return}
  if(!supabase){$("qrStatus").textContent="Supabase is not configured.";return}
- const {data:token,error}=await supabase.from("qzix_v2_tokens").select("token_number,token_code,owner_id").eq("token_number",number).maybeSingle();
+ const {data:tokenRows,error}=await supabase.rpc("qzix_public_token_status",{p_token_number:number});
+ const token=Array.isArray(tokenRows)?tokenRows[0]:null;
  if(error||!token){$("qrStatus").textContent="Token could not be loaded: "+(error?error.message:"No token record");return}
  const url=new URL(location.href);url.search="";url.hash="";url.searchParams.set("verify",String(number).padStart(3,"0"));
  $("qrcode").innerHTML="";$("qrResult").classList.remove("hidden");
  if(!window.QRCode){$("qrStatus").textContent="QR library did not load. Refresh and try again.";return}
  new QRCode($("qrcode"),{text:url.toString(),width:180,height:180,colorDark:"#071426",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
- $("qrDetails").textContent="QZIX-"+String(number).padStart(3,"0")+" · "+(token.owner_id?"Assigned":"Unassigned")+" · ₹7,000 milestone check";
+ $("qrDetails").textContent="QZIX-"+String(number).padStart(3,"0")+" · "+(token.is_assigned?"Assigned":"Unassigned")+" · ₹7,000 milestone check";
  $("verifyLink").href=url.toString();$("verifyLink").textContent=url.toString();$("qrStatus").textContent="QR code generated. Scan it or open the verification link.";
 }
 $("makeQR").addEventListener("click",generateTokenQR);
@@ -733,7 +732,8 @@ async function refreshInitialBuyOptions(){
  if(!supabase)return;
  const select=$("initialBuyToken");
  select.innerHTML="<option value=''>Loading…</option>";
- const {data,error}=await supabase.from("qzix_v2_tokens").select("token_number").is("owner_id",null).order("token_number",{ascending:true});
+ const {data:allTokens,error}=await supabase.rpc("qzix_public_token_list");
+ const data=Array.isArray(allTokens)?allTokens.filter(t=>!t.is_assigned):[];
  if(error){select.innerHTML="<option value=''>Could not load tokens</option>";$("initialBuyAvailability").textContent="Token availability could not load: "+error.message;return}
  $("initialBuyAvailability").textContent=String(data?.length||0)+" of 100 tokens are currently available for initial purchase.";
  select.innerHTML=data?.length?"<option value=''>Choose a token</option>"+data.map(t=>"<option value='"+Number(t.token_number)+"'>QZIX-"+String(t.token_number).padStart(3,"0")+"</option>").join(""):"<option value=''>No unassigned tokens available</option>";
@@ -823,10 +823,11 @@ async function refreshBuyTokens(){
  if(!supabase)return;
  const select=$("buyToken");
  select.innerHTML="<option value=''>Loading…</option>";
- const {data,error}=await supabase.from("qzix_v2_tokens").select("token_number,owner_id").not("owner_id","is",null).order("token_number");
+ const {data:allTokens,error}=await supabase.rpc("qzix_public_token_list");
+ const data=Array.isArray(allTokens)?allTokens.filter(t=>t.is_assigned):[];
  if(error){select.innerHTML="<option value=''>Could not load tokens</option>";$("buyStatus").textContent="Token list error: "+error.message;return}
  if(!data?.length){select.innerHTML="<option value=''>No tokens currently owned by buyers</option>";$("buyPriceInfo").textContent="No resale tokens are available yet. Admin must first assign tokens to initial owners.";return}
- select.innerHTML="<option value=''>Choose a token</option>"+data.map(t=>"<option value='"+Number(t.token_number)+"'>QZIX-"+String(t.token_number).padStart(3,"0")+" · owner "+safeText(t.owner_id.slice(0,8))+"…</option>").join("");
+ select.innerHTML="<option value=''>Choose a token</option>"+data.map(t=>"<option value='"+Number(t.token_number)+"'>QZIX-"+String(t.token_number).padStart(3,"0")+"</option>").join("");
  const {data:market}=await supabase.from("qzix_v2_market").select("current_price").eq("id",1).maybeSingle();
  $("buyPriceInfo").textContent="Current display price: "+money(market?.current_price||0)+" · Company fee: 20% of the gross resale amount; seller receives 80%.";
  updateUpiPayLink();
