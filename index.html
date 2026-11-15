@@ -568,7 +568,7 @@ async function checkUser(){
  const {data}=await supabase.auth.getUser();
  currentQzixUser=data.user||null;
  if(currentQzixUser){
-   $("userInfo").textContent="Logged in: "+currentQzixUser.email;
+   $("userInfo").textContent="Account securely connected;
    $("logout").classList.remove("hidden");
    $("myWalletTab").classList.remove("hidden");
    $("walletPanel").classList.add("hidden");
