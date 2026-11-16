@@ -589,9 +589,9 @@ async function checkUser(){
  if(currentQzixUser){
    $("userInfo").textContent="Account securely connected.";
    $("logout").classList.remove("hidden");
-   $("myWalletTab").classList.remove("hidden");
+   $("myWalletTab")?.classList.remove("hidden");
    $("walletPanel").classList.add("hidden");
-   $("myWalletTab").setAttribute("aria-expanded","false");
+   $("myWalletTab")?.setAttribute("aria-expanded","false");
    await refreshWallet();
    await initializeInitialBuy();
    await refreshMyOwnedTokens();
@@ -601,8 +601,8 @@ async function checkUser(){
    $("userInfo").textContent=tr("noUser");
    $("logout").classList.add("hidden");
    $("walletPanel").classList.add("hidden");
-   $("myWalletTab").classList.add("hidden");
-   $("myWalletTab").setAttribute("aria-expanded","false");
+   $("myWalletTab")?.classList.add("hidden");
+   $("myWalletTab")?.setAttribute("aria-expanded","false");
    $("initialBuyPanel").classList.add("hidden");
    $("buyPanel").classList.add("hidden");
    $("manualPaymentAdminPanel").classList.add("hidden");
