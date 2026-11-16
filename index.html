@@ -329,7 +329,13 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
     <div class="actions">
       <button id="signup">Sign Up</button><button class="secondary" id="login">Login</button><button class="secondary hidden" id="logout">Logout</button>
     </div>
+    <button type="button" class="secondary" id="forgotPassword" style="margin-top:10px;padding:9px 12px">Forgot Password?</button>
     <div class="status" id="authStatus">Connecting to Supabase…</div>
+    <div id="passwordRecoveryPanel" class="hidden" style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#081426">
+      <b style="display:block;margin-bottom:8px;color:var(--gold)">Set a New Password</b>
+      <label class="field"><span>New Password</span><input id="newPassword" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters"></label>
+      <button type="button" id="saveNewPassword">Update Password</button>
+    </div>
     <div class="muted" id="userInfo"></div>
   </section>
   <section class="panel">
@@ -506,7 +512,7 @@ $("language").addEventListener("change",e=>{applyLanguage(e.target.value);try{lo
 applyLanguage((()=>{try{const saved=localStorage.getItem("qzix-language");if(saved==="pa"){localStorage.setItem("qzix-language","en");return "en"}return saved||"en"}catch(e){return "en"}})());
 
 for(let i=1;i<=100;i++){const d=document.createElement("div");d.id="qzix-token-"+i;d.className="token available";d.innerHTML=`<b>${String(i).padStart(3,"0")}</b><small>LEFT</small><small class="token-price">₹${Number(window.qzixCurrentPrice||2).toLocaleString("en-IN")} / TOKEN</small>`;$("tokens").appendChild(d)}
-window.qzixSupabaseReady.then(()=>{if(configured){try{supabase=window.qzixCreateClient(SUPABASE_URL,SUPABASE_ANON_KEY);$("authStatus").textContent=tr("ready");refreshMarket();refreshTokenStatus();setInterval(refreshTokenStatus,30000);checkUser()}catch(e){$("authStatus").textContent="Supabase client failed to start: "+(e?.message||"Unknown error");$("marketStatus").textContent=tr("marketUnavailable")}}else{$("authStatus").textContent=tr("notConfigured");$("marketStatus").textContent=tr("marketUnavailable")}}).catch(e=>{$("authStatus").textContent="Supabase SDK import failed: "+(e?.message||"Check internet connection or browser support");$("marketStatus").textContent=tr("marketUnavailable")});
+window.qzixSupabaseReady.then(()=>{if(configured){try{supabase=window.qzixCreateClient(SUPABASE_URL,SUPABASE_ANON_KEY);supabase.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY"){$("passwordRecoveryPanel").classList.remove("hidden");$("authStatus").textContent="Password reset link verified. Enter your new password below.";$("newPassword").focus()}});$("authStatus").textContent=tr("ready");refreshMarket();refreshTokenStatus();setInterval(refreshTokenStatus,30000);checkUser()}catch(e){$("authStatus").textContent="Supabase client failed to start: "+(e?.message||"Unknown error");$("marketStatus").textContent=tr("marketUnavailable")}}else{$("authStatus").textContent=tr("notConfigured");$("marketStatus").textContent=tr("marketUnavailable")}}).catch(e=>{$("authStatus").textContent="Supabase SDK import failed: "+(e?.message||"Check internet connection or browser support");$("marketStatus").textContent=tr("marketUnavailable")});
 let qzixSelectedTokenNumber=null;
 async function startGridTokenPurchase(tokenNumber){
  if(!Number.isInteger(tokenNumber)||tokenNumber<1||tokenNumber>100)return;
@@ -672,6 +678,31 @@ async function auth(action){
  }
 }
 $("signup").onclick=()=>auth("signup");$("login").onclick=()=>auth("login");$("refresh").onclick=refreshMarket;
+$("forgotPassword").onclick=async()=>{
+ if(!supabase){$("authStatus").textContent=tr("notConfigured");return}
+ const email=$("email").value.trim();
+ if(!email){$("authStatus").textContent="Enter your registered email address first."; $("email").focus();return}
+ const button=$("forgotPassword");button.disabled=true;$("authStatus").textContent="Sending password reset email…";
+ try{
+  const redirectTo=window.location.origin+window.location.pathname;
+  const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo});
+  if(error)throw error;
+  $("authStatus").textContent="If an account exists for this email, a password reset link has been sent. Check your inbox and spam folder.";
+ }catch(error){$("authStatus").textContent="Could not send reset email: "+(error?.message||"Please try again.")}
+ finally{button.disabled=false}
+};
+$("saveNewPassword").onclick=async()=>{
+ const password=$("newPassword").value;
+ if(password.length<8){$("authStatus").textContent="New password must be at least 8 characters.";return}
+ const button=$("saveNewPassword");button.disabled=true;$("authStatus").textContent="Updating your password…";
+ try{
+  const {error}=await supabase.auth.updateUser({password});
+  if(error)throw error;
+  $("newPassword").value="";$("passwordRecoveryPanel").classList.add("hidden");
+  $("authStatus").textContent="Password updated successfully. You can now log in with your new password.";
+ }catch(error){$("authStatus").textContent="Password update failed: "+(error?.message||"Please open the latest reset email link and try again.")}
+ finally{button.disabled=false}
+};
 $("logout").onclick=async()=>{if(supabase){await supabase.auth.signOut();$("authStatus").textContent=tr("loggedOut");await checkUser()}};
 function safeText(value){
  return String(value==null?"":value).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
