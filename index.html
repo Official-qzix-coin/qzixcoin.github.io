@@ -597,11 +597,9 @@ async function checkUser(){
   if(info)info.textContent=signedIn?"Account securely connected.":tr("noUser");
   qzixSetHidden("logout",!signedIn);
   qzixSetHidden("walletPanel",true);
-  qzixSetHidden("myWalletTab",!signedIn);
   qzixSetHidden("initialBuyPanel",!signedIn);
   qzixSetHidden("buyPanel",true);
   qzixSetHidden("manualPaymentAdminPanel",true);
-  $("myWalletTab")?.setAttribute("aria-expanded","false");
   if(!signedIn)return;
   const tasks=[
    ["wallet",()=>refreshWallet()],
