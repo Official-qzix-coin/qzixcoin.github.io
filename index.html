@@ -774,7 +774,7 @@ async function refreshInitialBuyOptions(){
 }
 async function refreshMyInitialOrders(){
  if(!supabase||!currentQzixUser)return;
- const {data,error}=await supabase.from("qzix_initial_manual_purchase_requests").select("id,token_number,amount,status,admin_note,created_at,expires_at,payment_confirmed_at").eq("buyer_id",currentQzixUser.id).order("created_at",{ascending:false}).limit(10);
+ const {data,error}=await supabase.from("qzix_initial_manual_purchase_requests").select("id,token_number,amount,status,admin_note,created_at,expires_at,payment_confirmed_at").eq("buyer_id",currentQzixUser.id).order("created_at",{ascending:false}).limit(3);
  if(error){$("myInitialOrders").textContent="Requests unavailable: "+error.message;return}
  if(!data?.length){activeInitialManualRequestId=null;$("myInitialOrders").textContent="No initial Paytm requests yet.";return}
  const active=data.find(r=>r.status==="awaiting_payment"&&new Date(r.expires_at).getTime()>Date.now());
