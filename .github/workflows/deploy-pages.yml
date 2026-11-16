@@ -4,18 +4,61 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
+  schedule:
+    - cron: "17 2 * * *"
 
 permissions:
   contents: read
   pages: write
   id-token: write
+  security-events: write
 
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
+  security-scan:
+    name: Malware and security scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Install ClamAV
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clamav
+      - name: Update malware signatures
+        run: sudo freshclam
+      - name: Scan repository for malware
+        run: |
+          set -o pipefail
+          sudo clamscan --recursive --infected --alert-exceeds-max=yes --max-filesize=100M --max-scansize=1G --exclude-dir='^\.git$' . | tee clamav-report.txt
+      - name: Scan for vulnerable dependencies, secrets, and misconfigurations
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
+      - name: Save scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qzix-security-scan-report
+          path: clamav-report.txt
+          if-no-files-found: ignore
+          retention-days: 14
+
   deploy:
+    name: Deploy website
+    needs: security-scan
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
