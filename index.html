@@ -615,7 +615,7 @@ async function refreshMarket(){
  $("marketStatus").textContent=tr("marketLoading");
  const {data,error}=await supabase.from("qzix_v2_market").select("current_level,sales_in_level,total_sales,current_price").eq("id",1).single();
  if(error){$("marketStatus").textContent=tr("marketError")+error.message;return}
- $("price").textContent="₹"+Number(data.current_price).toLocaleString("en-IN");const nextPrice=Number(data.current_price)+2;$("nextPrice").textContent="₹"+nextPrice.toLocaleString("en-IN");window.qzixCurrentPrice=Number(data.current_price);const tokenPriceLabel=$("tokenPricePerToken");if(tokenPriceLabel)tokenPriceLabel.textContent="Price Per Token: ₹"+Number(window.qzixCurrentPrice).toLocaleString("en-IN");document.querySelectorAll(".token-price").forEach(el=>el.textContent="₹"+Number(window.qzixCurrentPrice).toLocaleString("en-IN")+" / TOKEN");updateQrGate();$("level").textContent=data.current_level;$("sales").textContent=data.sales_in_level;$("totalSales").textContent=data.total_sales;renderPricePlan(data.current_level,data.sales_in_level,data.current_price);$("marketStatus").textContent=tr("marketUpdated");
+ $("price").textContent="₹"+Number(data.current_price).toLocaleString("en-IN");const nextPrice=Number(data.current_price)+2;$("nextPrice").textContent="₹"+nextPrice.toLocaleString("en-IN");$("nextPriceLabel").textContent="Next Price (after 100 tokens sold)";window.qzixCurrentPrice=Number(data.current_price);const tokenPriceLabel=$("tokenPricePerToken");if(tokenPriceLabel)tokenPriceLabel.textContent="Price Per Token: ₹"+Number(window.qzixCurrentPrice).toLocaleString("en-IN");document.querySelectorAll(".token-price").forEach(el=>el.textContent="₹"+Number(window.qzixCurrentPrice).toLocaleString("en-IN")+" / TOKEN");updateQrGate();$("level").textContent=data.current_level;$("sales").textContent=data.sales_in_level;$("totalSales").textContent=data.total_sales;renderPricePlan(data.current_level,data.sales_in_level,data.current_price);$("marketStatus").textContent=tr("marketUpdated");
 }
 function qzixSetHidden(id,hidden){
  const el=$(id);
@@ -1037,7 +1037,7 @@ async function reviewInitialManualPayment(id,decision){
  $("initialManualAdminStatus").textContent="Processing initial purchase review…";
  const {data,error}=await supabase.rpc("qzix_admin_review_initial_manual_payment",{p_request_id:id,p_decision:decision,p_admin_note:null});
  if(error){$("initialManualAdminStatus").textContent="Review failed: "+error.message;return}
- $("initialManualAdminStatus").textContent=decision==="approve"?"Payment approved. Token assigned; company wallet and initial-sale counter updated.":"Initial purchase request rejected.";
+ $("initialManualAdminStatus").textContent=decision==="approve"?"Payment approved. Token assigned. The price level advances only after all 100 unique tokens are assigned.":"Initial purchase request rejected.";
  await refreshInitialManualQueue();
  await refreshInitialBuyOptions();
  await refreshMyInitialOrders();
