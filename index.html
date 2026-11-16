@@ -582,30 +582,45 @@ async function refreshMarket(){
  if(error){$("marketStatus").textContent=tr("marketError")+error.message;return}
  $("price").textContent="₹"+Number(data.current_price).toLocaleString("en-IN");const nextPrice=Number(data.current_price)+2;$("nextPrice").textContent="₹"+nextPrice.toLocaleString("en-IN");window.qzixCurrentPrice=Number(data.current_price);document.querySelectorAll(".token-price").forEach(el=>el.textContent="₹"+Number(window.qzixCurrentPrice).toLocaleString("en-IN")+" / TOKEN");updateQrGate();$("level").textContent=data.current_level;$("sales").textContent=data.sales_in_level;$("totalSales").textContent=data.total_sales;renderPricePlan(data.current_level,data.sales_in_level,data.current_price);$("marketStatus").textContent=tr("marketUpdated");
 }
+function qzixSetHidden(id,hidden){
+ const el=$(id);
+ if(el)el.classList.toggle("hidden",Boolean(hidden));
+}
 async function checkUser(){
- if(!supabase)return;
- const {data}=await supabase.auth.getUser();
- currentQzixUser=data.user||null;
- if(currentQzixUser){
-   $("userInfo").textContent="Account securely connected.";
-   $("logout").classList.remove("hidden");
-   $("myWalletTab")?.classList.remove("hidden");
-   $("walletPanel").classList.add("hidden");
-   $("myWalletTab")?.setAttribute("aria-expanded","false");
-   await refreshWallet();
-   await initializeInitialBuy();
-   await refreshMyOwnedTokens();
-   await refreshOwnershipHistory();
-   await initializeManualPayments();
- }else{
-   $("userInfo").textContent=tr("noUser");
-   $("logout").classList.add("hidden");
-   $("walletPanel").classList.add("hidden");
-   $("myWalletTab")?.classList.add("hidden");
-   $("myWalletTab")?.setAttribute("aria-expanded","false");
-   $("initialBuyPanel").classList.add("hidden");
-   $("buyPanel").classList.add("hidden");
-   $("manualPaymentAdminPanel").classList.add("hidden");
+ if(!supabase){$("authStatus").textContent="Supabase is not connected.";return}
+ try{
+  const {data,error}=await supabase.auth.getUser();
+  if(error)throw error;
+  currentQzixUser=data?.user||null;
+  const signedIn=Boolean(currentQzixUser);
+  const info=$("userInfo");
+  if(info)info.textContent=signedIn?"Account securely connected.":tr("noUser");
+  qzixSetHidden("logout",!signedIn);
+  qzixSetHidden("walletPanel",true);
+  qzixSetHidden("myWalletTab",!signedIn);
+  qzixSetHidden("initialBuyPanel",!signedIn);
+  qzixSetHidden("buyPanel",true);
+  qzixSetHidden("manualPaymentAdminPanel",true);
+  $("myWalletTab")?.setAttribute("aria-expanded","false");
+  if(!signedIn)return;
+  const tasks=[
+   ["wallet",()=>refreshWallet()],
+   ["initial purchase",()=>initializeInitialBuy()],
+   ["my tokens",()=>refreshMyOwnedTokens()],
+   ["ownership history",()=>refreshOwnershipHistory()],
+   ["admin payment panel",()=>initializeManualPayments()]
+  ];
+  const results=await Promise.allSettled(tasks.map(([,run])=>run()));
+  const failed=results.map((result,i)=>result.status==="rejected"?tasks[i][0]+": "+(result.reason?.message||"load failed"):null).filter(Boolean);
+  if(failed.length){
+   const status=$("userInfo");
+   if(status)status.textContent="Account securely connected. Some dashboard data could not load: "+failed.join(" | ");
+  }
+ }catch(error){
+  currentQzixUser=null;
+  const info=$("userInfo");
+  if(info)info.textContent="Login succeeded but account session could not be checked: "+(error?.message||"Unknown error");
+  throw error;
  }
 }
 async function auth(action){
