@@ -298,6 +298,13 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 <header class="top">
   <div class="brand"><div class="coin">Q</div><div><h1>QZIX COIN</h1><small>Fixed Supply Token Project</small></div></div>
   <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><label for="language" class="muted" id="languageLabel" style="margin:0">Language</label><select id="language" aria-label="Select language" style="background:#10213a;color:#fff;border:1px solid #806b3e;border-radius:9px;padding:9px"><option value="en">English</option></select><a class="about-link" href="about.html">About QZIX</a><a class="about-link" href="wallet.html">My Wallet</a></div></header>
+
+<section class="panel token-showcase" style="margin:0 0 18px">
+  <h3 id="tokensTitle">100 Unique Token IDs</h3>
+  <p class="muted" id="tokensDesc">Each token has a unique ID. The current price per token is shown below each ID. This list does not confirm ownership or purchase.</p>
+  <div id="tokenAvailabilitySummary" aria-live="polite">Loading token status from the database…</div>
+  <div class="token-list" id="tokens"></div>
+</section>
 <section class="hero">
   <div class="eyebrow">QZIX DIGITAL TOKEN SYSTEM</div>
   <h2 id="heroTitle">Simple. Structured. Transparent.</h2>
@@ -309,13 +316,6 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
   <div class="stat"><span id="nextPriceLabel">Next Price</span><strong id="nextPrice">₹4</strong></div>
   <div class="stat"><span id="supplyLabel">Total Token Supply</span><strong>100</strong></div>
   <div class="stat"><span id="tokenIdsLabel">Token IDs</span><strong style="font-size:19px">001 – 100</strong></div>
-</section>
-
-<section class="panel token-showcase" style="margin:0 0 18px">
-  <h3 id="tokensTitle">100 Unique Token IDs</h3>
-  <p class="muted" id="tokensDesc">Each token has a unique ID. The current price per token is shown below each ID. This list does not confirm ownership or purchase.</p>
-  <div id="tokenAvailabilitySummary" aria-live="polite">Loading token status from the database…</div>
-  <div class="token-list" id="tokens"></div>
 </section>
 
 <div class="grid">
