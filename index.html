@@ -284,6 +284,10 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 .payment-identity.visible{display:block}.payment-identity .pay-kicker{font-size:10px;letter-spacing:1.8px;font-weight:900;color:#ffe2a0}.payment-identity .pay-token{font-size:27px;font-weight:950;color:#fff0c2;margin:5px 0;text-shadow:0 2px 14px #eab84d44}.payment-identity .pay-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid #ffffff18;font-size:12px}.payment-identity .pay-row span{color:#b8c7da}.payment-identity .pay-row b{text-align:right;color:#fff}.payment-identity .pay-warning{margin-top:10px;padding:10px;border-radius:10px;background:#0a1728;color:#f3dba6;font-size:11px;line-height:1.5}
 #initialBuyUpiPayNow{width:100%;text-align:center;padding:15px!important;font-size:15px;color:#fff!important;background:linear-gradient(135deg,#315b88,#142d49)!important;border:1px solid #8eb6dc88!important;text-shadow:0 1px 3px #0008;box-shadow:0 4px 0 #091a2b,0 9px 20px #0007,inset 0 1px 0 #ffffff35!important}#initialBuyUpiPayNow:hover{filter:brightness(1.15);color:#fff!important}
 
+
+/* My Orders — separate buyer activity section */
+.orders-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.orders-kicker{font-size:10px;letter-spacing:1.8px;font-weight:850;color:var(--gold)}.orders-count{font-size:10px;color:#ffe5a5;border:1px solid #b38c4d66;background:#f5c66d12;border-radius:99px;padding:7px 10px}.orders-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}.order-card{min-width:0;padding:14px;border:1px solid #344d6b;border-radius:14px;background:linear-gradient(145deg,#142943,#0a1728);box-shadow:0 3px 0 #07111f,0 8px 16px #0004}.order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.order-top b{display:block;color:#ffe1a0;font-size:14px}.order-top small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.order-status{font-size:9px;font-weight:850;letter-spacing:.5px;padding:6px 8px;border-radius:99px;border:1px solid #806b3e;color:#f5d58e;background:#f5c66d12}.order-status.confirmed{color:#83edc0;border-color:#328e70;background:#103c3233}.order-status.rejected{color:#ffaaaa;border-color:#a85b5b;background:#51232355}.order-status.review{color:#9ed0ff;border-color:#4775a0;background:#17365366}.order-amount{font-size:22px;font-weight:900;color:#fff1c7;margin:12px 0 5px}.order-date{font-size:10px;color:#9aacc5;line-height:1.55}.order-note{margin-top:8px;padding:8px;border-radius:8px;background:#081426;color:#f0d59b;font-size:11px;line-height:1.5}
+@media(max-width:520px){.orders-list{grid-template-columns:1fr}.orders-heading{align-items:flex-start}}
 </style>
 </head>
 <body>
@@ -381,8 +385,14 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
     <button id="confirmInitialPayment">I Have Paid — Send for Admin Review</button>
   </div>
   <div class="status" id="initialBuyStatus" aria-live="polite">Create a request to lock the selected token and amount for 20 minutes. Pay the exact amount using any UPI app, then tap “I Have Paid”.</div>
-  <h3 style="margin-top:18px">My Initial UPI Requests</h3>
-  <div id="myInitialOrders" class="muted">Log in to view your requests.</div>
+</section>
+<section class="panel hidden" id="myInitialOrdersPanel" style="margin-top:16px">
+  <div class="orders-heading">
+    <div><div class="orders-kicker">ACCOUNT ACTIVITY</div><h3 style="margin:4px 0 0">My Orders</h3></div>
+    <span class="orders-count">Initial purchases</span>
+  </div>
+  <p class="muted" style="margin:8px 0 14px">Track your token reservations and payment verification status here.</p>
+  <div id="myInitialOrders" class="orders-list muted">Log in to view your requests.</div>
 </section>
 <section class="panel hidden" id="buyPanel" style="margin-top:16px">
   <h3>2. Buy from Another Owner</h3>
@@ -612,6 +622,7 @@ async function checkUser(){
   qzixSetHidden("logout",!signedIn);
   qzixSetHidden("walletPanel",true);
   qzixSetHidden("initialBuyPanel",!signedIn);
+  qzixSetHidden("myInitialOrdersPanel",!signedIn);
   qzixSetHidden("buyPanel",true);
   qzixSetHidden("manualPaymentAdminPanel",true);
   if(!signedIn)return;
@@ -804,7 +815,11 @@ async function refreshMyInitialOrders(){
    $("initialManualConfirmArea").classList.add("hidden");
    $("initialBuyUpiPayNow").classList.add("hidden");
  }
- $("myInitialOrders").innerHTML=data.map(r=>"<div style='padding:9px 0;border-bottom:1px solid var(--line)'><b>QZIX-"+String(r.token_number).padStart(3,"0")+"</b> · "+money(r.amount)+" · <b>"+safeText(r.status.replaceAll("_"," ").toUpperCase())+"</b><br><small>Request created: "+safeText(new Date(r.created_at).toLocaleString())+(r.payment_confirmed_at?"<br>Payment marked sent: "+safeText(new Date(r.payment_confirmed_at).toLocaleString()):"")+""+"</small>"+(r.admin_note?"<br><small>Admin note: "+safeText(r.admin_note)+"</small>":"")+"</div>").join("");
+ $("myInitialOrders").innerHTML=data.map(r=>{
+   const status=safeText(r.status.replaceAll("_"," ").toUpperCase());
+   const statusClass=r.status==="approved"?"confirmed":r.status==="rejected"?"rejected":r.status==="awaiting_payment"?"awaiting":"review";
+   return "<article class='order-card'><div class='order-top'><div><b>QZIX-"+String(r.token_number).padStart(3,"0")+"</b><small>Initial token purchase</small></div><span class='order-status "+statusClass+"'>"+status+"</span></div><div class='order-amount'>"+money(r.amount)+"</div><div class='order-date'>Request created: "+safeText(new Date(r.created_at).toLocaleString())+"</div>"+(r.payment_confirmed_at?"<div class='order-date'>Payment marked sent: "+safeText(new Date(r.payment_confirmed_at).toLocaleString())+"</div>":"")+(r.admin_note?"<div class='order-note'>Admin note: "+safeText(r.admin_note)+"</div>":"")+"</article>";
+ }).join("");
 }
 async function initializeInitialBuy(){
  await refreshInitialBuyOptions();
