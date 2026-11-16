@@ -581,28 +581,33 @@ async function refreshTokenStatus(){
  if(!supabase)return;
  const summary=$("tokenAvailabilitySummary");
  if(summary)summary.textContent="Updating token status…";
- const {data,error}=await supabase.rpc("qzix_public_token_list");
+ const {data,error}=await supabase.rpc("qzix_public_token_status_v2");
  if(error){if(summary)summary.textContent="Token status unavailable: "+error.message;return}
  const rows=Array.isArray(data)?data:[];
- let bought=0;
+ let bought=0,reserved=0;
  for(const row of rows){
   const number=Number(row.token_number);
   if(!Number.isInteger(number)||number<1||number>100)continue;
   const isBought=!!row.is_assigned;
+  const isReserved=!isBought&&!!row.is_reserved;
   if(isBought)bought++;
+  if(isReserved)reserved++;
+  const status=isBought?"BOUGHT":isReserved?"RESERVED":"LEFT";
   const card=$("qzix-token-"+number);
   if(card){
    card.classList.toggle("bought",isBought);
-   card.classList.toggle("available",!isBought);
-   card.setAttribute("role",isBought?"img":"button");
-   card.setAttribute("tabindex",isBought?"-1":"0");
-   card.setAttribute("aria-label","QZIX-"+String(number).padStart(3,"0")+" · "+(isBought?"Already bought":"Left — click to buy"));
-   card.innerHTML="<b>"+String(number).padStart(3,"0")+"</b><small>"+(isBought?"BOUGHT":"LEFT")+"</small><small class=\"token-price\">₹"+Number(window.qzixCurrentPrice||2).toLocaleString("en-IN")+" / TOKEN</small>";
-   card.title="QZIX-"+String(number).padStart(3,"0")+" · "+(isBought?"Bought":"Click to buy");
+   card.classList.toggle("reserved",isReserved);
+   card.classList.toggle("available",!isBought&&!isReserved);
+   card.setAttribute("role",(!isBought&&!isReserved)?"button":"img");
+   card.setAttribute("tabindex",(!isBought&&!isReserved)?"0":"-1");
+   const accessible=isBought?"Already bought":isReserved?"Reserved — payment request active":"Left — click to buy";
+   card.setAttribute("aria-label","QZIX-"+String(number).padStart(3,"0")+" · "+accessible);
+   card.innerHTML="<b>"+String(number).padStart(3,"0")+"</b><small>"+status+"</small><small class=\"token-price\">₹"+Number(window.qzixCurrentPrice||2).toLocaleString("en-IN")+" / TOKEN</small>";
+   card.title="QZIX-"+String(number).padStart(3,"0")+" · "+accessible;
   }
  }
- const left=Math.max(0,100-bought);
- if(summary)summary.textContent="Bought: "+bought+"  ·  Left: "+left+"  ·  Total: 100";
+ const left=Math.max(0,100-bought-reserved);
+ if(summary)summary.textContent="Bought: "+bought+"  ·  Reserved: "+reserved+"  ·  Left: "+left+"  ·  Total: 100";
  if(currentQzixUser)await refreshMyOwnedTokens();
 }
 async function refreshMarket(){
@@ -795,11 +800,11 @@ async function refreshInitialBuyOptions(){
  if(!supabase)return;
  const select=$("initialBuyToken");
  select.innerHTML="<option value=''>Loading…</option>";
- const {data:allTokens,error}=await supabase.rpc("qzix_public_token_list");
- const data=Array.isArray(allTokens)?allTokens.filter(t=>!t.is_assigned):[];
+ const {data:allTokens,error}=await supabase.rpc("qzix_public_token_status_v2");
+ const data=Array.isArray(allTokens)?allTokens.filter(t=>!t.is_assigned&&!t.is_reserved):[];
  if(error){select.innerHTML="<option value=''>Could not load tokens</option>";$("initialBuyAvailability").textContent="Token availability could not load: "+error.message;return}
- $("initialBuyAvailability").textContent=String(data?.length||0)+" of 100 tokens are currently available for initial purchase.";
- select.innerHTML=data?.length?"<option value=''>Choose a token</option>"+data.map(t=>"<option value='"+Number(t.token_number)+"'>QZIX-"+String(t.token_number).padStart(3,"0")+"</option>").join(""):"<option value=''>No unassigned tokens available</option>";
+ $("initialBuyAvailability").textContent=String(data?.length||0)+" of 100 tokens are currently available for initial purchase. Reserved tokens cannot be selected.";
+ select.innerHTML=data?.length?"<option value=''>Choose a token</option>"+data.map(t=>"<option value='"+Number(t.token_number)+"'>QZIX-"+String(t.token_number).padStart(3,"0")+"</option>").join(""):"<option value=''>No unreserved tokens available</option>";
  const {data:market,error:marketError}=await supabase.from("qzix_v2_market").select("current_price").eq("id",1).maybeSingle();
  $("initialBuyPrice").textContent=marketError?"Current price unavailable":"Current price: "+money(market?.current_price||0)+" per token";
 }
@@ -1071,3 +1076,7 @@ $("manualPaymentQueue").addEventListener("click",e=>{
 </script>
 </body>
 </html>
+
+/* Reserved token status */
+.token.reserved{background:linear-gradient(145deg,#44351a,#211d17);border-color:#c69a43;cursor:not-allowed;opacity:.96}
+.token.reserved b,.token.reserved small{color:#ffe09a}
