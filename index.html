@@ -311,8 +311,12 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
   <div class="stat"><span id="tokenIdsLabel">Token IDs</span><strong style="font-size:19px">001 – 100</strong></div>
 </section>
 
-
-
+<section class="panel token-showcase" style="margin:0 0 18px">
+  <h3 id="tokensTitle">100 Unique Token IDs</h3>
+  <p class="muted" id="tokensDesc">Each token has a unique ID. The current price per token is shown below each ID. This list does not confirm ownership or purchase.</p>
+  <div id="tokenAvailabilitySummary" aria-live="polite">Loading token status from the database…</div>
+  <div class="token-list" id="tokens"></div>
+</section>
 
 <div class="grid">
   <section class="panel">
@@ -439,12 +443,7 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
   <div id="qrResult" class="hidden" style="margin-top:12px;padding:14px;background:#0b1a2e;border:1px solid var(--line);border-radius:12px"><div id="qrcode" style="background:white;padding:12px;width:max-content;max-width:100%;border-radius:8px"></div><p id="qrDetails" class="muted"></p><a id="verifyLink" href="#" target="_blank" rel="noopener" style="color:var(--gold);overflow-wrap:anywhere">Open verification page</a></div>
 </section>
 <section class="panel hidden" id="verificationPanel" style="margin-top:16px"><h3>QZIX COIN — Public Token Verification</h3><div id="verificationDetails" class="muted">Loading token verification…</div></section>
-<section class="panel" style="margin-top:16px">
-  <h3 id="tokensTitle">100 Unique Token IDs</h3>
-  <p class="muted" id="tokensDesc">Green means bought. Dark means still available.</p>
-  <div id="tokenAvailabilitySummary" aria-live="polite">Loading token status from the database…</div>
-  <div class="token-list" id="tokens"></div>
-</section>
+
 <div class="notice" id="noticeText"><b>Important:</b> QZIX COIN has 100 fixed tokens. A payment reference or screenshot alone is not proof of payment. The admin verifies the actual bank/UPI credit before changing ownership. No profit or future price is guaranteed. There is no SELL option. Complete legal and payment checks before accepting real transactions.</div>
 <div class="footer" id="footerText">QZIX COIN • Fixed supply concept • Version 1</div>
 </div>
