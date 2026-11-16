@@ -855,9 +855,14 @@ async function confirmInitialPayment(){
 $("createInitialManualRequest").addEventListener("click",createInitialManualRequest);
 $("initialBuyUpiPayNow").addEventListener("click",()=>{
  if(!activeInitialManualRequestId)return;
+ // Keep this tap handler minimal so Android can hand off the UPI URI immediately.
  initialUpiOpenedForRequest=true;
- $("initialManualConfirmArea").classList.remove("hidden");
- $("initialBuyStatus").textContent="UPI app opened. Complete the payment there, verify the recipient and amount, then return here and tap “I Have Paid”. Opening the app alone does not confirm payment.";
+});
+document.addEventListener("visibilitychange",()=>{
+ if(document.visibilityState==="visible" && initialUpiOpenedForRequest && activeInitialManualRequestId){
+   $("initialManualConfirmArea").classList.remove("hidden");
+   $("initialBuyStatus").textContent="Return from your UPI app after completing payment. Verify the recipient and exact amount, then tap “I Have Paid”. Opening the app alone does not confirm payment.";
+ }
 });
 $("confirmInitialPayment").addEventListener("click",confirmInitialPayment);
 
