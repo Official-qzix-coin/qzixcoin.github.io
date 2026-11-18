@@ -561,14 +561,12 @@ async function startGridTokenPurchase(tokenNumber){
      activeInitialManualRequestId=tokenRequest.id;
      updateInitialManualUpiLink(tokenNumber,tokenRequest.amount);
      initialUpiOpenedForRequest=false;
-     $("initialBuyStatus").textContent="Opening the UPI app for your existing QZIX-"+String(tokenNumber).padStart(3,"0")+" request…";
-     window.location.href=$("initialBuyUpiPayNow").href;
+     $("initialBuyStatus").textContent="Your existing payment request is ready. Tap the “Open any UPI App to Pay” button below to launch your UPI app. Verify the token ID, exact amount and recipient before paying.";
    }else{
      await createInitialManualRequest();
      const payLink=$("initialBuyUpiPayNow");
      if(activeInitialManualRequestId&&payLink&&!payLink.classList.contains("hidden")){
-       $("initialBuyStatus").textContent="Opening your UPI app. Verify QZIX token ID, exact amount and recipient before paying.";
-       window.location.href=payLink.href;
+       $("initialBuyStatus").textContent="Your payment request is ready. Tap the “Open any UPI App to Pay” button below to launch your UPI app. Verify the token ID, exact amount and recipient before paying.";
      }
    }
  }
