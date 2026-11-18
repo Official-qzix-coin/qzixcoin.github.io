@@ -85,7 +85,7 @@ button.secondary{background:#172b45;border:1px solid #385575;box-shadow:none}
 .token.available{cursor:pointer}
 .token.available:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #initialBuyPanel .field:has(#initialBuyToken),#initialBuyPanel #initialBuyAvailability,#initialBuyPanel #createInitialManualRequest{display:none!important}
-#buyPanel{display:none!important}
+
 @media(max-width:650px){.token-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.token{padding:6px 1px}.token b{font-size:10px}.token small{font-size:8px}}
 #noticeText{font-size:11px;line-height:1.5}
 @media(max-width:600px){.simple-steps{grid-template-columns:1fr}.simple-guide{padding:16px}.wrap{padding:16px 12px 35px}}
@@ -1190,12 +1190,12 @@ async function refreshManualPaymentQueue(){
  $("manualAdminStatus").textContent="Check each payment in your bank/UPI app before approving.";
 }
 async function reviewManualPayment(id,decision){
- const message=decision==="approve"?"Confirm only after you have verified the exact amount and UTR in your bank/UPI account. Approval transfers the token and credits the previous owner with 80% of the gross resale amount; the company receives 20%. No profit is guaranteed.":"Reject this payment request?";
+ const message=decision==="approve"?"Confirm only after you have verified the exact amount and UTR in your bank/UPI account. Approval transfers the token and credits the previous owner with original cost plus 80% of net profit; the company receives 20% of net profit only. No profit is guaranteed.":"Reject this payment request?";
  if(!confirm(message))return;
  $("manualAdminStatus").textContent="Processing…";
  const {error}=await supabase.rpc("qzix_admin_review_manual_payment",{p_submission_id:id,p_decision:decision,p_admin_note:null});
  if(error){$("manualAdminStatus").textContent="Review failed: "+error.message;return}
- $("manualAdminStatus").textContent=decision==="approve"?"Payment approved. Ownership transferred; the company receives 20% of the gross resale amount and the previous owner receives 80%.":"Payment request rejected.";
+ $("manualAdminStatus").textContent=decision==="approve"?"Payment approved. Ownership transferred; seller wallet credited with original cost plus 80% of net profit; company credited with 20% of net profit.":"Payment request rejected.";
  await refreshManualPaymentQueue();
  await refreshBuyTokens();
 }
