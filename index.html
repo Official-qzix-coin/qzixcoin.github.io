@@ -454,7 +454,7 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
     <span class="muted">Available Balance</span>
     <strong id="walletBalance" class="gold" style="display:block;font-size:28px;margin-top:5px">₹0.00</strong>
   </div>
-  <label class="field"><span>Withdrawal Amount (₹)</span><input id="withdrawAmount" type="number" min="1" step="0.01" inputmode="decimal" placeholder="Enter amount"></label>
+  <label class="field"><span>Withdrawal Amount (₹)</span><input id="withdrawAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Enter any amount up to your available balance"></label><p class="muted">You may request any amount from ₹0.01 up to your full available wallet balance. Pending withdrawal requests are reserved and cannot be withdrawn again.</p>
   <div class="actions"><button id="requestWithdrawal">Request Withdrawal</button><button class="secondary" id="refreshWallet">Refresh Wallet</button></div>
   <div class="status" id="walletStatus" aria-live="polite"></div>
   <h3 style="margin-top:18px">Wallet History</h3>
@@ -889,7 +889,7 @@ async function refreshWallet(){
    supabase.from("qzix_withdrawal_requests").select("amount,status,created_at").eq("user_id",uid).order("created_at",{ascending:false}).limit(10)
  ]);
  if(walletResult.error){$("walletStatus").textContent="Wallet could not load: "+walletResult.error.message;return}
- $("walletBalance").textContent=money(walletResult.data?.balance||0);
+ const availableBalance=Number(walletResult.data?.balance||0); $("walletBalance").textContent=money(availableBalance); $("withdrawAmount").max=availableBalance.toFixed(2); $("withdrawAmount").placeholder=availableBalance>0?"Up to "+money(availableBalance):"No available balance";
  if(ledgerResult.error){$("walletHistory").textContent="History unavailable: "+ledgerResult.error.message}
  else if(!ledgerResult.data?.length){$("walletHistory").textContent="No wallet transactions yet."}
  else{$("walletHistory").innerHTML=ledgerResult.data.map(row=>"<div style='display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)'><span>"+safeText(row.entry_type.replaceAll("_"," "))+"<br><small>"+safeText(new Date(row.created_at).toLocaleString())+"</small></span><b>"+money(row.amount)+"</b></div>").join("")}
