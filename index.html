@@ -292,33 +292,122 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 @media(max-width:760px){.purchase-orders-layout{grid-template-columns:1fr;gap:13px}}
 .orders-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.orders-kicker{font-size:10px;letter-spacing:1.8px;font-weight:850;color:var(--gold)}.orders-count{font-size:10px;color:#ffe5a5;border:1px solid #b38c4d66;background:#f5c66d12;border-radius:99px;padding:7px 10px}.orders-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}.order-card{min-width:0;padding:14px;border:1px solid #344d6b;border-radius:14px;background:linear-gradient(145deg,#142943,#0a1728);box-shadow:0 3px 0 #07111f,0 8px 16px #0004}.order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.order-top b{display:block;color:#ffe1a0;font-size:14px}.order-top small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.order-status{font-size:9px;font-weight:850;letter-spacing:.5px;padding:6px 8px;border-radius:99px;border:1px solid #806b3e;color:#f5d58e;background:#f5c66d12}.order-status.confirmed{color:#83edc0;border-color:#328e70;background:#103c3233}.order-status.rejected{color:#ffaaaa;border-color:#a85b5b;background:#51232355}.order-status.review{color:#9ed0ff;border-color:#4775a0;background:#17365366}.order-amount{font-size:22px;font-weight:900;color:#fff1c7;margin:12px 0 5px}.order-date{font-size:10px;color:#9aacc5;line-height:1.55}.order-note{margin-top:8px;padding:8px;border-radius:8px;background:#081426;color:#f0d59b;font-size:11px;line-height:1.5}
 @media(max-width:520px){.orders-list{grid-template-columns:1fr}.orders-heading{align-items:flex-start}}
+
+/* QZIX dashboard redesign — blue neon and gold, inspired by selected concept 2 */
+.main-nav{display:flex;align-items:center;gap:8px;padding:7px;border:1px solid #1d4e83;border-radius:20px;background:linear-gradient(120deg,#07172c,#081326);box-shadow:0 0 22px #087dff18}
+.brand-home{color:inherit;text-decoration:none;flex-shrink:0}
+.nav-link{display:flex;align-items:center;gap:9px;padding:13px 19px;border-radius:14px;color:#e5edf9;text-decoration:none;font-size:14px;font-weight:750;white-space:nowrap;border:1px solid transparent}
+.nav-link span{font-size:20px;color:#c6ddff}
+.nav-link.active{background:linear-gradient(145deg,#126dff,#073aab);border-color:#3ca7ff;box-shadow:0 0 22px #087dff77,inset 0 1px #ffffff55}
+.top-right{display:flex;align-items:center;gap:7px}
+.top-right select{background:#10213a;color:#fff;border:1px solid #2874bd;border-radius:9px;padding:9px}
+.qzix-dashboard{display:grid;gap:16px;margin:4px 0 18px}
+.dashboard-hero{position:relative;display:grid;grid-template-columns:minmax(230px,.85fr) minmax(250px,1fr) minmax(400px,1.45fr);align-items:center;gap:22px;min-height:340px;padding:25px 27px;border:1px solid #147bd0;border-radius:25px;overflow:hidden;background:radial-gradient(ellipse at 8% 100%,#007dce66,transparent 45%),radial-gradient(ellipse at 100% 0%,#1b58b788,transparent 42%),linear-gradient(115deg,#061b35,#07152a 55%,#081a36);box-shadow:0 0 30px #087dff20,inset 0 1px #ffffff1c}
+.dashboard-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,#1b74c30c 70%,transparent);pointer-events:none}
+.coin-stage{position:relative;display:grid;place-items:center;min-height:260px;isolation:isolate}
+.hero-coin{z-index:2;width:210px;height:210px;display:grid;place-items:center;border-radius:50%;font-size:120px;font-weight:950;color:#392508;background:radial-gradient(circle at 32% 25%,#fff7bf 0,#f7d46e 20%,#c58b28 48%,#ffe99a 60%,#986018 78%,#f5ce6c 88%,#805015 100%);border:7px ridge #f7d77d;box-shadow:0 0 0 8px #f6c85b18,0 0 35px #08aaff9c,0 22px 35px #000a,inset 0 0 0 8px #8c5c1d,inset 0 0 22px #fff8;text-shadow:0 3px 2px #fff8;transform:perspective(500px) rotateY(-12deg)}
+.coin-orbit{position:absolute;width:270px;height:78px;border:3px solid #10bfffaa;border-radius:50%;transform:rotate(-12deg);box-shadow:0 0 16px #00aaff99,inset 0 0 13px #00aaff55}
+.orbit-two{width:310px;height:100px;transform:rotate(12deg);border-color:#1675ff88}
+.stage-glow{position:absolute;bottom:18px;width:250px;height:35px;border-radius:50%;background:#08aaff55;filter:blur(22px);z-index:-1}
+.hero-content{position:relative;z-index:1}
+.hero-content .eyebrow{color:#79dfff;border-color:#168bdc88;background:#087dff1a}
+.hero-content h2{font-size:clamp(28px,3vw,43px);line-height:1.08;margin:16px 0 12px;color:#fff}
+.hero-content h2 i{color:#ffd66e;font-style:normal;white-space:nowrap}
+.hero-content p{font-size:14px;color:#c4d6ed;line-height:1.7}
+.hero-caption{margin-top:23px;color:#ffdc81;font-size:11px;font-weight:900;letter-spacing:1.5px}
+.hero-caption b{color:#19baff;margin:0 5px}
+.dashboard-hero .stats{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:0;align-content:center}
+.dashboard-hero .stat{min-height:112px;padding:19px 18px;border:1px solid #148bd8;border-radius:17px;background:linear-gradient(145deg,#0d2b50,#07172e);box-shadow:0 0 16px #007dff22,inset 0 1px #ffffff22;overflow:hidden}
+.dashboard-hero .stat span{font-size:12px;text-transform:none;letter-spacing:.2px;color:#dcecff}
+.dashboard-hero .stat strong{display:block;font-size:31px;color:#fff;margin-top:8px}
+.dashboard-hero .stat em{position:absolute;right:16px;top:24px;font-style:normal;font-size:31px;color:#27d9ff;text-shadow:0 0 15px currentColor}
+.dashboard-hero .stat-current{border-color:#1acaff}.dashboard-hero .stat-current em{color:#37ed9c}
+.dashboard-hero .stat-next{border-color:#375bff}.dashboard-hero .stat-next em{color:#9c75ff}
+.dashboard-hero .stat-supply{border-color:#346dff}.dashboard-hero .stat-supply em{color:#268dff}
+.dashboard-hero .stat-ids{border-color:#11c8df}.dashboard-hero .stat-ids em{color:#32efc2}
+.dashboard-actions{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,.9fr);gap:18px}
+.price-chart{padding:19px 22px;border:1px solid #0ca9e9!important;background:linear-gradient(145deg,#071b32,#061326)!important;box-shadow:0 0 18px #00aaff16!important}
+.price-chart h3{color:#eef8ff;margin:0 0 14px}.price-chart h3 span{font-size:12px;color:#58d7ff}
+.chart-graphic{position:relative;height:130px;padding:8px 0 15px 28px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,#1b4770 32px),repeating-linear-gradient(to right,transparent 0,transparent 79px,#163b62 80px)}
+.chart-graphic svg{width:100%;height:100%;overflow:visible}
+.chart-area{fill:url(#qzixArea)}.chart-line{fill:none;stroke:#13caff;stroke-width:4;filter:drop-shadow(0 0 5px #00bfff)}
+.chart-dots circle{fill:#fff;stroke:#05bfff;stroke-width:3;filter:drop-shadow(0 0 5px #00bfff)}
+.chart-labels{position:absolute;left:0;top:0;bottom:12px;display:flex;flex-direction:column;justify-content:space-between;color:#c8d8ea;font-size:11px}
+.chart-note{margin:8px 0 0;color:#8098b6;font-size:10px}
+.dashboard-buttons{display:flex;flex-direction:column;justify-content:center;gap:14px}
+.dashboard-button{display:flex;align-items:center;gap:15px;padding:20px 22px;border-radius:17px;text-decoration:none;font-size:19px;font-weight:900;box-shadow:0 6px 0 #07111f,0 10px 20px #0007,inset 0 1px #ffffff8a;transition:transform .16s,filter .16s}
+.dashboard-button:hover{transform:translateY(-3px);filter:brightness(1.08)}
+.dashboard-button span{font-size:26px}.dashboard-button b{margin-left:auto;font-size:30px}
+.buy-button{color:#1b1b12;background:linear-gradient(135deg,#fff17d,#ffba13 55%,#e58b00);border:1px solid #fff0a0}
+.wallet-button{color:#fff;background:linear-gradient(135deg,#087dff,#0640c4 65%,#072c88);border:1px solid #63caff}
+.benefit-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:15px 18px;border:1px solid #1769a8;border-radius:17px;background:linear-gradient(100deg,#07172c,#0a2441,#07172c);box-shadow:0 0 18px #008dff18}
+.benefit-strip span{display:flex;align-items:center;justify-content:center;gap:9px;color:#ffdc81;font-size:17px}
+.benefit-strip b{font-size:12px;color:#eef5ff}
+#token-showcase{scroll-margin-top:18px}
+@media(max-width:980px){.top{flex-wrap:wrap}.main-nav{order:3;width:100%;justify-content:center}.nav-link{flex:1;justify-content:center}.dashboard-hero{grid-template-columns:minmax(190px,.8fr) minmax(220px,1fr);}.coin-stage{grid-row:span 1}.hero-content{grid-column:2}.dashboard-hero .stats{grid-column:1/-1;grid-template-columns:repeat(4,1fr)}.dashboard-hero .stat{min-height:95px}.dashboard-hero .stat strong{font-size:26px}.dashboard-hero .stat em{font-size:24px}.dashboard-actions{grid-template-columns:1fr .8fr}}
+@media(max-width:650px){.top{gap:12px}.brand h1{font-size:19px}.top-right{margin-left:auto}.main-nav{gap:4px;padding:5px}.nav-link{padding:11px 7px;font-size:12px;gap:5px}.nav-link span{font-size:17px}.dashboard-hero{grid-template-columns:1fr;gap:9px;padding:20px 16px}.coin-stage{min-height:190px;grid-row:auto}.hero-coin{width:155px;height:155px;font-size:90px}.coin-orbit{width:210px;height:60px}.orbit-two{width:240px;height:75px}.hero-content{grid-column:auto;text-align:center}.hero-content h2{margin:10px 0;font-size:31px}.hero-content p{margin:8px auto;max-width:420px}.hero-caption{margin-top:12px}.dashboard-hero .stats{grid-column:auto;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}.dashboard-hero .stat{min-height:90px;padding:15px 12px}.dashboard-hero .stat strong{font-size:25px}.dashboard-hero .stat span{font-size:10px}.dashboard-hero .stat em{right:11px;top:16px;font-size:21px}.dashboard-actions{grid-template-columns:1fr;gap:12px}.price-chart{padding:16px}.dashboard-buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}.dashboard-button{padding:15px 11px;font-size:14px;gap:8px}.dashboard-button span{font-size:20px}.dashboard-button b{font-size:22px}.benefit-strip{grid-template-columns:1fr 1fr;padding:13px 8px;gap:13px}.benefit-strip span{font-size:14px}.benefit-strip b{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.hero-coin{transform:none}.dashboard-button{transition:none}}
+
+.token.reserved{background:linear-gradient(145deg,#44351a,#211d17);border-color:#c69a43;cursor:not-allowed;opacity:.96}.token.reserved b,.token.reserved small{color:#ffe09a}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header class="top">
-  <div class="brand"><div class="coin">Q</div><div><h1>QZIX COIN</h1><small>Fixed Supply Token Project</small></div></div>
-  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><label for="language" class="muted" id="languageLabel" style="margin:0">Language</label><select id="language" aria-label="Select language" style="background:#10213a;color:#fff;border:1px solid #806b3e;border-radius:9px;padding:9px"><option value="en">English</option></select><a class="about-link" href="about.html">About QZIX</a><a class="about-link" href="wallet.html">My Wallet</a></div></header>
+<header class="top" id="dashboard">
+  <a class="brand brand-home" href="#dashboard" aria-label="QZIX COIN Home"><div class="coin">Q</div><div><h1>QZIX COIN</h1><small>Fixed Supply Token Project</small></div></a>
+  <nav class="main-nav" aria-label="Main navigation">
+    <a class="nav-link active" href="#dashboard"><span>⌂</span>Main</a>
+    <a class="nav-link" href="about.html"><span>ⓘ</span>About QZIX</a>
+    <a class="nav-link" href="wallet.html"><span>▣</span>My Wallet</a>
+  </nav>
+  <div class="top-right"><label for="language" class="muted" id="languageLabel">Language</label><select id="language" aria-label="Select language"><option value="en">English</option></select></div>
+</header>
 
-<section class="panel token-showcase" style="margin:0 0 18px">
+
+<main class="qzix-dashboard">
+  <section class="dashboard-hero">
+    <div class="coin-stage" aria-label="QZIX gold coin illustration"><div class="coin-orbit orbit-one"></div><div class="coin-orbit orbit-two"></div><div class="hero-coin">Q</div><div class="stage-glow"></div></div>
+    <div class="hero-content">
+      <div class="eyebrow">QZIX DIGITAL TOKEN SYSTEM</div>
+      <h2 id="heroTitle">Invest <i>• Own • Grow</i></h2>
+      <p id="heroDesc">A clear, structured dashboard for the QZIX fixed-supply token project.</p>
+      <div class="hero-caption">TRANSPARENT <b>•</b> SECURE <b>•</b> TRUSTED</div>
+    </div>
+    <div class="stats">
+      <div class="stat stat-current"><span id="priceLabel">Current Price (1 Token)</span><strong class="gold" id="price">₹2</strong><em>↗</em></div>
+      <div class="stat stat-next"><span id="nextPriceLabel">Next Price (1 Token)</span><strong id="nextPrice">₹4</strong><em>↗</em></div>
+      <div class="stat stat-supply"><span id="supplyLabel">Total Token Supply</span><strong>100</strong><em>◇</em></div>
+      <div class="stat stat-ids"><span id="tokenIdsLabel">Token IDs</span><strong style="font-size:19px">001 – 100</strong><em>▦</em></div>
+    </div>
+  </section>
+  <section class="dashboard-actions">
+    <div class="price-chart panel">
+      <h3>⌁ &nbsp;Price Trend <span>(Live)</span></h3>
+      <div class="chart-graphic" aria-label="Illustrative price trend graphic">
+        <svg viewBox="0 0 640 150" role="img" aria-label="Price trend illustration" preserveAspectRatio="none">
+          <defs><linearGradient id="qzixArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#08bfff" stop-opacity=".38"/><stop offset="1" stop-color="#08bfff" stop-opacity="0"/></linearGradient></defs>
+          <path class="chart-area" d="M0 125 L55 112 L105 98 L160 90 L215 80 L270 86 L325 68 L380 67 L435 48 L490 35 L545 22 L590 27 L640 8 L640 150 L0 150 Z"/>
+          <path class="chart-line" d="M0 125 L55 112 L105 98 L160 90 L215 80 L270 86 L325 68 L380 67 L435 48 L490 35 L545 22 L590 27 L640 8"/>
+          <g class="chart-dots"><circle cx="0" cy="125" r="4"/><circle cx="105" cy="98" r="4"/><circle cx="215" cy="80" r="4"/><circle cx="325" cy="68" r="4"/><circle cx="435" cy="48" r="4"/><circle cx="545" cy="22" r="4"/><circle cx="640" cy="8" r="5"/></g>
+        </svg>
+        <div class="chart-labels"><span>₹1</span><span>₹2</span><span>₹4</span></div>
+      </div>
+      <p class="chart-note">Illustrative visual only · Not a guarantee of future price or profit</p>
+    </div>
+    <div class="dashboard-buttons">
+      <a class="dashboard-button buy-button" href="#token-showcase"><span>🛒</span>Buy New Token <b>›</b></a>
+      <a class="dashboard-button wallet-button" href="wallet.html"><span>▣</span>My Wallet <b>›</b></a>
+    </div>
+  </section>
+  <div class="benefit-strip"><span>🛡 <b>100% Secure</b></span><span>⚡ <b>Payment Verification</b></span><span>♙ <b>Buyer Information</b></span><span>🤝 <b>Clear Rules</b></span></div>
+</main>
+<div id="token-showcase"><section class="panel token-showcase" style="margin:0 0 18px">
   <h3 id="tokensTitle">100 Unique Token IDs</h3>
   <p class="muted" id="tokensDesc">Each token has a unique ID. The current price per token is shown below each ID. This list does not confirm ownership or purchase.</p>
   <div id="tokenPricePerToken" class="token-price-heading">Price Per Token: ₹2</div>
   <div id="tokenAvailabilitySummary" aria-live="polite">Loading token status from the database…</div>
   <div class="token-list" id="tokens"></div>
-</section>
-<section class="hero">
-  <div class="eyebrow">QZIX DIGITAL TOKEN SYSTEM</div>
-  <h2 id="heroTitle">Simple. Structured. Transparent.</h2>
-  <p id="heroDesc">Your QZIX account, token supply and live market overview — in one secure dashboard.</p>
-</section>
-
-<section class="stats">
-  <div class="stat"><span id="priceLabel">Current Price (1 Token)</span><strong class="gold" id="price">₹2</strong></div>
-  <div class="stat"><span id="nextPriceLabel">Next Price (1 Token)</span><strong id="nextPrice">₹4</strong></div>
-  <div class="stat"><span id="supplyLabel">Total Token Supply</span><strong>100</strong></div>
-  <div class="stat"><span id="tokenIdsLabel">Token IDs</span><strong style="font-size:19px">001 – 100</strong></div>
-</section>
+</section></div>
 
 <div class="grid">
   <section class="panel">
@@ -1106,6 +1195,3 @@ $("manualPaymentQueue").addEventListener("click",e=>{
 </body>
 </html>
 
-/* Reserved token status */
-.token.reserved{background:linear-gradient(145deg,#44351a,#211d17);border-color:#c69a43;cursor:not-allowed;opacity:.96}
-.token.reserved b,.token.reserved small{color:#ffe09a}
