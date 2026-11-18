@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071426"><title>NEXT GEN CITY | 3D Demo</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b1422;color:#f4f7ff;font-family:system-ui,Arial,sans-serif}
+#game{position:fixed;inset:0}canvas{display:block}
+.panel{position:fixed;z-index:2;background:#0a1729d9;border:1px solid #8aa7c455;border-radius:14px;padding:12px;backdrop-filter:blur(9px);box-shadow:0 8px 24px #0005}
+#brand{top:12px;left:12px;font-weight:900;letter-spacing:1px}#brand small{display:block;color:#a9bfd8;font-size:10px;margin-top:3px}
+#stats{top:12px;right:12px;text-align:right;font-size:12px;line-height:1.7}
+#help{left:12px;bottom:12px;font-size:11px;line-height:1.6;max-width:225px}
+#actions{right:12px;bottom:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:260px}
+button{border:1px solid #ffffff35;border-radius:10px;padding:11px 13px;background:linear-gradient(135deg,#ffe5a0,#d9a746);color:#172238;font-weight:800}
+button.secondary{background:#203b5b;color:white}#notice{position:fixed;z-index:4;top:82px;left:50%;transform:translateX(-50%);display:none;background:#10243b;border:1px solid #7899bb;border-radius:12px;padding:11px 15px;text-align:center;max-width:90vw;font-size:13px}
+#back{position:fixed;z-index:3;top:88px;left:12px;text-decoration:none;color:#ffe2a0;font-size:12px}
+@media(max-width:600px){#stats{font-size:10px}#help{max-width:165px;font-size:9px}button{font-size:10px;padding:10px}#actions{max-width:190px}}
+</style></head><body>
+<div id="game"></div>
+<div id="brand" class="panel">🏙️ NEXT GEN CITY <small>PLAYABLE 3D BROWSER DEMO · NOT MULTIPLAYER YET</small></div>
+<a id="back" href="index.html">← Back to QZIX COIN</a>
+<div id="stats" class="panel">SERVER: DEMO-01<br>PLAYERS: 1 / 100 (DEMO DISPLAY)<br>GAME COINS: <span id="coins">500</span> GC<br>PROPERTY: NG-R-0001</div>
+<div id="help" class="panel"><b>CONTROLS</b><br>W A S D / Arrow keys — Move<br>Drag screen — Rotate camera<br>Space — Jump<br>Walk around and explore your demo home plot.</div>
+<div id="actions" class="panel"><button onclick="showHome()">MY HOME</button><button onclick="buildHome()">BUILD HOME</button><button class="secondary" onclick="toggleCamera()">CAMERA</button></div>
+<div id="notice"></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+const mount=document.getElementById('game'),scene=new THREE.Scene();scene.background=new THREE.Color(0x91b9d5);scene.fog=new THREE.Fog(0x91b9d5,45,150);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,300),renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;mount.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xe5f3ff,0x52634e,2));const sun=new THREE.DirectionalLight(0xffffff,2.2);sun.position.set(-25,45,20);sun.castShadow=true;scene.add(sun);
+const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.8});
+function box(x,y,z,w,h,d,c){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));m.position.set(x,y+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(220,220),mat(0x567b61));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+box(0,.02,0,220,.04,13,0x303b49);for(let i=-90;i<=90;i+=10)box(i,.05,0,.25,.02,.5,0xf3d57b);
+for(const z of [-9,9]){box(0,.12,z,220,.22,3,0xaaaeb0);for(let x=-90;x<=90;x+=15){box(x,.3,z,.35,2,.35,0x755038);const crown=new THREE.Mesh(new THREE.SphereGeometry(1.5,12,10),mat(0x2e7548));crown.position.set(x,3,z);scene.add(crown)}}
+const colors=[0xd9e2ea,0xe4c9a8,0xa8c8d8,0xc5b4d9,0xe2a99b,0xc5d8bd];
+for(const side of [-1,1])for(let i=0;i<9;i++){const x=-80+i*20,z=side*25,h=8+(i%4)*4;box(x,0,z,12,h,12,colors[i%colors.length]);for(let y=2;y<h-1;y+=3)for(const dx of [-3,0,3]){const win=new THREE.Mesh(new THREE.BoxGeometry(1.3,1.2,.12),mat(0x6da4c7));win.position.set(x+dx,y,z-side*6.08);scene.add(win)}}
+const plot=new THREE.Mesh(new THREE.BoxGeometry(19,.12,19),mat(0x4b9fe0));plot.position.set(12,.09,-18);scene.add(plot);
+const outline=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(19,.2,19)),new THREE.LineBasicMaterial({color:0xdaf2ff}));outline.position.set(12,.18,-18);scene.add(outline);
+let home;function makeHome(){if(home)scene.remove(home);home=new THREE.Group();const base=new THREE.Mesh(new THREE.BoxGeometry(10,4,8),mat(0xf0dfc8));base.position.y=2;home.add(base);const roof=new THREE.Mesh(new THREE.ConeGeometry(7.2,3,4),mat(0x31577c));roof.rotation.y=Math.PI/4;roof.position.y=5.3;home.add(roof);const door=new THREE.Mesh(new THREE.BoxGeometry(1.3,2.5,.15),mat(0x694a35));door.position.set(0,1.25,4.08);home.add(door);home.position.set(12,.15,-18);scene.add(home)}makeHome();
+const player=new THREE.Group(),body=new THREE.Mesh(new THREE.CapsuleGeometry(.55,.9,4,8),mat(0x246fca)),head=new THREE.Mesh(new THREE.SphereGeometry(.42,16,12),mat(0xd8a47d));body.position.y=1.35;head.position.y=2.35;player.add(body,head);player.position.set(0,0,0);scene.add(player);
+let yaw=0,cameraMode=3,jumping=0,velocityY=0,dragging=false,lastX=0;const keys={};
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space'&&!jumping){velocityY=.19;jumping=1}});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX});addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(dragging){yaw-=(e.clientX-lastX)*.006;lastX=e.clientX}});
+function toast(t){const n=document.getElementById('notice');n.textContent=t;n.style.display='block';clearTimeout(window.noticeTimer);window.noticeTimer=setTimeout(()=>n.style.display='none',2600)}
+window.showHome=()=>toast('Demo home: NG-R-0001 · Owner: You (test data only)');
+window.buildHome=()=>{makeHome();document.getElementById('coins').textContent='450';toast('Demo build placed. 50 test GC used — no real money involved.')};
+window.toggleCamera=()=>{cameraMode=cameraMode===3?1:3;toast(cameraMode===1?'First Person Camera':'Third Person Camera')};
+function animate(){requestAnimationFrame(animate);let f=0,s=0;if(keys.w||keys.arrowup)f=1;if(keys.s||keys.arrowdown)f=-1;if(keys.a||keys.arrowleft)s=-1;if(keys.d||keys.arrowright)s=1;const dir=new THREE.Vector3(s,0,-f).applyAxisAngle(new THREE.Vector3(0,1,0),yaw);if(dir.length()){dir.normalize();player.position.addScaledVector(dir,.14);player.rotation.y=Math.atan2(dir.x,dir.z)}if(jumping){player.position.y+=velocityY;velocityY-=.009;if(player.position.y<=0){player.position.y=0;jumping=0;velocityY=0}}
+if(cameraMode===3){const off=new THREE.Vector3(Math.sin(yaw)*8,5,Math.cos(yaw)*8);camera.position.lerp(new THREE.Vector3(player.position.x+off.x,player.position.y+off.y,player.position.z+off.z),.12);camera.lookAt(player.position.x,1.5,player.position.z)}else{camera.position.set(player.position.x,player.position.y+2.2,player.position.z);camera.rotation.set(0,yaw+Math.PI,0)}renderer.render(scene,camera)}animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script></body></html>
