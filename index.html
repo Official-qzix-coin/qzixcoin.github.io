@@ -613,12 +613,15 @@ async function startGridTokenPurchase(tokenNumber){
   $("email").focus();
   return;
  }
+ // Open a tab during this tap; navigate it to UPI after the server locks the exact amount.
+ const paymentLaunchWindow=window.open("about:blank","_blank");
  qzixSelectedTokenNumber=tokenNumber;
  const select=$("initialBuyToken");
  if(!select.options.length||!Array.from(select.options).some(o=>Number(o.value)===tokenNumber)){
   await refreshInitialBuyOptions();
  }
  if(!Array.from(select.options).some(o=>Number(o.value)===tokenNumber)){
+  if(paymentLaunchWindow)paymentLaunchWindow.close();
   $("tokenAvailabilitySummary").textContent="This token is no longer available. The token list is being refreshed.";
   await refreshTokenStatus();
   return;
@@ -643,6 +646,7 @@ async function startGridTokenPurchase(tokenNumber){
    const tokenRequest=tokenRequests?.[0];
    if(tokenRequest?.status==="pending"){
      activeInitialManualRequestId=null;
+     if(paymentLaunchWindow)paymentLaunchWindow.close();
      $("initialBuyUpiPayNow").classList.add("hidden");
      $("initialManualConfirmArea").classList.add("hidden");
      $("initialBuyStatus").textContent="Your payment confirmation for QZIX-"+String(tokenNumber).padStart(3,"0")+" is already with admin. Please wait for payment verification; no second request is needed.";
@@ -650,7 +654,7 @@ async function startGridTokenPurchase(tokenNumber){
      activeInitialManualRequestId=tokenRequest.id;
      updateInitialManualUpiLink(tokenNumber,tokenRequest.amount);
      initialUpiOpenedForRequest=false;
-     $("initialBuyStatus").textContent="Your existing payment request is ready. Tap the “Open any UPI App to Pay” button below to launch your UPI app. Verify the token ID, exact amount and recipient before paying.";
+     $("initialBuyStatus").textContent="Your existing payment request is ready. Opening your UPI app… Verify the token ID, exact amount and recipient before paying.";
    }else{
      await createInitialManualRequest();
      const payLink=$("initialBuyUpiPayNow");
@@ -658,6 +662,16 @@ async function startGridTokenPurchase(tokenNumber){
        $("initialBuyStatus").textContent="Your payment request is ready. Tap the “Open any UPI App to Pay” button below to launch your UPI app. Verify the token ID, exact amount and recipient before paying.";
      }
    }
+ }
+ const payLink=$("initialBuyUpiPayNow");
+ if(paymentLaunchWindow&&!paymentLaunchWindow.closed&&activeInitialManualRequestId&&payLink&&!payLink.classList.contains("hidden")){
+  paymentLaunchWindow.location.href=payLink.href;
+  initialUpiOpenedForRequest=true;
+ }else if(paymentLaunchWindow&&!paymentLaunchWindow.closed){
+  paymentLaunchWindow.close();
+ }else if(activeInitialManualRequestId&&payLink&&!payLink.classList.contains("hidden")){
+  window.location.href=payLink.href;
+  initialUpiOpenedForRequest=true;
  }
  await refreshTokenStatus();
 }
