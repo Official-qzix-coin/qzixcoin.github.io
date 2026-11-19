@@ -19,6 +19,31 @@ canvas{display:block;width:100vw;height:100vh;image-rendering:auto}
 </style>
 </head>
 <body>
+
+<style>
+#qzixOwnerGate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(ellipse at top,#263f66 0%,#07111f 68%);color:#f4f7ff;font-family:system-ui,Arial,sans-serif;text-align:center}
+#qzixOwnerGate .gate-card{width:min(430px,100%);padding:30px 24px;border:1px solid #b9914e88;border-radius:22px;background:linear-gradient(145deg,#172c46,#0a1728);box-shadow:0 18px 55px #0009}
+#qzixOwnerGate .gate-lock{font-size:48px;margin-bottom:12px}
+#qzixOwnerGate h1{font-size:23px;margin:0 0 10px;color:#ffe0a0;letter-spacing:1px}
+#qzixOwnerGate p{color:#b9c8da;font-size:14px;line-height:1.6;margin:8px 0}
+#qzixOwnerGate a{display:inline-block;margin-top:15px;padding:12px 18px;border-radius:11px;background:linear-gradient(135deg,#ffe5a0,#d9a746);color:#172238;text-decoration:none;font-weight:800}
+</style>
+<div id="qzixOwnerGate" role="alert">
+ <div class="gate-card"><div class="gate-lock">🔒</div><h1>GAME LOCKED</h1>
+ <p><b>NEXT GEN HOME</b> is currently restricted to the website owner.</p>
+ <p>Only the owner account can open this game.</p>
+ <a href="index.html">← Back to QZIX Website</a></div>
+</div>
+<script type="module">
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+const qzixGate=createClient('https://rxjrsbkqytovjqnijqek.supabase.co','sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q');
+try{
+ const {data,error}=await qzixGate.auth.getSession();
+ const email=(data?.session?.user?.email||'').toLowerCase();
+ if(!error && email==='qzixcoin@gmail.com'){document.getElementById('qzixOwnerGate')?.remove();}
+}catch(e){console.warn('Owner access check failed',e);}
+</script>
+
 <canvas id="game"></canvas>
 <div id="hud">
  <div class="top"><div class="pill"><b>NEXT GEN HOME</b><br>Demo City · Server concept: 100 players</div><div class="pill" id="stats">Coins: 250 · Home: Not owned</div></div>
