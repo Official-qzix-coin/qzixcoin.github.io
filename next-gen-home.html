@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pa">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>NEXT GEN HOME — Playable Demo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101820;color:#eef5f7;font-family:system-ui,Arial;overflow:hidden}
+#hud{position:fixed;inset:0;pointer-events:none}
+.top{display:flex;justify-content:space-between;gap:8px;padding:12px}
+.pill{background:#132a36dd;border:1px solid #416273;border-radius:14px;padding:8px 12px;font-size:13px}
+#help{position:absolute;left:12px;bottom:12px;max-width:220px;line-height:1.45}
+#actions{position:absolute;right:12px;bottom:14px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
+button{border:1px solid #7bc7d5;background:#123746;color:white;border-radius:12px;padding:11px 14px;font-weight:700}
+#toast{position:absolute;top:64px;left:50%;transform:translateX(-50%);background:#132a36eF;padding:9px 14px;border-radius:12px;display:none}
+#stick{position:absolute;left:16px;bottom:18px;width:116px;height:116px;border-radius:50%;background:#ffffff18;border:1px solid #ffffff55;pointer-events:auto;touch-action:none}
+#nub{position:absolute;width:42px;height:42px;border-radius:50%;background:#b7e9f0aa;left:36px;top:36px}
+canvas{display:block;width:100vw;height:100vh}
+@media(min-width:800px){#stick{display:none}#help{max-width:310px}}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">
+ <div class="top"><div class="pill"><b>NEXT GEN HOME</b><br>Demo City · Server concept: 100 players</div><div class="pill" id="stats">Coins: 250 · Home: Not owned</div></div>
+ <div id="toast"></div>
+ <div id="help" class="pill">Move: WASD / Arrow keys<br>Mobile: use joystick<br>Explore the city and walk to your home plot.</div>
+ <div id="stick"><div id="nub"></div></div>
+ <div id="actions">
+  <button id="cam">Camera: Third Person</button>
+  <button id="home">My Home</button>
+  <button id="build">Build Mode: OFF</button>
+  <button id="mission">Daily Mission</button>
+ </div>
+</div>
+<script>
+const c=document.getElementById('game'),ctx=c.getContext('2d');
+let W,H,dpr,px=0,pz=0,camMode=3,build=false,owned=false,coins=250,missionDone=false,joy={x:0,y:0};
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
+const keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault()});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+function toast(s){let t=document.getElementById('toast');t.textContent=s;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display='none',2200)}
+function project(x,z,y=0){let scale=Math.min(W,H)*.035;return [W/2+(x-px)*scale-(z-pz)*scale*.62,H*.54+(x-px)*scale*.35+(z-pz)*scale*.35-y*scale]}
+function poly(points,fill,stroke){ctx.beginPath();points.forEach((p,i)=>{let q=project(...p);i?ctx.lineTo(...q):ctx.moveTo(...q)});ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}}
+function building(x,z,w,d,h,color,label){poly([[x,z],[x+w,z],[x+w,z+d],[x,z+d]],'#344a50');let top=[[x,z,h],[x+w,z,h],[x+w,z+d,h],[x,z+d,h]];poly(top,color,'#b5d3d0');poly([[x+w,z,h],[x+w,z+d,h],[x+w,z+d,0],[x+w,z,0]],'#29414a');poly([[x,z+d,h],[x+w,z+d,h],[x+w,z+d,0],[x,z+d,0]],'#3d5961');let p=project(x+w/2,z+d/2,h+1);ctx.fillStyle='#e9f5f2';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(label,p[0],p[1])}
+function draw(){ctx.clearRect(0,0,W,H);let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#8ec7d0');g.addColorStop(.58,'#d6e3cf');g.addColorStop(1,'#607c66');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ for(let x=-18;x<19;x++)for(let z=-18;z<19;z++){let col=((x+z)%2===0)?'#79977b':'#718f75';poly([[x*3,z*3],[(x+1)*3,z*3],[(x+1)*3,(z+1)*3],[x*3,(z+1)*3]],col)}
+ for(let x=-18;x<19;x+=4)poly([[x*3,-54],[x*3+1.3,-54],[x*3+1.3,54],[x*3,54]],'#45565b');
+ for(let z=-18;z<19;z+=4)poly([[-54,z*3],[54,z*3],[54,z*3+1.3],[-54,z*3+1.3]],'#45565b');
+ poly([[-15,-15],[-3,-15],[-3,-3],[-15,-3]],'#4c9b69');
+ for(let i=0;i<5;i++){let x=-13+i*2,z=-13+(i%2)*4;let p=project(x,z,1);ctx.fillStyle='#285b3c';ctx.beginPath();ctx.arc(p[0],p[1],10,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9acb79';ctx.beginPath();ctx.arc(p[0],p[1]-5,8,0,Math.PI*2);ctx.fill()}
+ building(4,3,5,5,5,'#d28b58','MARKET');building(-8,5,5,5,7,'#7797bd','OFFICE');building(7,-9,6,5,8,'#b4a0d4','TOWER');building(-5,-9,5,4,4,'#d2c17b','CAFE');
+ poly([[0,0],[4,0],[4,4],[0,4]],owned?'#c8a76b':'#b2bd8b','#fff');
+ if(owned||build)building(0,0,3,3,owned?4:1.5,'#d9a16e','MY HOME');
+ let p=project(px,pz,0);ctx.fillStyle='#182e38';ctx.beginPath();ctx.ellipse(p[0],p[1]+8,10,5,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#263f79';ctx.fillRect(p[0]-7,p[1]-20,14,20);ctx.fillStyle='#f1c8a2';ctx.beginPath();ctx.arc(p[0],p[1]-26,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#eef7ff';ctx.fillRect(p[0]-8,p[1]-37,16,5);
+ ctx.fillStyle='#17333b';ctx.font='bold 14px system-ui';ctx.textAlign='left';ctx.fillText('RESIDENTIAL DISTRICT',16,H-150);requestAnimationFrame(draw)}
+let last=performance.now();function update(t){let dt=Math.min((t-last)/16,2);last=t;let x=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+joy.x;let z=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0)+joy.y;let n=Math.hypot(x,z)||1;px+=x/n*.11*dt;pz+=z/n*.11*dt;requestAnimationFrame(update)}
+document.getElementById('cam').onclick=()=>{camMode=camMode===3?1:3;document.getElementById('cam').textContent='Camera: '+(camMode===3?'Third Person':'First Person');toast('Camera mode changed')};
+document.getElementById('home').onclick=()=>{if(Math.hypot(px-2,pz-2)<8){if(!owned){owned=true;coins=Math.max(0,coins-100)}document.getElementById('stats').textContent='Coins: '+coins+' · Home: Owned';toast('Home plot claimed! (Demo only)')}else{px=1;pz=1;toast('You are at your home plot. Tap My Home again to claim (100 demo coins).')}};
+document.getElementById('build').onclick=()=>{build=!build;document.getElementById('build').textContent='Build Mode: '+(build?'ON':'OFF');toast(build?'Build mode enabled':'Build mode closed')};
+document.getElementById('mission').onclick=()=>{if(!missionDone){missionDone=true;coins+=25;document.getElementById('stats').textContent='Coins: '+coins+' · Home: '+(owned?'Owned':'Not owned');toast('Mission complete: Explore the city · +25 demo coins')}else toast('Daily mission already completed')};
+const stick=document.getElementById('stick'),nub=document.getElementById('nub');let active=false;
+function joyMove(e){let r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,m=Math.min(38,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);joy.x=Math.cos(a)*m/38;joy.y=Math.sin(a)*m/38;nub.style.left=(36+Math.cos(a)*m)+'px';nub.style.top=(36+Math.sin(a)*m)+'px'}
+stick.addEventListener('pointerdown',e=>{active=true;stick.setPointerCapture(e.pointerId);joyMove(e)});stick.addEventListener('pointermove',e=>{if(active)joyMove(e)});function joyEnd(){active=false;joy={x:0,y:0};nub.style.left='36px';nub.style.top='36px'}stick.addEventListener('pointerup',joyEnd);stick.addEventListener('pointercancel',joyEnd);
+requestAnimationFrame(draw);requestAnimationFrame(update);
+</script>
+</body></html>
