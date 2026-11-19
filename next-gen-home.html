@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>NEXT GEN HOME — Playable Demo</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#101820;color:#eef5f7;font-family:system-ui,Arial;overflow:hidden}
+*{box-sizing:border-box}body{margin:0;background:#101820;color:#eef5f7;font-family:system-ui,Arial;overflow:hidden;touch-action:pan-x pan-y}
 #hud{position:fixed;inset:0;pointer-events:none}
 .top{display:flex;justify-content:space-between;gap:8px;padding:12px}
 .pill{background:#132a36dd;border:1px solid #416273;border-radius:14px;padding:8px 12px;font-size:13px}
@@ -14,7 +14,7 @@ button{border:1px solid #7bc7d5;background:#123746;color:white;border-radius:12p
 #toast{position:absolute;top:64px;left:50%;transform:translateX(-50%);background:#132a36eF;padding:9px 14px;border-radius:12px;display:none}
 #stick{position:absolute;left:16px;bottom:18px;width:116px;height:116px;border-radius:50%;background:#ffffff18;border:1px solid #ffffff55;pointer-events:auto;touch-action:none}
 #nub{position:absolute;width:42px;height:42px;border-radius:50%;background:#b7e9f0aa;left:36px;top:36px}
-canvas{display:block;width:100vw;height:100vh}
+canvas{display:block;width:100vw;height:100vh;image-rendering:auto}
 @media(min-width:800px){#stick{display:none}#help{max-width:310px}}
 </style>
 </head>
@@ -36,23 +36,47 @@ canvas{display:block;width:100vw;height:100vh}
 const c=document.getElementById('game'),ctx=c.getContext('2d');
 let W,H,dpr,px=0,pz=0,camMode=3,build=false,owned=false,coins=250,missionDone=false,joy={x:0,y:0};
 function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
-const keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault()});
-addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+const keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 function toast(s){let t=document.getElementById('toast');t.textContent=s;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display='none',2200)}
-function project(x,z,y=0){let scale=Math.min(W,H)*.035;return [W/2+(x-px)*scale-(z-pz)*scale*.62,H*.54+(x-px)*scale*.35+(z-pz)*scale*.35-y*scale]}
-function poly(points,fill,stroke){ctx.beginPath();points.forEach((p,i)=>{let q=project(...p);i?ctx.lineTo(...q):ctx.moveTo(...q)});ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}}
-function building(x,z,w,d,h,color,label){poly([[x,z],[x+w,z],[x+w,z+d],[x,z+d]],'#344a50');let top=[[x,z,h],[x+w,z,h],[x+w,z+d,h],[x,z+d,h]];poly(top,color,'#b5d3d0');poly([[x+w,z,h],[x+w,z+d,h],[x+w,z+d,0],[x+w,z,0]],'#29414a');poly([[x,z+d,h],[x+w,z+d,h],[x+w,z+d,0],[x,z+d,0]],'#3d5961');let p=project(x+w/2,z+d/2,h+1);ctx.fillStyle='#e9f5f2';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(label,p[0],p[1])}
-function draw(){ctx.clearRect(0,0,W,H);let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#8ec7d0');g.addColorStop(.58,'#d6e3cf');g.addColorStop(1,'#607c66');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
- for(let x=-18;x<19;x++)for(let z=-18;z<19;z++){let col=((x+z)%2===0)?'#79977b':'#718f75';poly([[x*3,z*3],[(x+1)*3,z*3],[(x+1)*3,(z+1)*3],[x*3,(z+1)*3]],col)}
- for(let x=-18;x<19;x+=4)poly([[x*3,-54],[x*3+1.3,-54],[x*3+1.3,54],[x*3,54]],'#45565b');
- for(let z=-18;z<19;z+=4)poly([[-54,z*3],[54,z*3],[54,z*3+1.3],[-54,z*3+1.3]],'#45565b');
- poly([[-15,-15],[-3,-15],[-3,-3],[-15,-3]],'#4c9b69');
- for(let i=0;i<5;i++){let x=-13+i*2,z=-13+(i%2)*4;let p=project(x,z,1);ctx.fillStyle='#285b3c';ctx.beginPath();ctx.arc(p[0],p[1],10,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9acb79';ctx.beginPath();ctx.arc(p[0],p[1]-5,8,0,Math.PI*2);ctx.fill()}
- building(4,3,5,5,5,'#d28b58','MARKET');building(-8,5,5,5,7,'#7797bd','OFFICE');building(7,-9,6,5,8,'#b4a0d4','TOWER');building(-5,-9,5,4,4,'#d2c17b','CAFE');
- poly([[0,0],[4,0],[4,4],[0,4]],owned?'#c8a76b':'#b2bd8b','#fff');
- if(owned||build)building(0,0,3,3,owned?4:1.5,'#d9a16e','MY HOME');
- let p=project(px,pz,0);ctx.fillStyle='#182e38';ctx.beginPath();ctx.ellipse(p[0],p[1]+8,10,5,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#263f79';ctx.fillRect(p[0]-7,p[1]-20,14,20);ctx.fillStyle='#f1c8a2';ctx.beginPath();ctx.arc(p[0],p[1]-26,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#eef7ff';ctx.fillRect(p[0]-8,p[1]-37,16,5);
- ctx.fillStyle='#17333b';ctx.font='bold 14px system-ui';ctx.textAlign='left';ctx.fillText('RESIDENTIAL DISTRICT',16,H-150);requestAnimationFrame(draw)}
+function project(x,z,y=0){let scale=Math.min(W,H)*.043;return [W/2+(x-px)*scale-(z-pz)*scale*.58,H*.56+(x-px)*scale*.32+(z-pz)*scale*.32-y*scale]}
+function path(pts){ctx.beginPath();pts.forEach((v,i)=>{let p=project(...v);i?ctx.lineTo(...p):ctx.moveTo(...p)});ctx.closePath()}
+function poly(pts,fill,stroke=null,lw=1){path(pts);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.lineWidth=lw;ctx.strokeStyle=stroke;ctx.stroke()}}
+function line(a,b,color,width=1){let p=project(...a),q=project(...b);ctx.beginPath();ctx.moveTo(...p);ctx.lineTo(...q);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
+function ellipse(x,z,rx,ry,color){let p=project(x,z,.04);ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(p[0],p[1],rx,ry,0,0,Math.PI*2);ctx.fill()}
+function ground(){let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#91b9bd');g.addColorStop(.42,'#b7c8b2');g.addColorStop(1,'#647c68');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ for(let x=-20;x<21;x++)for(let z=-20;z<21;z++){let c1=((x+z)&1)?'#789477':'#829b7c';poly([[x*3,z*3],[(x+1)*3,z*3],[(x+1)*3,(z+1)*3],[x*3,(z+1)*3]],c1)}
+ // asphalt roads with shoulders, curbs and dashed lane markings
+ for(let k=-5;k<=5;k+=4){let x=k*3;poly([[x-1,-60],[x+1,-60],[x+1,60],[x-1,60]],'#39464a');poly([[x-1.35,-60],[x-1,-60],[x-1,60],[x-1.35,60]],'#b6b4a0');poly([[x+1,-60],[x+1.35,-60],[x+1.35,60],[x+1,60]],'#b6b4a0');for(let z=-54;z<54;z+=7)poly([[x-.055,z],[x+.055,z],[x+.055,z+3],[x-.055,z+3]],'#e8dfbd')}
+ for(let k=-5;k<=5;k+=4){let z=k*3;poly([[-60,z-1],[60,z-1],[60,z+1],[-60,z+1]],'#39464a');poly([[-60,z-1.35],[60,z-1.35],[60,z-1],[-60,z-1]],'#b6b4a0');poly([[-60,z+1],[60,z+1],[60,z+1.35],[-60,z+1.35]],'#b6b4a0');for(let x=-54;x<54;x+=7)poly([[x,z-.055],[x+3,z-.055],[x+3,z+.055],[x,z+.055]],'#e8dfbd')}
+ // landscaped park
+ poly([[-16,-16],[-4,-16],[-4,-4],[-16,-4]],'#4b8b61');poly([[-15,-15],[-5,-15],[-5,-5],[-15,-5]],'#58966a');
+}
+function tree(x,z,s=1){ellipse(x,z,12*s,5*s,'#334d3b');let p=project(x,z,1.2*s);ctx.fillStyle='#654b36';ctx.fillRect(p[0]-2*s,p[1]-2*s,4*s,12*s);for(let i=0;i<3;i++){ctx.fillStyle=['#356e4d','#43865a','#5b9a64'][i];ctx.beginPath();ctx.arc(p[0]+(i-1)*5*s,p[1]-7*s-i*3*s,9*s,0,Math.PI*2);ctx.fill()}ctx.fillStyle='#9dc57b';ctx.beginPath();ctx.arc(p[0]-3*s,p[1]-13*s,3*s,0,Math.PI*2);ctx.fill()}
+function building(x,z,w,d,h,color,label,kind='office'){// cast shadow
+ poly([[x+1,z+1],[x+w+2,z+1],[x+w+2,z+d+2],[x+1,z+d+2]],'#45534b66');
+ poly([[x,z],[x+w,z],[x+w,z+d],[x,z+d]],'#4b6063');
+ poly([[x+w,z,0],[x+w,z+d,0],[x+w,z+d,h],[x+w,z,h]],'#334b55');
+ poly([[x,z+d,0],[x+w,z+d,0],[x+w,z+d,h],[x,z+d,h]],'#45616a');
+ poly([[x,z,h],[x+w,z,h],[x+w,z+d,h],[x,z+d,h]],color,'#d4d8c4',1.2);
+ // windows on two visible facades
+ const rows=Math.max(2,Math.floor(h/1.5));
+ for(let r=0;r<rows;r++)for(let col=0;col<Math.max(2,Math.floor(w/1.4));col++){
+  let xx=x+.55+col*(w-.9)/Math.max(1,Math.floor(w/1.4)-1), yy=.55+r*(h-.8)/rows;
+  poly([[xx,z+d,yy],[xx+.38,z+d,yy],[xx+.38,z+d,yy+.58],[xx,z+d,yy+.58]],r%3===0?'#b8d6d2':'#8fb6bb');
+  poly([[x+w,z+.5+col*.65,yy],[x+w,z+.85+col*.65,yy],[x+w,z+.85+col*.65,yy+.58],[x+w,z+.5+col*.65,yy+.58]],'#91b9bd');
+ }
+ let p=project(x+w/2,z+d/2,h+1);ctx.fillStyle='#f4f2e6';ctx.font='600 12px system-ui';ctx.textAlign='center';ctx.shadowColor='#172d32';ctx.shadowBlur=4;ctx.fillText(label,p[0],p[1]);ctx.shadowBlur=0;
+}
+function person(){let p=project(px,pz,0);ellipse(px,pz,13,6,'#263b3b');ctx.fillStyle='#182f3a';ctx.beginPath();ctx.ellipse(p[0],p[1]-9,7,12,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#315b91';ctx.fillRect(p[0]-8,p[1]-31,16,23);ctx.fillStyle='#d9a984';ctx.beginPath();ctx.arc(p[0],p[1]-39,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#3d302b';ctx.beginPath();ctx.arc(p[0],p[1]-43,8,Math.PI,Math.PI*2);ctx.fill();ctx.fillStyle='#e5e8df';ctx.fillRect(p[0]-9,p[1]-52,18,5)}
+function draw(){ctx.clearRect(0,0,W,H);ground();
+ for(let i=0;i<8;i++)tree(-15+i*1.4,-13+(i%2)*2,.8);
+ building(-8,5,5,5,7,'#7797bd','OFFICE');building(4,3,5,5,5,'#c28b60','MARKET','shop');building(7,-9,6,5,8,'#a995c9','TOWER');building(-5,-9,5,4,4,'#c6b879','CAFE','shop');
+ // street lamps
+ for(let i=-2;i<=2;i++){let p=project(i*12,-3,3);ctx.strokeStyle='#34494a';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(p[0],p[1]+32);ctx.stroke();ctx.fillStyle='#f6e7ae';ctx.beginPath();ctx.arc(p[0],p[1],4,0,Math.PI*2);ctx.fill()}
+ poly([[0,0],[4,0],[4,4],[0,4]],owned?'#c5a56e':'#a8b78c','#f4e7c8',2);
+ if(owned||build){building(0,0,3,3,owned?4:1.5,'#d5a274','MY HOME','house');}
+ person();ctx.fillStyle='#17333b';ctx.font='700 14px system-ui';ctx.textAlign='left';ctx.fillText('RESIDENTIAL DISTRICT',16,H-150);
+ requestAnimationFrame(draw)}
 let last=performance.now();function update(t){let dt=Math.min((t-last)/16,2);last=t;let x=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+joy.x;let z=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0)+joy.y;let n=Math.hypot(x,z)||1;px+=x/n*.11*dt;pz+=z/n*.11*dt;requestAnimationFrame(update)}
 document.getElementById('cam').onclick=()=>{camMode=camMode===3?1:3;document.getElementById('cam').textContent='Camera: '+(camMode===3?'Third Person':'First Person');toast('Camera mode changed')};
 document.getElementById('home').onclick=()=>{if(Math.hypot(px-2,pz-2)<8){if(!owned){owned=true;coins=Math.max(0,coins-100)}document.getElementById('stats').textContent='Coins: '+coins+' · Home: Owned';toast('Home plot claimed! (Demo only)')}else{px=1;pz=1;toast('You are at your home plot. Tap My Home again to claim (100 demo coins).')}};
