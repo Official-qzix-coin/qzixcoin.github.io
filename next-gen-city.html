@@ -16,6 +16,9 @@ button.secondary{background:#203b5b;color:white}#notice{position:fixed;z-index:4
 #shopPanel h2{margin:0 0 5px;color:#ffe2a0}#shopPanel p{font-size:12px;color:#b9c9dc}
 .shopItem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid #ffffff20;font-size:13px}.shopItem button{white-space:nowrap;padding:9px 11px}
 .shopItem button:disabled{opacity:.45}#shopPrompt{position:fixed;z-index:4;left:50%;bottom:90px;transform:translateX(-50%);display:none}
+#touchPad{position:fixed;z-index:4;left:12px;bottom:105px;display:grid;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,46px);gap:5px}
+#touchPad button{padding:0;border-radius:12px;background:#10243bdc;color:white;border:1px solid #ffffff55;font-size:18px;touch-action:none}
+#touchPad button[data-key="w"]{grid-column:2;grid-row:1}#touchPad button[data-key="a"]{grid-column:1;grid-row:2}#touchPad button[data-key="s"]{grid-column:2;grid-row:2}#touchPad button[data-key="d"]{grid-column:3;grid-row:2}
 #back{position:fixed;z-index:3;top:88px;left:12px;text-decoration:none;color:#ffe2a0;font-size:12px}
 @media(max-width:600px){#stats{font-size:10px}#help{max-width:165px;font-size:9px}button{font-size:10px;padding:10px}#actions{max-width:190px}}
 </style></head><body>
@@ -51,6 +54,7 @@ try{
 <div id="help" class="panel"><b>CONTROLS</b><br>W A S D / Arrow keys — Move<br>Drag screen — Rotate camera<br>Space — Jump<br>Walk around and explore your demo home plot.</div>
 <div id="actions" class="panel"><button onclick="showHome()">MY HOME</button><button onclick="buildHome()">BUILD HOME</button><button class="secondary" onclick="toggleCamera()">CAMERA</button></div>
 <div id="notice"></div>
+<div id="touchPad" aria-label="Touch movement controls"><button data-key="w">▲</button><button data-key="a">◀</button><button data-key="s">▼</button><button data-key="d">▶</button></div>
 <div id="shopPrompt"><button onclick="enterNearbyShop()">🏪 ENTER SHOP</button></div>
 <div id="shopPanel"><h2 id="shopTitle">CITY SHOP</h2><p>Demo store · Buy with test Game Coins (GC) only.</p><div id="shopItems"></div><button class="secondary" onclick="closeShop()">CLOSE SHOP</button></div>
 <script type="module">
@@ -119,6 +123,13 @@ const outline=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeomet
 let home;function makeHome(){if(home)scene.remove(home);home=new THREE.Group();const base=new THREE.Mesh(new THREE.BoxGeometry(10,4,8),mat(0xf0dfc8));base.position.y=2;home.add(base);const roof=new THREE.Mesh(new THREE.ConeGeometry(7.2,3,4),mat(0x31577c));roof.rotation.y=Math.PI/4;roof.position.y=5.3;home.add(roof);const door=new THREE.Mesh(new THREE.BoxGeometry(1.3,2.5,.15),mat(0x694a35));door.position.set(0,1.25,4.08);home.add(door);home.position.set(12,.15,-18);scene.add(home)}makeHome();
 const player=new THREE.Group(),body=new THREE.Mesh(new THREE.CapsuleGeometry(.55,.9,4,8),mat(0x246fca)),head=new THREE.Mesh(new THREE.SphereGeometry(.42,16,12),mat(0xd8a47d));body.position.y=1.35;head.position.y=2.35;player.add(body,head);player.position.set(0,0,0);scene.add(player);
 let yaw=0,cameraMode=3,jumping=0,velocityY=0,dragging=false,lastX=0;const keys={};
+document.querySelectorAll('#touchPad button').forEach(btn=>{
+ const k=btn.dataset.key;
+ const down=e=>{e.preventDefault();keys[k]=true};
+ const up=e=>{e.preventDefault();keys[k]=false};
+ btn.addEventListener('pointerdown',down);btn.addEventListener('pointerup',up);
+ btn.addEventListener('pointercancel',up);btn.addEventListener('pointerleave',up);
+});
 addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space'&&!jumping){velocityY=.19;jumping=1}});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX});addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(dragging){yaw-=(e.clientX-lastX)*.006;lastX=e.clientX}});
 let gameCoins=500;const boughtItems=new Set();let nearbyShop=null;
