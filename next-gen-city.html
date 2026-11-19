@@ -16,11 +16,21 @@ button.secondary{background:#203b5b;color:white}#notice{position:fixed;z-index:4
 #shopPanel h2{margin:0 0 5px;color:#ffe2a0}#shopPanel p{font-size:12px;color:#b9c9dc}
 .shopItem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid #ffffff20;font-size:13px}.shopItem button{white-space:nowrap;padding:9px 11px}
 .shopItem button:disabled{opacity:.45}#shopPrompt{position:fixed;z-index:4;left:50%;bottom:90px;transform:translateX(-50%);display:none}
-#touchPad{position:fixed;z-index:4;left:12px;bottom:105px;display:grid;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,46px);gap:5px}
-#touchPad button{padding:0;border-radius:12px;background:#10243bdc;color:white;border:1px solid #ffffff55;font-size:18px;touch-action:none}
+#touchPad{position:fixed;z-index:20;left:18px;bottom:230px;display:grid;grid-template-columns:repeat(3,50px);grid-template-rows:repeat(2,50px);gap:6px}
+#touchPad button{padding:0;border-radius:12px;background:#10243bf2;color:white;border:2px solid #ffe2a0;font-size:22px;font-weight:900;touch-action:none;box-shadow:0 3px 12px #0008}
 #touchPad button[data-key="w"]{grid-column:2;grid-row:1}#touchPad button[data-key="a"]{grid-column:1;grid-row:2}#touchPad button[data-key="s"]{grid-column:2;grid-row:2}#touchPad button[data-key="d"]{grid-column:3;grid-row:2}
 #back{position:fixed;z-index:3;top:88px;left:12px;text-decoration:none;color:#ffe2a0;font-size:12px}
-@media(max-width:600px){#stats{font-size:10px}#help{max-width:165px;font-size:9px}button{font-size:10px;padding:10px}#actions{max-width:190px}}
+@media(max-width:600px){
+#brand{top:8px;left:8px;max-width:48vw;font-size:14px;padding:9px}
+#brand small{font-size:8px;letter-spacing:.3px}
+#stats{top:8px;right:8px;max-width:48vw;font-size:9px;padding:9px;line-height:1.55}
+#back{top:72px;left:10px;font-size:11px}
+#help{left:10px;bottom:10px;max-width:46vw;font-size:9px;padding:9px;line-height:1.45}
+#actions{right:10px;bottom:10px;max-width:48vw;padding:8px;gap:5px}
+#actions button{font-size:9px;padding:9px}
+#touchPad{left:12px;bottom:190px;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,48px)}
+#shopPrompt{bottom:155px}
+}
 </style></head><body>
 
 <style>
