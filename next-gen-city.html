@@ -12,6 +12,10 @@
 #actions{right:12px;bottom:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:260px}
 button{border:1px solid #ffffff35;border-radius:10px;padding:11px 13px;background:linear-gradient(135deg,#ffe5a0,#d9a746);color:#172238;font-weight:800}
 button.secondary{background:#203b5b;color:white}#notice{position:fixed;z-index:4;top:82px;left:50%;transform:translateX(-50%);display:none;background:#10243b;border:1px solid #7899bb;border-radius:12px;padding:11px 15px;text-align:center;max-width:90vw;font-size:13px}
+#shopPanel{position:fixed;z-index:5;display:none;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,92vw);max-height:82vh;overflow:auto;background:#0b1b30f5;border:1px solid #d9ad5d;border-radius:18px;padding:18px;box-shadow:0 20px 70px #000b}
+#shopPanel h2{margin:0 0 5px;color:#ffe2a0}#shopPanel p{font-size:12px;color:#b9c9dc}
+.shopItem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid #ffffff20;font-size:13px}.shopItem button{white-space:nowrap;padding:9px 11px}
+.shopItem button:disabled{opacity:.45}#shopPrompt{position:fixed;z-index:4;left:50%;bottom:90px;transform:translateX(-50%);display:none}
 #back{position:fixed;z-index:3;top:88px;left:12px;text-decoration:none;color:#ffe2a0;font-size:12px}
 @media(max-width:600px){#stats{font-size:10px}#help{max-width:165px;font-size:9px}button{font-size:10px;padding:10px}#actions{max-width:190px}}
 </style></head><body>
@@ -47,6 +51,8 @@ try{
 <div id="help" class="panel"><b>CONTROLS</b><br>W A S D / Arrow keys — Move<br>Drag screen — Rotate camera<br>Space — Jump<br>Walk around and explore your demo home plot.</div>
 <div id="actions" class="panel"><button onclick="showHome()">MY HOME</button><button onclick="buildHome()">BUILD HOME</button><button class="secondary" onclick="toggleCamera()">CAMERA</button></div>
 <div id="notice"></div>
+<div id="shopPrompt"><button onclick="enterNearbyShop()">🏪 ENTER SHOP</button></div>
+<div id="shopPanel"><h2 id="shopTitle">CITY SHOP</h2><p>Demo store · Buy with test Game Coins (GC) only.</p><div id="shopItems"></div><button class="secondary" onclick="closeShop()">CLOSE SHOP</button></div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const mount=document.getElementById('game'),scene=new THREE.Scene();scene.background=new THREE.Color(0x91b9d5);scene.fog=new THREE.Fog(0x91b9d5,45,150);
@@ -115,11 +121,18 @@ const player=new THREE.Group(),body=new THREE.Mesh(new THREE.CapsuleGeometry(.55
 let yaw=0,cameraMode=3,jumping=0,velocityY=0,dragging=false,lastX=0;const keys={};
 addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space'&&!jumping){velocityY=.19;jumping=1}});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX});addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(dragging){yaw-=(e.clientX-lastX)*.006;lastX=e.clientX}});
+let gameCoins=500;const boughtItems=new Set();let nearbyShop=null;
+const shopInventory=[{id:'outfit',name:'Street Outfit',price:60,desc:'A fresh player look'},{id:'sofa',name:'Modern Sofa',price:90,desc:'Furniture for your home'},{id:'lamp',name:'Golden Floor Lamp',price:35,desc:'A home decoration'},{id:'plant',name:'Indoor Plant',price:25,desc:'A little greenery'}];
+function renderShop(){document.getElementById('coins').textContent=gameCoins;document.getElementById('shopItems').innerHTML=shopInventory.map(it=>{const done=boughtItems.has(it.id);return '<div class="shopItem"><span><b>'+it.name+'</b><br><small>'+it.desc+' · '+it.price+' GC</small></span><button '+(done||gameCoins<it.price?'disabled':'')+' onclick="buyShopItem(\''+it.id+'\')">'+(done?'OWNED':'BUY')+'</button></div>'}).join('')}
+window.enterNearbyShop=()=>{if(!nearbyShop){toast('Walk closer to a shop first.');return}document.getElementById('shopTitle').textContent=nearbyShop.name;renderShop();document.getElementById('shopPanel').style.display='block';document.getElementById('shopPrompt').style.display='none'};
+window.closeShop=()=>document.getElementById('shopPanel').style.display='none';
+window.buyShopItem=id=>{const item=shopInventory.find(x=>x.id===id);if(!item||boughtItems.has(id))return;if(gameCoins<item.price){toast('Not enough demo GC.');return}gameCoins-=item.price;boughtItems.add(id);renderShop();toast(item.name+' purchased! Demo-only item added to your collection.')};
 function toast(t){const n=document.getElementById('notice');n.textContent=t;n.style.display='block';clearTimeout(window.noticeTimer);window.noticeTimer=setTimeout(()=>n.style.display='none',2600)}
 window.showHome=()=>toast('Demo home: NG-R-0001 · Owner: You (test data only)');
 window.buildHome=()=>{makeHome();document.getElementById('coins').textContent='450';toast('Demo build placed. 50 test GC used — no real money involved.')};
 window.toggleCamera=()=>{cameraMode=cameraMode===3?1:3;toast(cameraMode===1?'First Person Camera':'Third Person Camera')};
 function animate(){requestAnimationFrame(animate);const time=performance.now()*.001;for(const p of citizens){p.node.position.x=p.originX+Math.sin(time*.55+p.phase)*2.2;p.node.position.z=p.originZ+Math.cos(time*.42+p.phase)*1.6;p.node.rotation.y=Math.sin(time*.55+p.phase)*.35;}let f=0,s=0;if(keys.w||keys.arrowup)f=1;if(keys.s||keys.arrowdown)f=-1;if(keys.a||keys.arrowleft)s=-1;if(keys.d||keys.arrowright)s=1;const dir=new THREE.Vector3(s,0,-f).applyAxisAngle(new THREE.Vector3(0,1,0),yaw);if(dir.length()){dir.normalize();player.position.addScaledVector(dir,.14);player.rotation.y=Math.atan2(dir.x,dir.z)}if(jumping){player.position.y+=velocityY;velocityY-=.009;if(player.position.y<=0){player.position.y=0;jumping=0;velocityY=0}}
+let nearest=null,nearestD=Infinity;for(const [idx,x] of [-30,-12,12,30].entries()){const d=Math.hypot(player.position.x-x,player.position.z-5);if(d<nearestD){nearestD=d;nearest={name:['Corner Market','Style Store','Home Decor','City Mart'][idx],x}}}nearbyShop=nearestD<9?nearest:null;document.getElementById('shopPrompt').style.display=nearbyShop&&document.getElementById('shopPanel').style.display!=='block'?'block':'none';
 if(cameraMode===3){const off=new THREE.Vector3(Math.sin(yaw)*8,5,Math.cos(yaw)*8);camera.position.lerp(new THREE.Vector3(player.position.x+off.x,player.position.y+off.y,player.position.z+off.z),.12);camera.lookAt(player.position.x,1.5,player.position.z)}else{camera.position.set(player.position.x,player.position.y+2.2,player.position.z);camera.rotation.set(0,yaw+Math.PI,0)}renderer.render(scene,camera)}animate();
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 </script></body></html>
