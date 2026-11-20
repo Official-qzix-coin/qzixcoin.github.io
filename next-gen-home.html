@@ -185,9 +185,43 @@ const stick=document.getElementById('stick'),nub=document.getElementById('nub');
   const key=new THREE.DirectionalLight(0xffe2b0,3.1);key.position.set(-3,6,5);scene.add(key);
   const rim=new THREE.DirectionalLight(0x9dc9ff,1.8);rim.position.set(3,3,-4);scene.add(rim);
   const avatar=new THREE.Group();scene.add(avatar);
+  const mansion=new THREE.Group();scene.add(mansion);
   const mat=(color,roughness=.72,metalness=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
   const black=mat(0x101319),hood=mat(0x080b10),pants=mat(0x171b20),gold=mat(0xc99b42,.32,.65),skin=mat(0xc58d6c),hair=mat(0x17120f),glass=mat(0x080c12,.18,.2),sole=mat(0xe2bd70,.4,.45);
   function part(parent,geo,material,x,y,z){const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);parent.add(m);return m}
+  const wall=mat(0xe8dfcf), trim=mat(0xf7f0df), roof=mat(0x263849,.5,.18), roofEdge=mat(0x172635), doorMat=mat(0x3b2b23), glassHouse=new THREE.MeshPhysicalMaterial({color:0x8fd3e8,metalness:.18,roughness:.12,transparent:true,opacity:.72}), stone=mat(0x9d9b91), goldHouse=mat(0xc99b42,.28,.6), grass=mat(0x47784b), water=mat(0x36b9d2,.12,.25);
+  function housePart(geo,material,x,y,z){return part(mansion,geo,material,x,y,z)}
+  housePart(new THREE.BoxGeometry(4.9,.22,3.9),stone,0,.12,0);
+  housePart(new THREE.BoxGeometry(4.65,2.55,3.65),wall,0,1.42,0);
+  for(const x of [-2.18,2.18])housePart(new THREE.BoxGeometry(.16,2.65,.18),trim,x,1.43,1.84);
+  housePart(new THREE.BoxGeometry(4.75,.16,.16),trim,0,2.72,1.84);
+  const roofA=housePart(new THREE.BoxGeometry(2.75,.18,4.15),roof,-.72,3.02,0);roofA.rotation.z=-.52;
+  const roofB=housePart(new THREE.BoxGeometry(2.75,.18,4.15),roof,.72,3.02,0);roofB.rotation.z=.52;
+  housePart(new THREE.BoxGeometry(.16,.22,4.2),roofEdge,0,3.73,0);
+  housePart(new THREE.BoxGeometry(.92,1.82,.12),doorMat,0,1.05,1.91);
+  housePart(new THREE.BoxGeometry(.07,.08,.05),goldHouse,.31,1.02,2);
+  housePart(new THREE.BoxGeometry(1.18,.12,.75),roofEdge,0,2.08,2.12);
+  for(const x of [-.62,.62])housePart(new THREE.CylinderGeometry(.075,.09,1.9,12),trim,x,1.05,2.22);
+  for(const x of [-1.48,1.48]){
+   housePart(new THREE.BoxGeometry(.94,1.15,.08),glassHouse,x,1.55,1.88);
+   housePart(new THREE.BoxGeometry(1,.07,.11),trim,x,1.55,1.94);
+   housePart(new THREE.BoxGeometry(.07,1.2,.11),trim,x,1.55,1.94);
+   housePart(new THREE.BoxGeometry(.9,.055,.13),goldHouse,x,1.55,2);
+  }
+  housePart(new THREE.BoxGeometry(2.35,.12,.65),stone,0,2.42,2.12);
+  housePart(new THREE.BoxGeometry(2.3,.09,.08),trim,0,2.95,2.4);
+  for(let i=0;i<9;i++)housePart(new THREE.BoxGeometry(.045,.48,.045),trim,-1.08+i*.27,2.69,2.4);
+  housePart(new THREE.BoxGeometry(.42,.9,.42),stone,1.62,3.35,-.95);
+  housePart(new THREE.BoxGeometry(.55,.12,.55),roofEdge,1.62,3.83,-.95);
+  housePart(new THREE.BoxGeometry(1.05,.78,.16),wall,0,3.15,-.55);
+  housePart(new THREE.BoxGeometry(.55,.34,.05),glassHouse,0,3.18,-.455);
+  for(let i=0;i<3;i++)housePart(new THREE.BoxGeometry(1.75,.12,.35),stone,0,.08+i*.11,2.55+i*.32);
+  for(const x of [-2.55,2.55]){
+   housePart(new THREE.CylinderGeometry(.3,.38,.38,16),stone,x,.34,1.85);
+   housePart(new THREE.SphereGeometry(.38,16,12),grass,x,.76,1.85);
+  }
+  housePart(new THREE.BoxGeometry(1.4,.12,2.3),stone,3.1,.08,.2);
+  housePart(new THREE.BoxGeometry(1.18,.045,2.05),water,3.1,.16,.2);
   const torso=part(avatar,new THREE.CapsuleGeometry(.34,.62,6,12),hood,0,1.42,0);torso.scale.set(1,1.03,.72);
   const hoodBack=part(avatar,new THREE.SphereGeometry(.34,16,12),black,0,1.88,-.12);hoodBack.scale.set(1,.92,.7);
   const neck=part(avatar,new THREE.CylinderGeometry(.105,.12,.18,12),skin,0,1.94,0);
