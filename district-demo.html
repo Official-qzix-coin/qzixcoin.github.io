@@ -28,6 +28,18 @@ h1{font-size:clamp(21px,4vw,30px);margin:0;letter-spacing:1.2px}.sub{color:var(-
 .buy{border:0;border-radius:8px;padding:10px 17px;background:linear-gradient(135deg,#ffe5a0,#d9a746);color:#172238;font-size:11px;font-weight:900;cursor:pointer}
 .note{margin-top:17px;padding:13px;border:1px solid #806536;border-radius:12px;background:#2a2418;color:#f4dca7;font-size:11px;line-height:1.6}footer{text-align:center;color:#8294ad;font-size:10px;margin-top:20px}
 @media(max-width:600px){.wrap{padding:13px 9px 30px}.district{padding:11px}.token-row{grid-auto-columns:72px}.district-head span{font-size:8px}.stats{gap:5px}.stat{padding:8px 3px}.stat b{font-size:17px}.stat span{font-size:9px}.buy{padding:9px 12px}}
+
+.payment-identity{display:block;margin:10px 0;padding:14px;border:1px solid #d9b45f99;border-radius:12px;background:linear-gradient(145deg,#342a19,#14243a 72%)}
+.payment-identity .pay-kicker{font-size:10px;letter-spacing:1.4px;font-weight:900;color:#ffe2a0}
+.payment-identity .pay-token{font-size:23px;font-weight:950;color:#fff0c2;margin:5px 0}
+.payment-identity .pay-row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid #ffffff18;font-size:12px}
+.payment-identity .pay-row span{color:#b8c7da}.payment-identity .pay-row b{text-align:right;color:#fff}
+.payment-identity .pay-warning{margin-top:8px;padding:9px;border-radius:8px;background:#0a1728;color:#f3dba6;font-size:11px;line-height:1.45}
+.token.reserved{background:#332b1b;border-color:#bd944c;cursor:not-allowed;opacity:.9}
+.token.owned{background:#103c32;border-color:#27b887;cursor:not-allowed}
+.token:disabled{opacity:.9}
+#districtAccountPanel .search-controls input{flex:1;min-width:145px}
+
 </style></head><body><main class="wrap">
 <div class="top"><div class="brand"><div class="coin">Q</div><div><h1>QZIX COIN</h1><p class="sub">Punjab District Token Demo</p></div></div><a href="./">← Main Website</a></div>
 <section class="hero"><h2>Punjab — 23 Districts</h2><p class="sub">Every district has its own separate list of 100 token IDs. Swipe horizontally to view IDs 001–100 and select a token.</p><div class="price">Token Price: ₹2 per Token</div><div class="stats"><div class="stat"><b>23</b><span>Districts</span></div><div class="stat"><b>100</b><span>Tokens / district</span></div><div class="stat"><b>0</b><span>Bought (demo)</span></div><div class="stat"><b>₹2</b><span>Per token</span></div></div></section>
@@ -35,6 +47,44 @@ h1{font-size:clamp(21px,4vw,30px);margin:0;letter-spacing:1.2px}.sub{color:var(-
   <label for="districtSearch">FIND YOUR DISTRICT</label>
   <div class="search-controls"><input id="districtSearch" type="search" placeholder="Enter district name or code (e.g. PB31 or Mansa)" autocomplete="off" onkeydown="if(event.key==='Enter'){searchDistrict()}"><button type="button" onclick="searchDistrict()">SEARCH DISTRICT</button><button class="clear" type="button" onclick="clearDistrictSearch()">CLEAR</button></div>
   <p id="searchMessage" role="status">Search PB code or district name to jump directly to that district’s 100 tokens.</p>
+</section>
+
+
+<section class="search-panel" id="districtAccountPanel">
+  <label>BUYER ACCOUNT · SIGN IN REQUIRED</label>
+  <div class="search-controls">
+    <input id="districtEmail" type="email" placeholder="Email address" autocomplete="email">
+    <input id="districtPassword" type="password" placeholder="Password" autocomplete="current-password">
+    <button type="button" id="districtSignup">SIGN UP</button>
+    <button type="button" id="districtLogin">LOG IN</button>
+    <button type="button" class="clear" id="districtLogout" style="display:none">LOG OUT</button>
+  </div>
+  <p id="districtAuthStatus" role="status">Connecting securely to QZIX account…</p>
+</section>
+<section class="district" id="districtPaymentPanel" style="display:none">
+  <div class="district-head"><h2>Secure Token Payment</h2><span>₹2 FIXED PRICE</span></div>
+  <p class="intro">Selected token and payment details are shown below. Sign in, create a payment request, pay through your UPI app, then confirm. Token ownership is assigned only after admin verifies the actual payment in the bank/UPI account.</p>
+  <div class="payment-identity visible" id="districtPaymentSummary">
+    <div class="pay-kicker">PAYMENT SUMMARY · PLEASE CHECK</div>
+    <div class="pay-token" id="districtPayToken">QZIX-PB02-001</div>
+    <div class="pay-row"><span>District</span><b id="districtPayName">Amritsar (PB02)</b></div>
+    <div class="pay-row"><span>Exact amount</span><b>₹2.00</b></div>
+    <div class="pay-row"><span>Pay to (UPI ID)</span><b>7814244038@ptyes</b></div>
+    <div class="pay-warning">Verify the token ID, amount and recipient name inside your UPI app before paying. A screenshot or “I Have Paid” tap is not proof of payment.</div>
+  </div>
+  <a id="districtUpiPayNow" class="buy" href="#" style="display:none;text-align:center;text-decoration:none;margin:10px 0">OPEN UPI APP TO PAY ₹2</a>
+  <button type="button" id="districtConfirmPaid" style="display:none;width:100%">I HAVE PAID — SEND FOR ADMIN REVIEW</button>
+  <p class="intro" id="districtPaymentStatus" role="status">Select any available district token and tap BUY TOKEN to begin.</p>
+</section>
+<section class="district" id="districtMyOrders">
+  <div class="district-head"><h2>My District Token Orders</h2><button type="button" class="buy" id="districtRefreshOrders">REFRESH</button></div>
+  <div id="districtOrdersList" class="intro">Log in to view your district token orders.</div>
+</section>
+<section class="district" id="districtAdminPanel" style="display:none">
+  <div class="district-head"><h2>Admin · District Payment Review</h2><button type="button" class="buy" id="districtRefreshAdmin">REFRESH QUEUE</button></div>
+  <p class="intro">Approve only after verifying the actual incoming ₹2 payment in the bank/UPI transaction history. Enter the verified UTR/reference when approving. Do not approve from a screenshot or buyer confirmation alone.</p>
+  <p class="intro" id="districtAdminStatus" role="status"></p>
+  <div id="districtAdminQueue" class="intro">No pending district payments.</div>
 </section>
 
 <section class="district" data-code="PB02">
@@ -243,33 +293,199 @@ h1{font-size:clamp(21px,4vw,30px);margin:0;letter-spacing:1.2px}.sub{color:var(-
   <div class="token-row" aria-label="Tarn Taran token IDs"><button class="token" type="button" data-id="001" onclick="selectToken('PB46','001',this)"><strong>001</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="002" onclick="selectToken('PB46','002',this)"><strong>002</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="003" onclick="selectToken('PB46','003',this)"><strong>003</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="004" onclick="selectToken('PB46','004',this)"><strong>004</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="005" onclick="selectToken('PB46','005',this)"><strong>005</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="006" onclick="selectToken('PB46','006',this)"><strong>006</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="007" onclick="selectToken('PB46','007',this)"><strong>007</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="008" onclick="selectToken('PB46','008',this)"><strong>008</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="009" onclick="selectToken('PB46','009',this)"><strong>009</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="010" onclick="selectToken('PB46','010',this)"><strong>010</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="011" onclick="selectToken('PB46','011',this)"><strong>011</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="012" onclick="selectToken('PB46','012',this)"><strong>012</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="013" onclick="selectToken('PB46','013',this)"><strong>013</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="014" onclick="selectToken('PB46','014',this)"><strong>014</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="015" onclick="selectToken('PB46','015',this)"><strong>015</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="016" onclick="selectToken('PB46','016',this)"><strong>016</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="017" onclick="selectToken('PB46','017',this)"><strong>017</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="018" onclick="selectToken('PB46','018',this)"><strong>018</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="019" onclick="selectToken('PB46','019',this)"><strong>019</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="020" onclick="selectToken('PB46','020',this)"><strong>020</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="021" onclick="selectToken('PB46','021',this)"><strong>021</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="022" onclick="selectToken('PB46','022',this)"><strong>022</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="023" onclick="selectToken('PB46','023',this)"><strong>023</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="024" onclick="selectToken('PB46','024',this)"><strong>024</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="025" onclick="selectToken('PB46','025',this)"><strong>025</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="026" onclick="selectToken('PB46','026',this)"><strong>026</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="027" onclick="selectToken('PB46','027',this)"><strong>027</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="028" onclick="selectToken('PB46','028',this)"><strong>028</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="029" onclick="selectToken('PB46','029',this)"><strong>029</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="030" onclick="selectToken('PB46','030',this)"><strong>030</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="031" onclick="selectToken('PB46','031',this)"><strong>031</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="032" onclick="selectToken('PB46','032',this)"><strong>032</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="033" onclick="selectToken('PB46','033',this)"><strong>033</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="034" onclick="selectToken('PB46','034',this)"><strong>034</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="035" onclick="selectToken('PB46','035',this)"><strong>035</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="036" onclick="selectToken('PB46','036',this)"><strong>036</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="037" onclick="selectToken('PB46','037',this)"><strong>037</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="038" onclick="selectToken('PB46','038',this)"><strong>038</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="039" onclick="selectToken('PB46','039',this)"><strong>039</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="040" onclick="selectToken('PB46','040',this)"><strong>040</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="041" onclick="selectToken('PB46','041',this)"><strong>041</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="042" onclick="selectToken('PB46','042',this)"><strong>042</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="043" onclick="selectToken('PB46','043',this)"><strong>043</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="044" onclick="selectToken('PB46','044',this)"><strong>044</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="045" onclick="selectToken('PB46','045',this)"><strong>045</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="046" onclick="selectToken('PB46','046',this)"><strong>046</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="047" onclick="selectToken('PB46','047',this)"><strong>047</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="048" onclick="selectToken('PB46','048',this)"><strong>048</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="049" onclick="selectToken('PB46','049',this)"><strong>049</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="050" onclick="selectToken('PB46','050',this)"><strong>050</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="051" onclick="selectToken('PB46','051',this)"><strong>051</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="052" onclick="selectToken('PB46','052',this)"><strong>052</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="053" onclick="selectToken('PB46','053',this)"><strong>053</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="054" onclick="selectToken('PB46','054',this)"><strong>054</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="055" onclick="selectToken('PB46','055',this)"><strong>055</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="056" onclick="selectToken('PB46','056',this)"><strong>056</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="057" onclick="selectToken('PB46','057',this)"><strong>057</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="058" onclick="selectToken('PB46','058',this)"><strong>058</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="059" onclick="selectToken('PB46','059',this)"><strong>059</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="060" onclick="selectToken('PB46','060',this)"><strong>060</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="061" onclick="selectToken('PB46','061',this)"><strong>061</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="062" onclick="selectToken('PB46','062',this)"><strong>062</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="063" onclick="selectToken('PB46','063',this)"><strong>063</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="064" onclick="selectToken('PB46','064',this)"><strong>064</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="065" onclick="selectToken('PB46','065',this)"><strong>065</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="066" onclick="selectToken('PB46','066',this)"><strong>066</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="067" onclick="selectToken('PB46','067',this)"><strong>067</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="068" onclick="selectToken('PB46','068',this)"><strong>068</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="069" onclick="selectToken('PB46','069',this)"><strong>069</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="070" onclick="selectToken('PB46','070',this)"><strong>070</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="071" onclick="selectToken('PB46','071',this)"><strong>071</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="072" onclick="selectToken('PB46','072',this)"><strong>072</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="073" onclick="selectToken('PB46','073',this)"><strong>073</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="074" onclick="selectToken('PB46','074',this)"><strong>074</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="075" onclick="selectToken('PB46','075',this)"><strong>075</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="076" onclick="selectToken('PB46','076',this)"><strong>076</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="077" onclick="selectToken('PB46','077',this)"><strong>077</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="078" onclick="selectToken('PB46','078',this)"><strong>078</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="079" onclick="selectToken('PB46','079',this)"><strong>079</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="080" onclick="selectToken('PB46','080',this)"><strong>080</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="081" onclick="selectToken('PB46','081',this)"><strong>081</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="082" onclick="selectToken('PB46','082',this)"><strong>082</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="083" onclick="selectToken('PB46','083',this)"><strong>083</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="084" onclick="selectToken('PB46','084',this)"><strong>084</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="085" onclick="selectToken('PB46','085',this)"><strong>085</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="086" onclick="selectToken('PB46','086',this)"><strong>086</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="087" onclick="selectToken('PB46','087',this)"><strong>087</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="088" onclick="selectToken('PB46','088',this)"><strong>088</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="089" onclick="selectToken('PB46','089',this)"><strong>089</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="090" onclick="selectToken('PB46','090',this)"><strong>090</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="091" onclick="selectToken('PB46','091',this)"><strong>091</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="092" onclick="selectToken('PB46','092',this)"><strong>092</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="093" onclick="selectToken('PB46','093',this)"><strong>093</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="094" onclick="selectToken('PB46','094',this)"><strong>094</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="095" onclick="selectToken('PB46','095',this)"><strong>095</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="096" onclick="selectToken('PB46','096',this)"><strong>096</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="097" onclick="selectToken('PB46','097',this)"><strong>097</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="098" onclick="selectToken('PB46','098',this)"><strong>098</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="099" onclick="selectToken('PB46','099',this)"><strong>099</strong><small>₹2 / token</small></button><button class="token" type="button" data-id="100" onclick="selectToken('PB46','100',this)"><strong>100</strong><small>₹2 / token</small></button></div>
   <div class="buy-panel"><span>Selected Token: <b id="selected-PB46">QZIX-001</b></span><button class="buy" type="button" onclick="demoBuy('PB46')">BUY TOKEN</button></div>
 </section>
-<div class="note"><b>DEMO ONLY:</b> This preview does not start payment, reserve a token, confirm purchase, or prove ownership. Bought, Reserved and Left are demonstration figures only. No profit or future price is guaranteed. Main website payment and ownership rules are unchanged.</div>
+<div class="note"><b>PAYMENT & OWNERSHIP RULES:</b> All 23 district lists connect to the QZIX account and UPI payment-request system. Each district has 100 separate tokens at ₹2 each. A token is only reserved after a valid logged-in request and becomes owned only after admin verifies the actual incoming payment. No profit or future price is guaranteed. No Sell option is provided.</div>
 <footer>QZIX COIN · 23 Districts · 100 Unique Token IDs in every district · Total demo entries: 2,300</footer>
 </main><script>
+
+const QZIX_SUPABASE_URL="https://rxjrsbkqytovjqnijqek.supabase.co";
+const QZIX_SUPABASE_KEY="sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q";
+const QZIX_DISTRICT_UPI="7814244038@ptyes";
+let districtSupabase=null,districtUser=null,districtAdmin=false;
+let selectedDistrictCode="PB02",selectedTokenNumber=1;
+let activeDistrictRequestId=null,districtUpiOpened=false;
+const districtNames={PB02:"Amritsar",PB19:"Barnala",PB03:"Bathinda",PB04:"Faridkot",PB23:"Fatehgarh Sahib",PB22:"Fazilka",PB05:"Ferozepur",PB06:"Gurdaspur",PB07:"Hoshiarpur",PB08:"Jalandhar",PB09:"Kapurthala",PB10:"Ludhiana",PB28:"Malerkotla",PB31:"Mansa",PB29:"Moga",PB35:"Pathankot",PB11:"Patiala",PB12:"Rupnagar",PB65:"S.A.S. Nagar (Mohali)",PB13:"Sangrur",PB32:"S.B.S. Nagar (Nawanshahr)",PB30:"Sri Muktsar Sahib",PB46:"Tarn Taran"};
+const districtCodes=Object.keys(districtNames);
+const $=id=>document.getElementById(id);
+function safeDistrictText(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function districtTokenCode(code,num){return "QZIX-"+code+"-"+String(num).padStart(3,"0");}
 function searchDistrict(){
- const input=document.getElementById("districtSearch");
- const q=input.value.trim().toUpperCase().replace(/\\s+/g," ");
- const msg=document.getElementById("searchMessage");
- const all=[...document.querySelectorAll(".district")];
+ const input=$("districtSearch"),q=input.value.trim().toUpperCase().replace(/\s+/g," ");
+ const msg=$("searchMessage"),all=[...document.querySelectorAll(".district[data-code]")];
  all.forEach(s=>s.classList.remove("search-hidden","search-match"));
  if(!q){msg.textContent="Please enter a district name or PB code, such as PB31 or Mansa.";return;}
- const matches=all.filter(s=>{
-   const title=s.querySelector(".district-head h2").textContent.toUpperCase();
-   const code=(s.dataset.code||"").toUpperCase();
-   return title.includes(q)||code===q||code.replace("PB","PB ")===q;
- });
+ const matches=all.filter(s=>{const title=s.querySelector(".district-head h2").textContent.toUpperCase();const code=(s.dataset.code||"").toUpperCase();return title.includes(q)||code===q||code.replace("PB","PB ")===q;});
  if(!matches.length){msg.textContent="No district found. Check the spelling or PB code and try again.";return;}
  all.forEach(s=>{if(!matches.includes(s))s.classList.add("search-hidden");});
- matches[0].classList.add("search-match");
- matches[0].scrollIntoView({behavior:"smooth",block:"start"});
+ matches[0].classList.add("search-match");matches[0].scrollIntoView({behavior:"smooth",block:"start"});
  msg.textContent="Found: "+matches.map(s=>s.querySelector(".district-head h2").textContent).join(", ")+". Showing its token list below.";
 }
 function clearDistrictSearch(){
- document.getElementById("districtSearch").value="";
- document.querySelectorAll(".district").forEach(s=>s.classList.remove("search-hidden","search-match"));
- document.getElementById("searchMessage").textContent="Search PB code or district name to jump directly to that district’s 100 tokens.";
+ $("districtSearch").value="";
+ document.querySelectorAll(".district[data-code]").forEach(s=>s.classList.remove("search-hidden","search-match"));
+ $("searchMessage").textContent="Search PB code or district name to jump directly to that district’s 100 tokens.";
 }
-function selectToken(code,id,el){const section=el.closest(".district");section.querySelectorAll(".token").forEach(x=>x.classList.remove("selected"));el.classList.add("selected");document.getElementById("selected-"+code).textContent="QZIX-"+id;}
-function demoBuy(code){const id=document.getElementById("selected-"+code).textContent;alert("DEMO ONLY\\nSelected: "+id+"\\nDistrict: "+code+"\\nPrice: ₹2\\nNo payment or reservation has been made.");}
-document.querySelectorAll(".district").forEach(s=>s.querySelector('.token[data-id="001"]').classList.add("selected"));
+function selectToken(code,id,el){
+ const section=el.closest(".district");if(el.disabled)return;
+ section.querySelectorAll(".token").forEach(x=>x.classList.remove("selected"));el.classList.add("selected");
+ selectedDistrictCode=code;selectedTokenNumber=Number(id);
+ const label=$("selected-"+code);if(label)label.textContent=districtTokenCode(code,id);
+ $("districtPayToken").textContent=districtTokenCode(code,id);
+ $("districtPayName").textContent=(districtNames[code]||code)+" ("+code+")";
+ $("districtPaymentStatus").textContent="Selected "+districtTokenCode(code,id)+". Tap BUY TOKEN in this district to create a ₹2 payment request.";
+}
+function setDistrictPaymentLink(request){
+ const link=$("districtUpiPayNow");
+ const params=new URLSearchParams({pa:QZIX_DISTRICT_UPI,pn:"QZIX COIN",am:"2.00",cu:"INR",tn:request.token_code});
+ link.href="upi://pay?"+params.toString();link.style.display="block";
+ link.textContent="PAY ₹2 FOR "+request.token_code+" · OPEN UPI APP";
+ $("districtConfirmPaid").style.display="block";
+ districtUpiOpened=false;
+}
+async function demoBuy(code){
+ if(!districtSupabase){$("districtPaymentStatus").textContent="Payment service is connecting. Please wait and try again.";return;}
+ if(!districtUser){$("districtPaymentStatus").textContent="Please log in or sign up first. Your selected token is "+districtTokenCode(code,selectedTokenNumber)+"."; $("districtAccountPanel").scrollIntoView({behavior:"smooth",block:"center"});return;}
+ if(code!==selectedDistrictCode){$("districtPaymentStatus").textContent="Please select a token in this district first.";return;}
+ $("districtPaymentPanel").style.display="block";
+ $("districtPayToken").textContent=districtTokenCode(code,selectedTokenNumber);
+ $("districtPaymentStatus").textContent="Creating secure payment request…";
+ try{
+  const {data,error}=await districtSupabase.rpc("qzix_create_district_manual_payment",{p_district_code:code,p_token_number:selectedTokenNumber});
+  if(error)throw error;
+  activeDistrictRequestId=data.request_id;
+  setDistrictPaymentLink(data);
+  $("districtPaymentStatus").textContent="Request created for "+data.token_code+". Pay exactly ₹2 using the UPI button, verify recipient name, then return and tap I HAVE PAID. Request expires at "+new Date(data.expires_at).toLocaleTimeString()+".";
+  await refreshDistrictOrders();await refreshDistrictTokenStatus();
+  $("districtPaymentPanel").scrollIntoView({behavior:"smooth",block:"center"});
+ }catch(e){$("districtPaymentStatus").textContent=e.message||"Could not create payment request.";}
+}
+$("districtUpiPayNow").addEventListener("click",()=>{if(activeDistrictRequestId)districtUpiOpened=true;});
+$("districtConfirmPaid").addEventListener("click",async()=>{
+ if(!districtUser||!activeDistrictRequestId){$("districtPaymentStatus").textContent="Create a new payment request first.";return;}
+ if(!districtUpiOpened){$("districtPaymentStatus").textContent="First open your UPI app using the payment button. After paying, return and confirm.";return;}
+ const btn=$("districtConfirmPaid");btn.disabled=true;
+ try{
+  const {error}=await districtSupabase.rpc("qzix_confirm_district_manual_payment",{p_request_id:activeDistrictRequestId});
+  if(error)throw error;
+  activeDistrictRequestId=null;districtUpiOpened=false;
+  $("districtUpiPayNow").style.display="none";btn.style.display="none";
+  $("districtPaymentStatus").textContent="Payment marked as sent. Admin will verify the actual incoming payment. Your token becomes owned only after admin approval.";
+  await refreshDistrictOrders();await refreshDistrictTokenStatus();if(districtAdmin)await refreshDistrictAdminQueue();
+ }catch(e){$("districtPaymentStatus").textContent=e.message||"Could not send payment confirmation.";}
+ finally{btn.disabled=false;}
+});
+async function refreshDistrictTokenStatus(){
+ if(!districtSupabase)return;
+ const results=await Promise.all(districtCodes.map(code=>districtSupabase.rpc("qzix_district_token_status",{p_district_code:code})));
+ let total=0,available=0,assigned=0,reserved=0;
+ results.forEach((result,index)=>{
+  if(result.error){console.error("District token status error",districtCodes[index],result.error);return;}
+  (result.data||[]).forEach(row=>{
+   total++;const button=document.querySelector('.district[data-code="'+row.district_code+'"] .token[data-id="'+String(row.token_number).padStart(3,"0")+'"]');
+   if(!button)return;
+   const small=button.querySelector("small");
+   button.classList.remove("reserved","owned");
+   if(row.is_assigned){button.disabled=true;button.classList.add("owned");small.textContent="OWNED";assigned++;}
+   else if(row.is_reserved){button.disabled=true;button.classList.add("reserved");small.textContent="RESERVED";reserved++;}
+   else{button.disabled=false;small.textContent="₹2 / token";available++;}
+  });
+ });
+ const stat=document.querySelector(".hero .stats");
+ if(stat)stat.innerHTML='<div class="stat"><b>23</b><span>Districts</span></div><div class="stat"><b>2,300</b><span>Total Tokens</span></div><div class="stat"><b>'+assigned+'</b><span>Owned</span></div><div class="stat"><b>'+available+'</b><span>Available</span></div>';
+ $("searchMessage").textContent="Live token status: "+available+" available · "+reserved+" reserved · "+assigned+" owned · "+total+" checked across all districts.";
+}
+async function refreshDistrictOrders(){
+ if(!districtSupabase||!districtUser){$("districtOrdersList").textContent="Log in to view your district token orders.";return;}
+ const {data,error}=await districtSupabase.from("qzix_district_manual_purchase_requests")
+  .select("id,district_code,district_name,token_number,amount,status,admin_note,created_at,expires_at,payment_confirmed_at")
+  .eq("buyer_id",districtUser.id).order("created_at",{ascending:false}).limit(30);
+ if(error){$("districtOrdersList").textContent="Orders unavailable: "+error.message;return;}
+ if(!data?.length){$("districtOrdersList").textContent="No district token orders yet.";return;}
+ $("districtOrdersList").innerHTML=data.map(r=>{
+  const code=districtTokenCode(r.district_code,r.token_number),status=r.status.replaceAll("_"," ").toUpperCase();
+  return '<article style="padding:10px 0;border-bottom:1px solid #304764"><b style="color:#ffe2a0">'+safeDistrictText(code)+'</b> · ₹'+Number(r.amount).toFixed(2)+'<br><small>'+safeDistrictText(r.district_name)+' · '+safeDistrictText(status)+' · '+safeDistrictText(new Date(r.created_at).toLocaleString())+'</small>'+(r.payment_confirmed_at?'<br><small>Payment marked sent: '+safeDistrictText(new Date(r.payment_confirmed_at).toLocaleString())+'</small>':'')+(r.admin_note?'<br><small>'+safeDistrictText(r.admin_note)+'</small>':'')+'</article>';
+ }).join("");
+ const active=data.find(r=>r.status==="awaiting_payment"&&new Date(r.expires_at).getTime()>Date.now());
+ if(active){
+  activeDistrictRequestId=active.id;
+  setDistrictPaymentLink({token_code:districtTokenCode(active.district_code,active.token_number)});
+  $("districtPaymentPanel").style.display="block";
+  $("districtPayToken").textContent=districtTokenCode(active.district_code,active.token_number);
+  $("districtPayName").textContent=active.district_name+" ("+active.district_code+")";
+  $("districtPaymentStatus").textContent="You have an active payment request. Open the UPI app, pay ₹2, then confirm here.";
+ }
+}
+async function refreshDistrictAdminQueue(){
+ if(!districtSupabase||!districtAdmin)return;
+ $("districtAdminStatus").textContent="Loading pending district payments…";
+ const {data,error}=await districtSupabase.from("qzix_district_manual_purchase_requests")
+  .select("id,district_code,district_name,token_number,buyer_id,amount,status,created_at,payment_confirmed_at")
+  .eq("status","pending").order("created_at",{ascending:true}).limit(200);
+ if(error){$("districtAdminStatus").textContent="Queue error: "+error.message;return;}
+ if(!data?.length){$("districtAdminQueue").textContent="No pending district payment requests.";$("districtAdminStatus").textContent="Queue updated.";return;}
+ $("districtAdminQueue").innerHTML=data.map(r=>'<article style="padding:12px 0;border-bottom:1px solid #304764"><b style="color:#ffe2a0">'+safeDistrictText(districtTokenCode(r.district_code,r.token_number))+'</b> · ₹'+Number(r.amount).toFixed(2)+'<br><small>Buyer: '+safeDistrictText(r.buyer_id)+'<br>Paid confirmation: '+safeDistrictText(r.payment_confirmed_at?new Date(r.payment_confirmed_at).toLocaleString():"Not available")+'</small><div class="search-controls" style="margin-top:8px"><button type="button" data-district-review="approve" data-id="'+safeDistrictText(r.id)+'">APPROVE</button><button type="button" class="clear" data-district-review="reject" data-id="'+safeDistrictText(r.id)+'">REJECT</button></div></article>').join("");
+ $("districtAdminStatus").textContent="Match each payment against actual incoming UPI/bank credit before approval.";
+}
+$("districtAdminQueue").addEventListener("click",async e=>{
+ const btn=e.target.closest("[data-district-review]");if(!btn)return;
+ const decision=btn.dataset.districtReview;let reference=null;
+ if(decision==="approve"){reference=prompt("Enter the verified bank/UPI UTR or payment reference (must match the actual credit):");if(!reference||reference.trim().length<4){$("districtAdminStatus").textContent="Approval cancelled. Verified payment reference is required.";return;}}
+ else if(!confirm("Reject this district token payment request?"))return;
+ btn.disabled=true;$("districtAdminStatus").textContent="Processing review…";
+ const {error}=await districtSupabase.rpc("qzix_admin_review_district_manual_payment",{
+  p_request_id:btn.dataset.id,p_decision:decision,p_payment_reference:reference,p_admin_note:null
+ });
+ btn.disabled=false;
+ if(error){$("districtAdminStatus").textContent="Review failed: "+error.message;return;}
+ $("districtAdminStatus").textContent=decision==="approve"?"Payment approved. District token assigned and company wallet credited.":"Payment request rejected.";
+ await refreshDistrictAdminQueue();await refreshDistrictTokenStatus();await refreshDistrictOrders();
+});
+$("districtRefreshOrders").addEventListener("click",refreshDistrictOrders);
+$("districtRefreshAdmin").addEventListener("click",refreshDistrictAdminQueue);
+async function updateDistrictAuth(){
+ const status=$("districtAuthStatus");
+ if(!districtUser){status.textContent="Not logged in. Sign in or create an account to buy a district token."; $("districtLogout").style.display="none";districtAdmin=false;$("districtAdminPanel").style.display="none";$("districtOrdersList").textContent="Log in to view your district token orders.";return;}
+ status.textContent="Signed in: "+(districtUser.email||"QZIX account")+". You can buy available district tokens.";
+ $("districtLogout").style.display="inline-block";
+ const {data:admin}=await districtSupabase.from("qzix_v2_admins").select("user_id").eq("user_id",districtUser.id).maybeSingle();
+ districtAdmin=!!admin;$("districtAdminPanel").style.display=districtAdmin?"block":"none";
+ await refreshDistrictOrders();if(districtAdmin)await refreshDistrictAdminQueue();
+}
+async function initDistrictPayments(){
+ try{
+  let mod;
+  try{mod=await import("https://esm.sh/@supabase/supabase-js@2");}
+  catch(e){mod=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");}
+  districtSupabase=mod.createClient(QZIX_SUPABASE_URL,QZIX_SUPABASE_KEY);
+  const {data:{session}}=await districtSupabase.auth.getSession();districtUser=session?.user||null;
+  districtSupabase.auth.onAuthStateChange((_event,session)=>{districtUser=session?.user||null;setTimeout(()=>updateDistrictAuth(),0);});
+  await updateDistrictAuth();await refreshDistrictTokenStatus();
+  $("districtAuthStatus").textContent=districtUser?"Signed in: "+(districtUser.email||"QZIX account")+".":"Connected. Log in or sign up to buy a district token.";
+ }catch(e){$("districtAuthStatus").textContent="Payment connection failed: "+(e.message||"Please refresh and try again.");}
+}
+$("districtSignup").addEventListener("click",async()=>{
+ if(!districtSupabase){$("districtAuthStatus").textContent="Payment service is still connecting.";return;}
+ const email=$("districtEmail").value.trim(),password=$("districtPassword").value;
+ if(!email||password.length<6){$("districtAuthStatus").textContent="Enter a valid email and a password of at least 6 characters.";return;}
+ $("districtAuthStatus").textContent="Creating account…";
+ const {data,error}=await districtSupabase.auth.signUp({email,password});
+ $("districtAuthStatus").textContent=error?"Sign up failed: "+error.message:(data.session?"Account created and signed in.":"Account created. Check your email for the verification link, then log in.");
+ if(data.session){districtUser=data.user;await updateDistrictAuth();}
+});
+$("districtLogin").addEventListener("click",async()=>{
+ if(!districtSupabase){$("districtAuthStatus").textContent="Payment service is still connecting.";return;}
+ const {data,error}=await districtSupabase.auth.signInWithPassword({email:$("districtEmail").value.trim(),password:$("districtPassword").value});
+ $("districtAuthStatus").textContent=error?"Login failed: "+error.message:"Login successful.";
+ if(data.user){districtUser=data.user;await updateDistrictAuth();}
+});
+$("districtLogout").addEventListener("click",async()=>{
+ if(!districtSupabase)return;const {error}=await districtSupabase.auth.signOut();
+ $("districtAuthStatus").textContent=error?"Logout failed: "+error.message:"Logged out.";
+ if(!error){districtUser=null;activeDistrictRequestId=null;await updateDistrictAuth();}
+});
+document.querySelectorAll(".district[data-code]").forEach(section=>{
+ const code=section.dataset.code,first=section.querySelector('.token[data-id="001"]');
+ if(first){first.classList.add("selected");selectedDistrictCode=code;selectedTokenNumber=1;const label=$("selected-"+code);if(label)label.textContent=districtTokenCode(code,1);}
+});
+initDistrictPayments();
+
 </script></body></html>
