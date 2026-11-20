@@ -2,7 +2,7 @@
 <html lang="pa">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>NEXT GEN HOME — Playable Demo</title>
+<title>NEXT GEN HOME — Advanced City & Mansion Demo</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#101820;color:#eef5f7;font-family:system-ui,Arial;overflow:hidden;touch-action:pan-x pan-y}
 #hud{position:fixed;inset:0;pointer-events:none}
@@ -50,9 +50,9 @@ try{
 
 <canvas id="game"></canvas>
 <div id="hud">
- <div class="top"><div class="pill"><b>NEXT GEN HOME</b><br>Demo City · Server concept: 100 players</div><div class="pill" id="stats">Coins: 250 · Home: Not owned</div></div>
+ <div class="top"><div class="pill"><b>NEXT GEN HOME</b><br>ADVANCED CITY · Mansion & Garden</div><div class="pill" id="stats">Coins: 250 · Home: Not owned</div></div>
  <div id="toast"></div>
- <div id="help" class="pill">Move: WASD / Arrow keys<br>Mobile: use joystick<br>Explore the city and walk to your home plot.</div>
+ <div id="help" class="pill">Move: WASD / Arrow keys<br>Mobile: use joystick<br>Explore the mansion, garden, pool and city. WASD / joystick to move.</div>
  <div id="stick"><div id="nub"></div></div>
  <div id="actions">
   <button id="cam">Camera: Third Person</button>
@@ -83,19 +83,36 @@ function building(x,z,w,d,h,color,label){poly([[x+1,z+1],[x+w+2,z+1],[x+w+2,z+d+
 let rows=Math.max(2,Math.floor(h/1.5));for(let r=0;r<rows;r++)for(let col=0;col<Math.max(2,Math.floor(w/1.4));col++){let xx=x+.55+col*(w-.9)/Math.max(1,Math.floor(w/1.4)-1),yy=.55+r*(h-.8)/rows;poly([[xx,z+d,yy],[xx+.38,z+d,yy],[xx+.38,z+d,yy+.58],[xx,z+d,yy+.58]],r%3===0?'#b8d6d2':'#8fb6bb');poly([[x+w,z+.5+col*.65,yy],[x+w,z+.85+col*.65,yy],[x+w,z+.85+col*.65,yy+.58],[x+w,z+.5+col*.65,yy+.58]],'#91b9bd')}
 let p=project(x+w/2,z+d/2,h+1);ctx.fillStyle='#f4f2e6';ctx.font='600 12px system-ui';ctx.textAlign='center';ctx.fillText(label,p[0],p[1]);
 let door=project(x+w/2,z+d,1.15);ctx.fillStyle=doorOpen&&inside===label?'#c79a52':'#473a30';ctx.fillRect(door[0]-5,door[1]-17,10,18);ctx.fillStyle='#e6c87b';ctx.beginPath();ctx.arc(door[0]+2,door[1]-8,1.3,0,7);ctx.fill()}
-const places=[{name:'MY HOME',x:0,z:0,w:3,d:3,color:'#d5a274'},{name:'OFFICE',x:-8,z:5,w:5,d:5,color:'#7797bd'},{name:'MARKET',x:4,z:3,w:5,d:5,color:'#c28b60'},{name:'TOWER',x:7,z:-9,w:6,d:5,color:'#a995c9'},{name:'CAFE',x:-5,z:-9,w:5,d:4,color:'#c6b879'}];
+const places=[{name:'MY HOME',x:-2,z:-2,w:7,d:6,color:'#d5a274'},{name:'OFFICE',x:-10,z:9,w:5,d:5,color:'#7797bd'},{name:'MARKET',x:10,z:7,w:5,d:5,color:'#c28b60'},{name:'TOWER',x:10,z:-10,w:6,d:5,color:'#a995c9'},{name:'CAFE',x:-10,z:-10,w:5,d:4,color:'#c6b879'}];
 function nearest(){let best=null,dist=999;for(let a of places){let d=Math.hypot(px-(a.x+a.w/2),pz-(a.z+a.d/2));if(d<dist){dist=d;best=a}}return dist<9?best:null}
 function person(){let p=project(px,pz,0),s=Math.sin(walk)*4;ellipse(px,pz,13,6,'#263b3b');if(camMode===1)return;
 ctx.strokeStyle='#263c53';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(p[0]-4,p[1]-14);ctx.lineTo(p[0]-6+s,p[1]+1);ctx.moveTo(p[0]+4,p[1]-14);ctx.lineTo(p[0]+6-s,p[1]+1);ctx.stroke();
 ctx.fillStyle='#315b91';ctx.fillRect(p[0]-8,p[1]-32,16,22);ctx.strokeStyle='#d9a984';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(p[0]-7,p[1]-27);ctx.lineTo(p[0]-12-s*.5,p[1]-14);ctx.moveTo(p[0]+7,p[1]-27);ctx.lineTo(p[0]+12+s*.5,p[1]-14);ctx.stroke();
 ctx.fillStyle='#d9a984';ctx.beginPath();ctx.arc(p[0],p[1]-40,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#3d302b';ctx.beginPath();ctx.arc(p[0],p[1]-44,8,Math.PI,Math.PI*2);ctx.fill()}
 function interior(){ctx.fillStyle='#b9a58a';ctx.fillRect(0,0,W,H);ctx.fillStyle='#e2d4b9';ctx.fillRect(W*.08,H*.12,W*.84,H*.72);ctx.fillStyle='#9b8064';ctx.fillRect(W*.08,H*.66,W*.84,H*.18);ctx.fillStyle='#526b76';ctx.fillRect(W*.16,H*.2,W*.24,H*.28);ctx.fillStyle='#9fc4ca';ctx.fillRect(W*.18,H*.22,W*.2,H*.24);ctx.fillStyle='#8b674b';ctx.fillRect(W*.58,H*.53,W*.24,H*.1);ctx.fillStyle='#f4f0e7';ctx.font='bold 24px system-ui';ctx.textAlign='center';ctx.fillText(inside+' INTERIOR',W/2,H*.1);ctx.font='15px system-ui';ctx.fillText('Demo interior · Walk around coming in next upgrade',W/2,H*.9)}
-function draw(){ctx.clearRect(0,0,W,H);if(inside){interior()}else{ground();for(let i=0;i<8;i++)tree(-15+i*1.4,-13+(i%2)*2,.8);building(-8,5,5,5,7,'#7797bd','OFFICE');building(4,3,5,5,5,'#c28b60','MARKET');building(7,-9,6,5,8,'#a995c9','TOWER');building(-5,-9,5,4,4,'#c6b879','CAFE');poly([[0,0],[4,0],[4,4],[0,4]],owned?'#c5a56e':'#a8b78c','#f4e7c8',2);if(owned||build){building(0,0,3,3,4+(upgrades.floor?3:0),'#d5a274','MY HOME');if(upgrades.garden){tree(-1.7,4.2,.65);tree(4.1,2.2,.65);poly([[-2,3.8],[4,3.8],[4,5.3],[-2,5.3]],'#477d50')}if(upgrades.solar){for(let q=0;q<3;q++)poly([[.35+q*.8,.35,4.15],[1+q*.8,.35,4.15],[1+q*.8,1.15,4.15],[.35+q*.8,1.15,4.15]],'#315d78','#b8dce8',1)}}person();if(camMode===1){ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(W/2,H*.48,3,0,7);ctx.fill();ctx.strokeStyle='#fff';ctx.beginPath();ctx.moveTo(W/2-12,H*.48);ctx.lineTo(W/2+12,H*.48);ctx.moveTo(W/2,H*.48-12);ctx.lineTo(W/2,H*.48+12);ctx.stroke()}}requestAnimationFrame(draw)}
+function draw(){ctx.clearRect(0,0,W,H);if(inside){interior()}else{ground();
+// Expanded city district and skyline
+building(-18,10,5,6,10,'#7899ad','RESIDENCE');building(-17,-12,6,5,13,'#8b91b7','CITY TOWER');building(17,11,6,6,12,'#bd906e','HOTEL');building(17,-13,5,6,16,'#778fae','SKY TOWER');building(-4,17,7,5,8,'#b6a17a','COMMUNITY');building(8,17,6,5,9,'#829f91','PLAZA');
+// Main mansion compound, driveway and landscaped garden
+poly([[-6,-6],[9,-6],[9,10],[-6,10]],'#91a77d','#e9e0c8',1.5);
+poly([[-3,4],[6,4],[6,7],[-3,7]],'#b6b9ad');poly([[-1.5,4],[4.5,4],[4.5,8],[-1.5,8]],'#d0c7ad','#f1e7ce',1);
+// Swimming pool and deck
+poly([[6,-3],[10,-3],[10,1],[6,1]],'#c7b99b','#f1e7d5',2);poly([[6.4,-2.6],[9.6,-2.6],[9.6,.6],[6.4,.6]],'#42a8c2','#c9f2f3',1.5);
+for(let i=0;i<5;i++){tree(-5+i*2.8,-5,.85);tree(-5+i*2.8,9,.8)}tree(8,3,.85);tree(8,6,.75);tree(-5,2,.7);tree(-5,6,.7);
+// Garden beds and lawn paths
+poly([[-5,-1],[-3,-1],[-3,3],[-5,3]],'#477d50');poly([[4,2],[6,2],[6,3.5],[4,3.5]],'#477d50');
+// Surrounding city landmarks
+building(-10,9,5,5,7,'#7797bd','OFFICE');building(10,7,5,5,5,'#c28b60','MARKET');building(10,-10,6,5,8,'#a995c9','TOWER');building(-10,-10,5,4,4,'#c6b879','CAFE');
+// Large luxury mansion with optional second floor
+building(-2,-2,7,6,5+(upgrades.floor?3:0),'#d5a274','MY HOME');
+if(upgrades.garden){tree(-4,4,.8);tree(5,4,.8);poly([[-5,3],[6,3],[6,5],[-5,5]],'#477d50')}
+if(upgrades.solar){for(let q=0;q<4;q++)poly([[-1.4+q*1.3,-1.5,5.15],[-.8+q*1.3,-1.5,5.15],[-.8+q*1.3,-.6,5.15],[-1.4+q*1.3,-.6,5.15]],'#315d78','#b8dce8',1)}
+person();if(camMode===1){ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(W/2,H*.48,3,0,7);ctx.fill();ctx.strokeStyle='#fff';ctx.beginPath();ctx.moveTo(W/2-12,H*.48);ctx.lineTo(W/2+12,H*.48);ctx.moveTo(W/2,H*.48-12);ctx.lineTo(W/2,H*.48+12);ctx.stroke()}}requestAnimationFrame(draw)}
 let last=performance.now();function update(t){let dt=Math.min((t-last)/16,2);last=t;let x=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+joy.x,z=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0)+joy.y,n=Math.hypot(x,z);if(n){px+=x/n*.11*dt;pz+=z/n*.11*dt;walk+=.22*dt;facing=Math.atan2(z,x)}requestAnimationFrame(update)}
-function interact(){if(inside){toast('Leaving '+inside);inside=null;doorOpen=false;return}let a=nearest();if(!a){toast('Move closer to a building door first');return}if(a.name==='MY HOME'&&!owned){toast('Claim your home plot first');return}inside=a.name;doorOpen=true;toast('Entered '+a.name)}
+function interact(){if(inside){toast('Leaving '+inside);inside=null;doorOpen=false;return}let a=nearest();if(!a){toast('Move closer to a building door first');return}if(a.name==='MY HOME'&&!owned){toast('Claim your mansion first');return}inside=a.name;doorOpen=true;toast('Entered '+a.name)}
 document.getElementById('cam').onclick=()=>{camMode=camMode===3?1:3;document.getElementById('cam').textContent='Camera: '+(camMode===3?'Third Person':'First Person');toast('Camera mode changed')};
 function updateStats(){document.getElementById('stats').textContent='Coins: '+coins+' · Home: '+(owned?'Owned':'Not owned')}
-document.getElementById('home').onclick=()=>{const doorX=1.5,doorZ=5.4;if(Math.hypot(px-doorX,pz-doorZ)>1.6){px=doorX;pz=doorZ;inside=null;doorOpen=false;toast('Your character has been moved to your home door. Tap My Home again to claim your home.');return}if(!owned){if(coins<100){toast('Need 100 demo coins to claim your home');return}owned=true;coins-=100;updateStats();toast('Home plot claimed! Now press Enter / Exit to enter your home. (Demo only)')}else{inside='MY HOME';doorOpen=true;toast('Welcome to your home!')}};
+document.getElementById('home').onclick=()=>{const doorX=1.5,doorZ=5.4;if(Math.hypot(px-doorX,pz-doorZ)>1.6){px=doorX;pz=doorZ;inside=null;doorOpen=false;toast('Your character has been moved to your home door. Tap My Home again to claim your home.');return}if(!owned){if(coins<100){toast('Need 100 demo coins to claim your home');return}owned=true;coins-=100;updateStats();toast('Home plot claimed! Now press Enter / Exit to enter your home. (Demo only)')}else{inside='MY HOME';doorOpen=true;toast('Welcome to your luxury mansion!')}};
 document.getElementById('build').onclick=()=>{build=!build;document.getElementById('build').textContent='Build Mode: '+(build?'ON':'OFF');document.getElementById('buildPanel').style.display=build?'block':'none';document.getElementById('buildHint').textContent=owned?'Choose an upgrade. Each can be purchased once.':'Claim your home first to unlock upgrades.';toast(build?'Build mode enabled':'Build mode closed')};
 function buyUpgrade(key,cost,label){if(!owned){toast('Claim your home before upgrading');return}if(upgrades[key]){toast(label+' is already installed');return}if(coins<cost){toast('Not enough demo coins');return}coins-=cost;upgrades[key]=true;updateStats();document.getElementById('buildHint').textContent=label+' installed successfully!';toast(label+' installed!')}
 document.getElementById('gardenUpgrade').onclick=()=>buyUpgrade('garden',30,'Garden');document.getElementById('floorUpgrade').onclick=()=>buyUpgrade('floor',80,'Second Floor');document.getElementById('solarUpgrade').onclick=()=>buyUpgrade('solar',50,'Solar Panels');
