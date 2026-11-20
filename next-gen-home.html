@@ -5,7 +5,7 @@
 <title>NEXT GEN HOME — Advanced City & Mansion Demo</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#101820;color:#eef5f7;font-family:system-ui,Arial;overflow:hidden;touch-action:pan-x pan-y}
-#hud{position:fixed;inset:0;pointer-events:none}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:2}
 .top{display:flex;justify-content:space-between;gap:8px;padding:12px}
 .pill{background:#132a36dd;border:1px solid #416273;border-radius:14px;padding:8px 12px;font-size:13px}
 #help{position:absolute;left:12px;bottom:12px;max-width:220px;line-height:1.45}
@@ -49,6 +49,7 @@ try{
 </script>
 
 <canvas id="game"></canvas>
+<canvas id="avatar3d" aria-hidden="true" style="position:fixed;inset:0;z-index:1;pointer-events:none;width:100vw;height:100vh"></canvas>
 <div id="hud">
  <div class="top"><div class="pill"><b>NEXT GEN HOME</b><br>ADVANCED CITY · Mansion & Garden</div><div class="pill" id="stats">Coins: 250 · Home: Not owned</div></div>
  <div id="toast"></div>
@@ -166,6 +167,81 @@ document.getElementById('gardenUpgrade').onclick=()=>buyUpgrade('garden',30,'Gar
 document.getElementById('mission').onclick=()=>{if(!missionDone){missionDone=true;coins+=25;updateStats();toast('Mission complete: Explore the city · +25 demo coins')}else toast('Daily mission already completed')};
 const enterBtn=document.createElement('button');enterBtn.id='enter';enterBtn.textContent='Enter / Exit';document.getElementById('actions').appendChild(enterBtn);enterBtn.onclick=interact;
 const stick=document.getElementById('stick'),nub=document.getElementById('nub');let active=false;function joyMove(e){let r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,m=Math.min(38,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);joy.x=Math.cos(a)*m/38;joy.y=Math.sin(a)*m/38;nub.style.left=(36+Math.cos(a)*m)+'px';nub.style.top=(36+Math.sin(a)*m)+'px'}stick.addEventListener('pointerdown',e=>{active=true;stick.setPointerCapture(e.pointerId);joyMove(e)});stick.addEventListener('pointermove',e=>{if(active)joyMove(e)});function joyEnd(){active=false;joy={x:0,y:0};nub.style.left='36px';nub.style.top='36px'}stick.addEventListener('pointerup',joyEnd);stick.addEventListener('pointercancel',joyEnd);
+
+// Procedural 3D OG avatar layer (Three.js). The 2D city remains the game world.
+(async()=>{
+ try{
+  const THREE=await import('https://esm.sh/three@0.160.0');
+  const avatarCanvas=document.getElementById('avatar3d');
+  const renderer=new THREE.WebGLRenderer({canvas:avatarCanvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setClearColor(0x000000,0);
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(34,innerWidth/innerHeight,.1,100);
+  camera.position.set(0,1.25,7.4);camera.lookAt(0,1.05,0);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x4a5260,2.0));
+  const key=new THREE.DirectionalLight(0xffe2b0,3.1);key.position.set(-3,6,5);scene.add(key);
+  const rim=new THREE.DirectionalLight(0x9dc9ff,1.8);rim.position.set(3,3,-4);scene.add(rim);
+  const avatar=new THREE.Group();scene.add(avatar);
+  const mat=(color,roughness=.72,metalness=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
+  const black=mat(0x101319),hood=mat(0x080b10),pants=mat(0x171b20),gold=mat(0xc99b42,.32,.65),skin=mat(0xc58d6c),hair=mat(0x17120f),glass=mat(0x080c12,.18,.2),sole=mat(0xe2bd70,.4,.45);
+  function part(parent,geo,material,x,y,z){const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);parent.add(m);return m}
+  const torso=part(avatar,new THREE.CapsuleGeometry(.34,.62,6,12),hood,0,1.42,0);torso.scale.set(1,1.03,.72);
+  const hoodBack=part(avatar,new THREE.SphereGeometry(.34,16,12),black,0,1.88,-.12);hoodBack.scale.set(1,.92,.7);
+  const neck=part(avatar,new THREE.CylinderGeometry(.105,.12,.18,12),skin,0,1.94,0);
+  const head=part(avatar,new THREE.SphereGeometry(.255,24,18),skin,0,2.18,0);head.scale.set(.88,1.08,.88);
+  const hairCap=part(avatar,new THREE.SphereGeometry(.26,20,12,0,Math.PI*2,0,Math.PI*.52),hair,0,2.29,-.01);
+  // Hood rim and drawstrings
+  const rimHood=part(avatar,new THREE.TorusGeometry(.27,.045,8,24,Math.PI),black,0,2.02,.05);rimHood.rotation.z=Math.PI;
+  for(const x of [-.075,.075]){const cord=part(avatar,new THREE.CylinderGeometry(.009,.009,.28,6),gold,x,1.63,.235);cord.rotation.x=-.08}
+  // Sunglasses: two lenses and bridge
+  for(const x of [-.105,.105]){const lens=part(avatar,new THREE.BoxGeometry(.16,.075,.035),glass,x,2.19,.222);const frame=part(avatar,new THREE.BoxGeometry(.18,.018,.045),gold,x,2.235,.22)}
+  part(avatar,new THREE.BoxGeometry(.055,.018,.035),gold,0,2.20,.23);
+  const legs=[];
+  for(const x of [-.17,.17]){
+   const leg=new THREE.Group();leg.position.set(x,1.0,0);avatar.add(leg);legs.push(leg);
+   part(leg,new THREE.CapsuleGeometry(.105,.62,5,10),pants,0,-.42,0);
+   const pocket=part(leg,new THREE.BoxGeometry(.13,.19,.035),black,x<0?-.015:.015,-.42,.095);
+   const shoe=part(leg,new THREE.BoxGeometry(.22,.12,.38),black,0,-.84,.09);
+   part(leg,new THREE.BoxGeometry(.225,.025,.385),gold,0,-.895,.09);
+  }
+  const arms=[];
+  for(const x of [-.43,.43]){
+   const arm=new THREE.Group();arm.position.set(x,1.72,0);avatar.add(arm);arms.push(arm);
+   const upper=part(arm,new THREE.CapsuleGeometry(.095,.48,5,10),hood,0,-.29,0);upper.rotation.z=x<0?-.12:.12;
+   part(arm,new THREE.SphereGeometry(.09,12,10),skin,0,-.62,.015);
+   part(arm,new THREE.TorusGeometry(.092,.014,6,16),gold,0,-.57,.01);
+  }
+  // Chest pocket and subtle OG monogram medallion (symbol only)
+  part(avatar,new THREE.BoxGeometry(.17,.15,.025),black,-.16,1.48,.238);
+  const badge=part(avatar,new THREE.TorusGeometry(.055,.012,8,20),gold,.16,1.56,.245);
+  // Scale and foot placement in the 2D game's projected world coordinates
+  function resize3d(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
+  addEventListener('resize',resize3d);
+  function renderAvatar(){
+   const pp=project(px,pz,0);
+   const visible=camMode!==1&&!inside;
+   avatarCanvas.style.display=visible?'block':'none';
+   if(visible){
+    const scale=Math.max(.75,Math.min(1.45,Math.min(W,H)*.00135));
+    const sx=(pp[0]-W/2)/(W/2), sy=-(pp[1]-H*.56)/(H/2);
+    avatar.position.set(sx*3.75,sy*2.65,0);
+    avatar.scale.setScalar(scale);
+    avatar.rotation.y=-facing+Math.PI/2;
+    const swing=Math.sin(walk)*.48;
+    legs[0].rotation.x=swing;legs[1].rotation.x=-swing;
+    arms[0].rotation.x=-swing*.72;arms[1].rotation.x=swing*.72;
+    torso.position.y=1.42+Math.abs(Math.sin(walk*2))*.025;
+    renderer.render(scene,camera);
+   }
+   requestAnimationFrame(renderAvatar);
+  }
+  renderAvatar();
+ }catch(err){console.warn('3D avatar unavailable; 2D avatar remains active.',err)}
+})();
+
 requestAnimationFrame(draw);requestAnimationFrame(update);
 </script>
 </body></html>
