@@ -1019,6 +1019,9 @@ function updateInitialManualUpiLink(tokenNumber,amount){
  const exactAmount=Number(amount).toFixed(2);
  const params=new URLSearchParams({pa:QZIX_UPI_ID,pn:"QZIX COIN",am:exactAmount,cu:"INR",tn:"QZIX-INITIAL-"+String(tokenNumber).padStart(3,"0")});
  link.href="upi://pay?"+params.toString();
+ link.target="_blank";
+ link.rel="noopener noreferrer";
+ link.setAttribute("aria-label","Pay "+tokenId+" using an installed UPI app");
  setQzixUpiAppLinks("initialPay",params);
  link.textContent="Pay "+money(amount)+" for "+tokenId+" · Open any UPI app";
  $("paymentTokenName").textContent=tokenId;
@@ -1100,7 +1103,14 @@ async function refreshBuyTokens(){
 function setQzixUpiAppLinks(prefix,params){
  const query=params.toString();
  const links={Google:"tez://upi/pay?"+query,PhonePe:"phonepe://pay?"+query,Paytm:"paytmmp://pay?"+query,Any:"upi://pay?"+query};
- Object.entries(links).forEach(([app,href])=>{const el=$(prefix+app);if(el)el.href=href;});
+ Object.entries(links).forEach(([app,href])=>{
+  const el=$(prefix+app);
+  if(!el)return;
+  el.href=href;
+  el.target="_blank";
+  el.rel="noopener noreferrer";
+  el.setAttribute("aria-label","Open "+({Google:"Google Pay",PhonePe:"PhonePe",Paytm:"Paytm",Any:"any installed UPI app"}[app])+" with QZIX payment details");
+ });
  const box=$(prefix==="initialPay"?"initialUpiAppChoices":"resaleUpiAppChoices");
  if(box)box.classList.remove("hidden");
 }
@@ -1112,6 +1122,9 @@ function updateUpiPayLink(){
  if(!link||!QZIX_UPI_ID.trim()||!Number.isInteger(tokenNumber)||tokenNumber<1||tokenNumber>100||!Number.isFinite(amount)||amount<=0){link?.classList.add("hidden");$("resaleUpiAppChoices")?.classList.add("hidden");return}
  const params=new URLSearchParams({pa:QZIX_UPI_ID,pn:"QZIX COIN",am:amount.toFixed(2),cu:"INR",tn:"QZIX-"+String(tokenNumber).padStart(3,"0")});
  link.href="upi://pay?"+params.toString();
+ link.target="_blank";
+ link.rel="noopener noreferrer";
+ link.setAttribute("aria-label","Pay for QZIX token "+String(tokenNumber).padStart(3,"0")+" using an installed UPI app");
  setQzixUpiAppLinks("resalePay",params);
  link.classList.remove("hidden");
 }
