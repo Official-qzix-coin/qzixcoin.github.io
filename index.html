@@ -318,6 +318,7 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 .hero-content p{font-size:14px;color:#c4d6ed;line-height:1.7}
 .hero-caption{margin-top:23px;color:#ffdc81;font-size:11px;font-weight:900;letter-spacing:1.5px}
 .hero-caption b{color:#19baff;margin:0 5px}
+.game-launch{display:inline-flex;align-items:center;gap:9px;margin-top:16px;padding:13px 19px;border:1px solid #f4c76b;border-radius:13px;background:linear-gradient(135deg,#ffe5a0,#d6a23d);color:#13233a;text-decoration:none;font-size:13px;font-weight:950;letter-spacing:.7px;box-shadow:0 8px 24px #d6a23d33;transition:transform .18s,box-shadow .18s}.game-launch:hover{transform:translateY(-2px);box-shadow:0 12px 30px #d6a23d55}.game-launch[href="#qzix-game-locked"]{filter:grayscale(.55);opacity:.8;cursor:not-allowed}
 .dashboard-hero .stats{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:0;align-content:center}
 .dashboard-hero .stat{min-height:112px;padding:19px 18px;border:1px solid #148bd8;border-radius:17px;background:linear-gradient(145deg,#0d2b50,#07172e);box-shadow:0 0 16px #007dff22,inset 0 1px #ffffff22;overflow:hidden}
 .dashboard-hero .stat span{font-size:12px;text-transform:none;letter-spacing:.2px;color:#dcecff}
@@ -376,6 +377,7 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
       <h2 id="heroTitle">Invest <i>• Own • Grow</i></h2>
       <p id="heroDesc">A clear, structured dashboard for the QZIX fixed-supply token project.</p>
       <div class="hero-caption">TRANSPARENT <b>•</b> SECURE <b>•</b> TRUSTED</div>
+      <a class="game-launch" href="next-gen-home.html" aria-label="Play NEXT GEN HOME game">🎮 PLAY NEXT GEN HOME</a>
     </div>
     <div class="stats">
       <div class="stat stat-current"><span id="priceLabel">Current Price (1 Token)</span><strong class="gold" id="price">₹2</strong><em>↗</em></div>
@@ -1252,7 +1254,7 @@ $("manualPaymentQueue").addEventListener("click",e=>{
 </style>
 <script>
 (()=> {
- const gameLinks=[...document.querySelectorAll('.main-nav a[href="next-gen-city.html"],.main-nav a[href="next-gen-home.html"]')];
+ const gameLinks=[...document.querySelectorAll('a[href="next-gen-city.html"],a[href="next-gen-home.html"]')];
  const original=gameLinks.map(a=>({a,href:a.getAttribute('href'),label:a.textContent.trim()}));
  function setOwner(isOwner){
   original.forEach(({a,href,label})=>{
