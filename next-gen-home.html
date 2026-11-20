@@ -85,10 +85,34 @@ let p=project(x+w/2,z+d/2,h+1);ctx.fillStyle='#f4f2e6';ctx.font='600 12px system
 let door=project(x+w/2,z+d,1.15);ctx.fillStyle=doorOpen&&inside===label?'#c79a52':'#473a30';ctx.fillRect(door[0]-5,door[1]-17,10,18);ctx.fillStyle='#e6c87b';ctx.beginPath();ctx.arc(door[0]+2,door[1]-8,1.3,0,7);ctx.fill()}
 const places=[{name:'MY HOME',x:-2,z:-2,w:7,d:6,color:'#d5a274'},{name:'OFFICE',x:-10,z:9,w:5,d:5,color:'#7797bd'},{name:'MARKET',x:10,z:7,w:5,d:5,color:'#c28b60'},{name:'TOWER',x:10,z:-10,w:6,d:5,color:'#a995c9'},{name:'CAFE',x:-10,z:-10,w:5,d:4,color:'#c6b879'}];
 function nearest(){let best=null,dist=999;for(let a of places){let d=Math.hypot(px-(a.x+a.w/2),pz-(a.z+a.d/2));if(d<dist){dist=d;best=a}}return dist<9?best:null}
-function person(){let p=project(px,pz,0),s=Math.sin(walk)*4;ellipse(px,pz,13,6,'#263b3b');if(camMode===1)return;
-ctx.strokeStyle='#263c53';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(p[0]-4,p[1]-14);ctx.lineTo(p[0]-6+s,p[1]+1);ctx.moveTo(p[0]+4,p[1]-14);ctx.lineTo(p[0]+6-s,p[1]+1);ctx.stroke();
-ctx.fillStyle='#315b91';ctx.fillRect(p[0]-8,p[1]-32,16,22);ctx.strokeStyle='#d9a984';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(p[0]-7,p[1]-27);ctx.lineTo(p[0]-12-s*.5,p[1]-14);ctx.moveTo(p[0]+7,p[1]-27);ctx.lineTo(p[0]+12+s*.5,p[1]-14);ctx.stroke();
-ctx.fillStyle='#d9a984';ctx.beginPath();ctx.arc(p[0],p[1]-40,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#3d302b';ctx.beginPath();ctx.arc(p[0],p[1]-44,8,Math.PI,Math.PI*2);ctx.fill()}
+function drawOGAvatar(x,y,scale=1,phase=0,angle=0){
+ ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(scale,scale);
+ // soft contact shadow
+ ctx.fillStyle='#1119';ctx.beginPath();ctx.ellipse(0,2,15,5,0,0,Math.PI*2);ctx.fill();
+ // legs with animated stride
+ const stride=Math.sin(phase)*3;
+ ctx.lineCap='round';ctx.lineWidth=6;ctx.strokeStyle='#171b20';
+ ctx.beginPath();ctx.moveTo(-4,-15);ctx.lineTo(-5-stride,-3);ctx.moveTo(4,-15);ctx.lineTo(5+stride,-3);ctx.stroke();
+ // gold-edged black sneakers
+ ctx.strokeStyle='#d7ad55';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-5-stride,-3);ctx.lineTo(-10-stride,-2);ctx.moveTo(5+stride,-3);ctx.lineTo(10+stride,-2);ctx.stroke();
+ // black cargo hoodie torso
+ ctx.fillStyle='#090d12';ctx.beginPath();ctx.moveTo(-8,-39);ctx.quadraticCurveTo(-12,-37,-11,-27);ctx.lineTo(-9,-15);ctx.lineTo(9,-15);ctx.lineTo(11,-27);ctx.quadraticCurveTo(12,-37,8,-39);ctx.closePath();ctx.fill();
+ ctx.strokeStyle='#b88b3e';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(-7,-17);ctx.lineTo(7,-17);ctx.stroke();
+ // hoodie arms and gold cuff details
+ ctx.strokeStyle='#10151b';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-8,-35);ctx.lineTo(-13-Math.sin(phase)*2,-22);ctx.moveTo(8,-35);ctx.lineTo(13+Math.sin(phase)*2,-22);ctx.stroke();
+ ctx.strokeStyle='#c59a4b';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-14,-23);ctx.lineTo(-11,-22);ctx.moveTo(11,-22);ctx.lineTo(14,-23);ctx.stroke();
+ // hood behind head
+ ctx.fillStyle='#171c23';ctx.beginPath();ctx.arc(0,-42,9,Math.PI,Math.PI*2);ctx.lineTo(8,-35);ctx.lineTo(-8,-35);ctx.closePath();ctx.fill();
+ // neck and face
+ ctx.fillStyle='#bd8968';ctx.fillRect(-3,-41,6,5);ctx.fillStyle='#c99472';ctx.beginPath();ctx.arc(0,-47,7,0,Math.PI*2);ctx.fill();
+ // dark hair, sunglasses and OG-gold temple accents
+ ctx.fillStyle='#171411';ctx.beginPath();ctx.arc(0,-49,7,Math.PI,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#080b10';ctx.fillRect(-6,-48,5,3);ctx.fillRect(1,-48,5,3);ctx.strokeStyle='#c59a4b';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(-1,-47);ctx.lineTo(1,-47);ctx.stroke();
+ // hoodie drawstrings
+ ctx.strokeStyle='#d0ad68';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(-2,-35);ctx.lineTo(-2,-27);ctx.moveTo(2,-35);ctx.lineTo(2,-27);ctx.stroke();
+ ctx.restore();
+}
+function person(){let p=project(px,pz,0);ellipse(px,pz,13,6,'#263b3b');if(camMode===1)return;drawOGAvatar(p[0],p[1],1,walk,facing)}
 function interior(){
  ctx.fillStyle='#182b35';ctx.fillRect(0,0,W,H);
  const unit=Math.min((W-42)/12,(H-150)/10),ox=(W-unit*12)/2,oy=(H-unit*9)/2+12;
@@ -109,12 +133,7 @@ function interior(){
  ctx.fillStyle='#20323c';ctx.font='bold '+Math.max(11,unit*.28)+'px system-ui';ctx.textAlign='left';
  ctx.fillText('LIVING ROOM',X(.55),Y(4.15));ctx.fillText('BEDROOM',X(6.3),Y(4.15));ctx.fillText('DINING ROOM',X(.55),Y(8.55));ctx.fillText('BATHROOM',X(6.3),Y(8.55));
  const ax=X(px),ay=Y(pz),bob=Math.sin(walk)*unit*.035;
- ctx.fillStyle='#0005';ctx.beginPath();ctx.ellipse(ax,ay+unit*.12,unit*.25,unit*.15,0,0,Math.PI*2);ctx.fill();
- ctx.save();ctx.translate(ax,ay-bob);ctx.rotate(facing);
- ctx.strokeStyle='#d8a17e';ctx.lineWidth=Math.max(3,unit*.11);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-unit*.12,0);ctx.lineTo(-unit*.25,unit*.22);ctx.moveTo(unit*.12,0);ctx.lineTo(unit*.25,unit*.22);ctx.stroke();
- ctx.fillStyle='#315d91';ctx.fillRect(-unit*.17,-unit*.16,unit*.34,unit*.42);
- ctx.fillStyle='#d8a17e';ctx.beginPath();ctx.arc(0,-unit*.27,unit*.14,0,Math.PI*2);ctx.fill();
- ctx.fillStyle='#302b28';ctx.beginPath();ctx.arc(0,-unit*.32,unit*.14,Math.PI,Math.PI*2);ctx.fill();ctx.restore();
+ drawOGAvatar(ax,ay-bob,Math.max(.85,Math.min(1.5,unit*.055)),walk,facing);
  ctx.fillStyle='#f7f1e6';ctx.textAlign='center';ctx.font='bold 17px system-ui';ctx.fillText(inside+' · '+roomName,W/2,28);
  ctx.font='12px system-ui';ctx.fillStyle='#c4d6dc';ctx.fillText('Explore Living Room • Bedroom • Dining • Bathroom',W/2,H-16);
 }
