@@ -9,7 +9,17 @@ a{color:#ffe2a0;text-decoration:none;border:1px solid #8b7044;border-radius:10px
 h1{font-size:clamp(21px,4vw,30px);margin:0;letter-spacing:1.2px}.sub{color:var(--muted);margin:5px 0 0;font-size:12px}
 .hero{padding:19px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(125deg,#182f4d,#0d1a2c);margin-bottom:14px}.hero h2{margin:0 0 7px;font-size:20px}
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0}.stat{padding:9px 7px;border:1px solid var(--line);border-radius:10px;background:#0a1728;text-align:center}.stat b{display:block;color:var(--gold);font-size:19px}.stat span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.price{margin:10px 0;color:#ffe2a0;font-weight:800}.district{padding:14px;margin:12px 0;border:1px solid var(--line);border-radius:15px;background:linear-gradient(150deg,#142640,#0b1728);min-width:0}
+.price{margin:10px 0;color:#ffe2a0;font-weight:800}.search-panel{padding:15px;margin:14px 0;border:1px solid var(--gold);border-radius:14px;background:linear-gradient(130deg,#182b43,#0a1728)}
+.search-panel label{display:block;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:1px;margin-bottom:9px}
+.search-controls{display:flex;gap:7px;flex-wrap:wrap}
+.search-controls input{flex:1;min-width:160px;padding:12px;border:1px solid #49617e;border-radius:9px;background:#071426;color:#fff;font-size:14px;outline:none}
+.search-controls input:focus{border-color:var(--gold)}
+.search-controls button{border:0;border-radius:8px;padding:10px 13px;background:linear-gradient(135deg,#ffe5a0,#d9a746);color:#172238;font-weight:900;font-size:10px}
+.search-controls .clear{background:#263b55;color:#fff;border:1px solid #49617e}
+#searchMessage{font-size:11px;color:var(--muted);margin:9px 0 0;line-height:1.5}
+.district.search-match{border:2px solid var(--gold);box-shadow:0 0 18px #f5c66d33}
+.district.search-hidden{display:none}
+.district{padding:14px;margin:12px 0;border:1px solid var(--line);border-radius:15px;background:linear-gradient(150deg,#142640,#0b1728);min-width:0}
 .district-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.district h2{font-size:16px;margin:0}.district-head span{font-size:9px;color:var(--gold);letter-spacing:.7px}
 .intro{font-size:11px;line-height:1.5;color:var(--muted);margin:8px 0 0}.token-row{display:grid;grid-auto-flow:column;grid-auto-columns:78px;gap:6px;overflow-x:auto;overflow-y:hidden;padding:4px 2px 12px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
 .token{min-height:66px;padding:7px 3px;border:1px solid #2a405c;border-radius:9px;background:linear-gradient(145deg,#11223a,#0a1627);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;scroll-snap-align:start;color:#fff;cursor:pointer}
@@ -21,6 +31,11 @@ h1{font-size:clamp(21px,4vw,30px);margin:0;letter-spacing:1.2px}.sub{color:var(-
 </style></head><body><main class="wrap">
 <div class="top"><div class="brand"><div class="coin">Q</div><div><h1>QZIX COIN</h1><p class="sub">Punjab District Token Demo</p></div></div><a href="./">← Main Website</a></div>
 <section class="hero"><h2>Punjab — 23 Districts</h2><p class="sub">Every district has its own separate list of 100 token IDs. Swipe horizontally to view IDs 001–100 and select a token.</p><div class="price">Token Price: ₹2 per Token</div><div class="stats"><div class="stat"><b>23</b><span>Districts</span></div><div class="stat"><b>100</b><span>Tokens / district</span></div><div class="stat"><b>0</b><span>Bought (demo)</span></div><div class="stat"><b>₹2</b><span>Per token</span></div></div></section>
+<section class="search-panel">
+  <label for="districtSearch">FIND YOUR DISTRICT</label>
+  <div class="search-controls"><input id="districtSearch" type="search" placeholder="Enter district name or code (e.g. PB31 or Mansa)" autocomplete="off" onkeydown="if(event.key==='Enter'){searchDistrict()}"><button type="button" onclick="searchDistrict()">SEARCH DISTRICT</button><button class="clear" type="button" onclick="clearDistrictSearch()">CLEAR</button></div>
+  <p id="searchMessage" role="status">Search PB code or district name to jump directly to that district’s 100 tokens.</p>
+</section>
 
 <section class="district" data-code="PB02">
   <div class="district-head"><h2>Amritsar (PB02)</h2><span>DISTRICT TOKEN LIST</span></div>
@@ -231,6 +246,29 @@ h1{font-size:clamp(21px,4vw,30px);margin:0;letter-spacing:1.2px}.sub{color:var(-
 <div class="note"><b>DEMO ONLY:</b> This preview does not start payment, reserve a token, confirm purchase, or prove ownership. Bought, Reserved and Left are demonstration figures only. No profit or future price is guaranteed. Main website payment and ownership rules are unchanged.</div>
 <footer>QZIX COIN · 23 Districts · 100 Unique Token IDs in every district · Total demo entries: 2,300</footer>
 </main><script>
+function searchDistrict(){
+ const input=document.getElementById("districtSearch");
+ const q=input.value.trim().toUpperCase().replace(/\\s+/g," ");
+ const msg=document.getElementById("searchMessage");
+ const all=[...document.querySelectorAll(".district")];
+ all.forEach(s=>s.classList.remove("search-hidden","search-match"));
+ if(!q){msg.textContent="Please enter a district name or PB code, such as PB31 or Mansa.";return;}
+ const matches=all.filter(s=>{
+   const title=s.querySelector(".district-head h2").textContent.toUpperCase();
+   const code=(s.dataset.code||"").toUpperCase();
+   return title.includes(q)||code===q||code.replace("PB","PB ")===q;
+ });
+ if(!matches.length){msg.textContent="No district found. Check the spelling or PB code and try again.";return;}
+ all.forEach(s=>{if(!matches.includes(s))s.classList.add("search-hidden");});
+ matches[0].classList.add("search-match");
+ matches[0].scrollIntoView({behavior:"smooth",block:"start"});
+ msg.textContent="Found: "+matches.map(s=>s.querySelector(".district-head h2").textContent).join(", ")+". Showing its token list below.";
+}
+function clearDistrictSearch(){
+ document.getElementById("districtSearch").value="";
+ document.querySelectorAll(".district").forEach(s=>s.classList.remove("search-hidden","search-match"));
+ document.getElementById("searchMessage").textContent="Search PB code or district name to jump directly to that district’s 100 tokens.";
+}
 function selectToken(code,id,el){const section=el.closest(".district");section.querySelectorAll(".token").forEach(x=>x.classList.remove("selected"));el.classList.add("selected");document.getElementById("selected-"+code).textContent="QZIX-"+id;}
 function demoBuy(code){const id=document.getElementById("selected-"+code).textContent;alert("DEMO ONLY\\nSelected: "+id+"\\nDistrict: "+code+"\\nPrice: ₹2\\nNo payment or reservation has been made.");}
 document.querySelectorAll(".district").forEach(s=>s.querySelector('.token[data-id="001"]').classList.add("selected"));
