@@ -16,10 +16,12 @@ h1{font-size:clamp(22px,4vw,32px);margin:0;letter-spacing:1.5px}.sub{color:var(-
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:13px}
 .district{padding:14px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(150deg,#142640,#0b1728);min-width:0}
 .district-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:11px}.district h2{font-size:15px;margin:0}.district-head span{font-size:9px;color:var(--gold);letter-spacing:.8px;white-space:nowrap}
-.token-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.token{padding:9px;border:1px solid #314762;border-radius:10px;background:#081526;display:flex;flex-direction:column;gap:5px}
-.token strong{font-size:12px;color:#ffe2a0}.token small{font-size:11px;color:var(--muted)}
-button{border:0;border-radius:8px;padding:8px;background:linear-gradient(135deg,#ffe5a0,#d9a746);color:#172238;font-weight:800;cursor:pointer}
+.token-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.token{padding:8px 3px;border:1px solid #2a405c;border-radius:9px;background:linear-gradient(145deg,#11223a,#0a1627);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;text-align:center}
+.token strong{font-size:11px;color:#ffe2a0;white-space:nowrap;letter-spacing:.1px}.token small{font-size:9px;color:var(--muted);line-height:1.1}
+button{border:0;border-radius:7px;padding:5px 8px;background:linear-gradient(135deg,#ffe5a0,#d9a746);color:#172238;font-size:10px;font-weight:800;cursor:pointer}
+.token:hover{border-color:#d9ad58;transform:translateY(-1px)}
+@media(max-width:500px){.token-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.token{padding:7px 1px}.token strong{font-size:9px}.token small{font-size:8px}button{padding:5px 4px;font-size:9px}}
 .note{margin-top:17px;padding:14px;border:1px solid #806536;border-radius:12px;background:#2a2418;color:#f4dca7;font-size:12px;line-height:1.6}
 footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 @media(max-width:500px){.wrap{padding:15px 11px 32px}.top{align-items:flex-start}.stats{gap:7px}.stat{padding:10px}.stat b{font-size:19px}.grid{grid-template-columns:1fr}}
