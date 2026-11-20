@@ -492,6 +492,12 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
   </div>
   <button id="createInitialManualRequest" class="hidden">Create UPI Payment Request</button>
   <a id="initialBuyUpiPayNow" class="button secondary hidden" href="#" style="display:inline-block;text-decoration:none;margin:12px 0" rel="nofollow">Open any UPI App to Pay</a>
+  <div id="initialUpiAppChoices" class="actions hidden" style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">
+    <a id="initialPayGoogle" class="button secondary" href="#" rel="nofollow">Google Pay</a>
+    <a id="initialPayPhonePe" class="button secondary" href="#" rel="nofollow">PhonePe</a>
+    <a id="initialPayPaytm" class="button secondary" href="#" rel="nofollow">Paytm</a>
+    <a id="initialPayAny" class="button secondary" href="#" rel="nofollow">Other UPI app</a>
+  </div>
   <div id="initialManualConfirmArea" class="hidden">
     <button id="confirmInitialPayment">I Have Paid — Send for Admin Review</button>
   </div>
@@ -511,6 +517,12 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
   <p class="muted">Choose a token currently owned by another buyer. The price is locked when your request is submitted. Ownership changes only after payment verification.</p>
   <div id="upiInstructions" class="notice" style="margin:12px 0">Pay using any UPI app with UPI ID 7814244038@ptyes. Verify the recipient name in your UPI app before paying. Token ownership changes only after admin verifies the actual credit.</div>
   <a id="upiPayNow" class="button secondary hidden" href="#" style="display:inline-block;text-decoration:none;margin:0 0 12px" rel="nofollow">Open UPI App to Pay</a>
+  <div id="resaleUpiAppChoices" class="actions hidden" style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">
+    <a id="resalePayGoogle" class="button secondary" href="#" rel="nofollow">Google Pay</a>
+    <a id="resalePayPhonePe" class="button secondary" href="#" rel="nofollow">PhonePe</a>
+    <a id="resalePayPaytm" class="button secondary" href="#" rel="nofollow">Paytm</a>
+    <a id="resalePayAny" class="button secondary" href="#" rel="nofollow">Other UPI app</a>
+  </div>
   <label class="field"><span>Token ID (currently owned)</span><select id="buyToken"><option value="">Loading available tokens…</option></select></label>
   <div class="muted" id="buyPriceInfo">Current price: loading…</div>
   <label class="field"><span>UPI Transaction Reference / UTR</span><input id="buyerUpiReference" type="text" maxlength="120" placeholder="Enter UPI reference after payment"></label>
@@ -1007,6 +1019,7 @@ function updateInitialManualUpiLink(tokenNumber,amount){
  const exactAmount=Number(amount).toFixed(2);
  const params=new URLSearchParams({pa:QZIX_UPI_ID,pn:"QZIX COIN",am:exactAmount,cu:"INR",tn:"QZIX-INITIAL-"+String(tokenNumber).padStart(3,"0")});
  link.href="upi://pay?"+params.toString();
+ setQzixUpiAppLinks("initialPay",params);
  link.textContent="Pay "+money(amount)+" for "+tokenId+" · Open any UPI app";
  $("paymentTokenName").textContent=tokenId;
  $("paymentExactAmount").textContent=money(amount);
@@ -1057,9 +1070,10 @@ async function confirmInitialPayment(){
  await refreshInitialManualQueue();
 }
 $("createInitialManualRequest").addEventListener("click",createInitialManualRequest);
-$("initialBuyUpiPayNow").addEventListener("click",()=>{
- if(!activeInitialManualRequestId)return;
- // Keep this tap handler minimal so Android can hand off the UPI URI immediately.
+$("initialBuyPanel").addEventListener("click",e=>{
+ const appLink=e.target.closest("#initialBuyUpiPayNow,#initialPayGoogle,#initialPayPhonePe,#initialPayPaytm,#initialPayAny");
+ if(!appLink||!activeInitialManualRequestId)return;
+ // A direct user tap launches the selected installed UPI app via its app URI scheme.
  initialUpiOpenedForRequest=true;
 });
 document.addEventListener("visibilitychange",()=>{
@@ -1083,14 +1097,22 @@ async function refreshBuyTokens(){
  $("buyPriceInfo").textContent="Current resale price: "+money(market?.current_price||0)+" · Company receives 20% of net profit only; seller receives original cost + 80% of net profit.";
  updateUpiPayLink();
 }
+function setQzixUpiAppLinks(prefix,params){
+ const query=params.toString();
+ const links={Google:"tez://upi/pay?"+query,PhonePe:"phonepe://pay?"+query,Paytm:"paytmmp://pay?"+query,Any:"upi://pay?"+query};
+ Object.entries(links).forEach(([app,href])=>{const el=$(prefix+app);if(el)el.href=href;});
+ const box=$(prefix==="initialPay"?"initialUpiAppChoices":"resaleUpiAppChoices");
+ if(box)box.classList.remove("hidden");
+}
 function updateUpiPayLink(){
  const link=$("upiPayNow");
  const tokenNumber=Number($("buyToken").value);
  const priceText=$("buyPriceInfo").textContent.match(/₹\s*[\d,.]+/);
  const amount=priceText?Number(priceText[0].replace(/[^\d.]/g,"")):0;
- if(!link||!QZIX_UPI_ID.trim()||!Number.isInteger(tokenNumber)||tokenNumber<1||tokenNumber>100||!Number.isFinite(amount)||amount<=0){link?.classList.add("hidden");return}
+ if(!link||!QZIX_UPI_ID.trim()||!Number.isInteger(tokenNumber)||tokenNumber<1||tokenNumber>100||!Number.isFinite(amount)||amount<=0){link?.classList.add("hidden");$("resaleUpiAppChoices")?.classList.add("hidden");return}
  const params=new URLSearchParams({pa:QZIX_UPI_ID,pn:"QZIX COIN",am:amount.toFixed(2),cu:"INR",tn:"QZIX-"+String(tokenNumber).padStart(3,"0")});
  link.href="upi://pay?"+params.toString();
+ setQzixUpiAppLinks("resalePay",params);
  link.classList.remove("hidden");
 }
 $("buyToken").addEventListener("change",updateUpiPayLink);
