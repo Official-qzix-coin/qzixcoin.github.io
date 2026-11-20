@@ -55,6 +55,7 @@ h1{font-size:clamp(21px,4vw,30px);margin:0;letter-spacing:1.2px}.sub{color:var(-
   <div class="search-controls">
     <input id="districtEmail" type="email" placeholder="Email address" autocomplete="email">
     <input id="districtPassword" type="password" placeholder="Password" autocomplete="current-password">
+    <button type="button" id="districtGoogleLogin">CONTINUE WITH GOOGLE</button>
     <button type="button" id="districtSignup">SIGN UP</button>
     <button type="button" id="districtLogin">LOG IN</button>
     <button type="button" class="clear" id="districtLogout" style="display:none">LOG OUT</button>
@@ -462,6 +463,15 @@ async function initDistrictPayments(){
   $("districtAuthStatus").textContent=districtUser?"Signed in: "+(districtUser.email||"QZIX account")+".":"Connected. Log in or sign up to buy a district token.";
  }catch(e){$("districtAuthStatus").textContent="Payment connection failed: "+(e.message||"Please refresh and try again.");}
 }
+$("districtGoogleLogin").addEventListener("click",async()=>{
+ if(!districtSupabase){$("districtAuthStatus").textContent="Payment service is still connecting.";return;}
+ $("districtAuthStatus").textContent="Opening Google sign-in…";
+ const {error}=await districtSupabase.auth.signInWithOAuth({
+  provider:"google",
+  options:{redirectTo:window.location.href}
+ });
+ if(error)$("districtAuthStatus").textContent="Google sign-in is not active yet: "+error.message+". Google OAuth must first be enabled in Supabase Auth settings.";
+});
 $("districtSignup").addEventListener("click",async()=>{
  if(!districtSupabase){$("districtAuthStatus").textContent="Payment service is still connecting.";return;}
  const email=$("districtEmail").value.trim(),password=$("districtPassword").value;
