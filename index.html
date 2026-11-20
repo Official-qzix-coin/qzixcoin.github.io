@@ -408,11 +408,15 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
   <div class="benefit-strip"><span>🛡 <b>100% Secure</b></span><span>⚡ <b>Payment Verification</b></span><span>♙ <b>Buyer Information</b></span><span>🤝 <b>Clear Rules</b></span></div>
 </main>
 <div id="token-showcase"><section class="panel token-showcase" style="margin:0 0 18px">
-  <h3 id="tokensTitle">100 Unique Token IDs</h3>
-  <p class="muted" id="tokensDesc">Each token has a unique ID. The current price per token is shown below each ID. This list does not confirm ownership or purchase.</p>
-  <div id="tokenPricePerToken" class="token-price-heading">Price Per Token: ₹2</div>
+  <h3 id="tokensTitle">Select Your Token (1–100)</h3>
+  <p class="muted" id="tokensDesc">Choose one token from the row below. Availability is checked live.</p>
+  <div id="tokenPricePerToken" class="token-price-heading">Token Price: ₹2 per Token</div>
   <div id="tokenAvailabilitySummary" aria-live="polite">Loading token status from the database…</div>
-  <div class="token-list" id="tokens"></div>
+  <div class="token-row-scroll"><div class="token-list" id="tokens" aria-label="Choose a token from 1 to 100"></div></div>
+  <div class="token-buy-control">
+    <div id="selectedTokenInfo" aria-live="polite">Selected Token: QZIX-001</div>
+    <button type="button" id="buySelectedToken">BUY TOKEN</button>
+  </div>
 </section></div>
 
 <div class="grid">
@@ -618,9 +622,20 @@ function applyLanguage(lang){
 $("language").addEventListener("change",e=>{applyLanguage(e.target.value);try{localStorage.setItem("qzix-language",e.target.value)}catch(e){}});
 applyLanguage((()=>{try{const saved=localStorage.getItem("qzix-language");if(saved==="pa"){localStorage.setItem("qzix-language","en");return "en"}return saved||"en"}catch(e){return "en"}})());
 
-for(let i=1;i<=100;i++){const d=document.createElement("div");d.id="qzix-token-"+i;d.className="token available";d.innerHTML=`<b>${String(i).padStart(3,"0")}</b><small>LEFT</small><small class="token-price">₹${Number(window.qzixCurrentPrice||2).toLocaleString("en-IN")} / TOKEN</small>`;$("tokens").appendChild(d)}
+for(let i=1;i<=100;i++){const d=document.createElement("div");d.id="qzix-token-"+i;d.className="token available";d.setAttribute("role","button");d.setAttribute("tabindex","0");d.innerHTML=`<b>${i}</b>`;$("tokens").appendChild(d)}
+let qzixSelectedTokenNumber=1;
+function selectGridToken(tokenNumber){
+ if(!Number.isInteger(tokenNumber)||tokenNumber<1||tokenNumber>100)return;
+ const card=$("qzix-token-"+tokenNumber);
+ if(!card||card.classList.contains("reserved"))return;
+ qzixSelectedTokenNumber=tokenNumber;
+ document.querySelectorAll("#tokens .token").forEach(el=>el.classList.toggle("selected",el===card));
+ const info=$("selectedTokenInfo");
+ if(info)info.textContent="Selected Token: QZIX-"+String(tokenNumber).padStart(3,"0");
+ const buy=$("buySelectedToken");
+ if(buy){buy.disabled=false;buy.textContent=card.classList.contains("bought")?"BUY FROM OWNER":"BUY TOKEN";}
+}
 window.qzixSupabaseReady.then(()=>{if(configured){try{supabase=window.qzixCreateClient(SUPABASE_URL,SUPABASE_ANON_KEY);supabase.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY"){$("passwordRecoveryPanel").classList.remove("hidden");$("authStatus").textContent="Password reset link verified. Enter your new password below.";$("newPassword").focus()}});$("authStatus").textContent=tr("ready");refreshMarket();refreshTokenStatus();setInterval(refreshTokenStatus,30000);checkUser()}catch(e){$("authStatus").textContent="Supabase client failed to start: "+(e?.message||"Unknown error");$("marketStatus").textContent=tr("marketUnavailable")}}else{$("authStatus").textContent=tr("notConfigured");$("marketStatus").textContent=tr("marketUnavailable")}}).catch(e=>{$("authStatus").textContent="Supabase SDK import failed: "+(e?.message||"Check internet connection or browser support");$("marketStatus").textContent=tr("marketUnavailable")});
-let qzixSelectedTokenNumber=null;
 async function startGridTokenPurchase(tokenNumber){
  if(!Number.isInteger(tokenNumber)||tokenNumber<1||tokenNumber>100)return;
  const card=$("qzix-token-"+tokenNumber);
@@ -713,20 +728,23 @@ async function startGridResalePurchase(tokenNumber){
  $("buyStatus").textContent="You are buying this same token from its current owner. After admin verifies the actual UPI payment, ownership transfers automatically. The previous owner receives original purchase cost plus 80% of net profit in their QZIX wallet. Bank withdrawal is processed separately by admin.";
 }
 $("tokens").addEventListener("click",e=>{
- const card=e.target.closest(".token.available,.token.bought");
+ const card=e.target.closest(".token");
  if(!card)return;
- const number=Number(card.id.replace("qzix-token-",""));
- if(card.classList.contains("available"))startGridTokenPurchase(number);
- else if(card.classList.contains("bought"))startGridResalePurchase(number);
+ selectGridToken(Number(card.id.replace("qzix-token-","")));
 });
 $("tokens").addEventListener("keydown",e=>{
  if(e.key!=="Enter"&&e.key!==" ")return;
- const card=e.target.closest(".token.available,.token.bought");
+ const card=e.target.closest(".token");
  if(!card)return;
  e.preventDefault();
- const number=Number(card.id.replace("qzix-token-",""));
- if(card.classList.contains("available"))startGridTokenPurchase(number);
- else if(card.classList.contains("bought"))startGridResalePurchase(number);
+ selectGridToken(Number(card.id.replace("qzix-token-","")));
+});
+$("buySelectedToken").addEventListener("click",()=>{
+ const number=qzixSelectedTokenNumber;
+ const card=$("qzix-token-"+number);
+ if(!card||card.classList.contains("reserved"))return;
+ if(card.classList.contains("bought"))startGridResalePurchase(number);
+ else if(card.classList.contains("available"))startGridTokenPurchase(number);
 });
 async function refreshTokenStatus(){
  if(!supabase)return;
@@ -753,12 +771,15 @@ async function refreshTokenStatus(){
    card.setAttribute("tabindex",(!isReserved)?"0":"-1");
    const accessible=isBought?"Owned token — click to buy from current owner":isReserved?"Reserved — payment request active":"Left — click to buy from company";
    card.setAttribute("aria-label","QZIX-"+String(number).padStart(3,"0")+" · "+accessible);
-   card.innerHTML="<b>"+String(number).padStart(3,"0")+"</b><small>"+status+"</small><small class=\"token-price\">₹"+Number(window.qzixCurrentPrice||2).toLocaleString("en-IN")+" / TOKEN</small>";
-   card.title="QZIX-"+String(number).padStart(3,"0")+" · "+accessible;
+   card.innerHTML="<b>"+number+"</b>";
+   card.setAttribute("aria-label","QZIX-"+String(number).padStart(3,"0")+" · "+status+" · "+accessible);
+   card.title="QZIX-"+String(number).padStart(3,"0")+" · "+status+" · "+accessible;
   }
  }
  const left=Math.max(0,100-bought-reserved);
  if(summary)summary.textContent="Bought: "+bought+"  ·  Reserved: "+reserved+"  ·  Left: "+left+"  ·  Total: 100";
+ const selectedCard=$("qzix-token-"+qzixSelectedTokenNumber);
+ if(selectedCard){document.querySelectorAll("#tokens .token").forEach(el=>el.classList.toggle("selected",el===selectedCard));const buy=$("buySelectedToken");if(buy){buy.disabled=selectedCard.classList.contains("reserved");buy.textContent=selectedCard.classList.contains("bought")?"BUY FROM OWNER":"BUY TOKEN";}const info=$("selectedTokenInfo");if(info)info.textContent="Selected Token: QZIX-"+String(qzixSelectedTokenNumber).padStart(3,"0");}
  if(currentQzixUser)await refreshMyOwnedTokens();
 }
 async function refreshMarket(){
@@ -766,7 +787,7 @@ async function refreshMarket(){
  $("marketStatus").textContent=tr("marketLoading");
  const {data,error}=await supabase.from("qzix_v2_market").select("current_level,sales_in_level,total_sales,current_price").eq("id",1).single();
  if(error){$("marketStatus").textContent=tr("marketError")+error.message;return}
- $("price").textContent="₹"+Number(data.current_price).toLocaleString("en-IN");const nextPrice=Number(data.current_price)+2;$("nextPrice").textContent="₹"+nextPrice.toLocaleString("en-IN");$("nextPriceLabel").textContent="Next Price (after 100 tokens sold)";window.qzixCurrentPrice=Number(data.current_price);const tokenPriceLabel=$("tokenPricePerToken");if(tokenPriceLabel)tokenPriceLabel.textContent="Price Per Token: ₹"+Number(window.qzixCurrentPrice).toLocaleString("en-IN");document.querySelectorAll(".token-price").forEach(el=>el.textContent="₹"+Number(window.qzixCurrentPrice).toLocaleString("en-IN")+" / TOKEN");updateQrGate();$("level").textContent=data.current_level;$("sales").textContent=data.sales_in_level;$("totalSales").textContent=data.total_sales;renderPricePlan(data.current_level,data.sales_in_level,data.current_price);$("marketStatus").textContent=tr("marketUpdated");
+ $("price").textContent="₹"+Number(data.current_price).toLocaleString("en-IN");const nextPrice=Number(data.current_price)+2;$("nextPrice").textContent="₹"+nextPrice.toLocaleString("en-IN");$("nextPriceLabel").textContent="Next Price (after 100 tokens sold)";window.qzixCurrentPrice=Number(data.current_price);const tokenPriceLabel=$("tokenPricePerToken");if(tokenPriceLabel)tokenPriceLabel.textContent="Token Price: ₹"+Number(window.qzixCurrentPrice).toLocaleString("en-IN")+" per Token";updateQrGate();$("level").textContent=data.current_level;$("sales").textContent=data.sales_in_level;$("totalSales").textContent=data.total_sales;renderPricePlan(data.current_level,data.sales_in_level,data.current_price);$("marketStatus").textContent=tr("marketUpdated");
 }
 function qzixSetHidden(id,hidden){
  const el=$(id);
@@ -1276,6 +1297,19 @@ $("manualPaymentQueue").addEventListener("click",e=>{
 
 <style>
 .main-nav a[href="#qzix-game-locked"]{border-color:#9a773d!important;color:#ffe0a0!important;background:#302719!important}
+
+/* QZIX 1–100 horizontal token selector */
+.token-row-scroll{width:100%;overflow-x:auto;overflow-y:hidden;padding:8px 2px 14px;scrollbar-width:thin;scrollbar-color:#b98a3d #10213a;-webkit-overflow-scrolling:touch}
+.token-list{display:flex!important;flex-wrap:nowrap!important;gap:9px!important;width:max-content;min-width:100%;padding:2px 2px 8px}
+.token-list .token{flex:0 0 48px;width:48px;min-height:48px;height:48px;display:flex;align-items:center;justify-content:center;padding:6px!important;border-radius:11px;cursor:pointer;scroll-snap-align:start}
+.token-list .token b{font-size:14px!important;white-space:nowrap}
+.token-list .token small{display:none!important}
+.token-list .token.selected{border:2px solid #ffe08a;background:linear-gradient(145deg,#49371c,#17263b);box-shadow:0 0 0 2px #f5c66d22,0 5px 15px #0007}
+.token-list .token.reserved{cursor:not-allowed;opacity:.48}
+.token-buy-control{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;padding:13px;border:1px solid #405875;border-radius:14px;background:linear-gradient(135deg,#142943,#0a1728)}
+#selectedTokenInfo{font-size:13px;font-weight:800;color:#ffe2a0}
+#buySelectedToken{min-width:132px}
+@media(max-width:480px){.token-list .token{flex-basis:45px;width:45px;height:45px}.token-buy-control{align-items:stretch;flex-direction:column}.token-buy-control button{width:100%}}
 </style>
 <script>
 (()=> {
