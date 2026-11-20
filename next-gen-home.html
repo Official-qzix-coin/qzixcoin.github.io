@@ -222,6 +222,10 @@ const stick=document.getElementById('stick'),nub=document.getElementById('nub');
   addEventListener('resize',resize3d);
   function renderAvatar(){
    const pp=project(px,pz,0);
+   const hp=project(1.5,1,0);
+   mansion.position.set(((hp[0]-W/2)/(W/2))*3.75,-((hp[1]-H*.56)/(H/2))*2.65,-1.35);
+   mansion.scale.setScalar(Math.max(.78,Math.min(1.18,Math.min(W,H)*.00105)));
+   mansion.visible=!inside;
    const visible=camMode!==1&&!inside;
    avatarCanvas.style.display=visible?'block':'none';
    if(visible){
