@@ -656,7 +656,7 @@ async function startGridTokenPurchase(tokenNumber){
      activeInitialManualRequestId=tokenRequest.id;
      updateInitialManualUpiLink(tokenNumber,tokenRequest.amount);
      initialUpiOpenedForRequest=false;
-     $("initialBuyStatus").textContent="Your existing payment request is ready. Opening your UPI app… Verify the token ID, exact amount and recipient before paying.";
+     $("initialBuyStatus").textContent="Your existing payment request is ready. Tap “Open any UPI App to Pay” below. Verify the token ID, exact amount and recipient before paying.";
    }else{
      await createInitialManualRequest();
      const payLink=$("initialBuyUpiPayNow");
