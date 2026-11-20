@@ -29,7 +29,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes clamav
       - name: Update malware signatures
-        run: sudo freshclam
+        run: sudo freshclam --stdout
       - name: Scan repository for malware
         run: |
           set -o pipefail
