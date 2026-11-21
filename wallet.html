@@ -369,7 +369,7 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 <section class="panel hidden" id="initialBuyPanel" style="margin-top:16px">
   <h3 id="selectedTokenHeading">Buy Selected QZIX Token</h3>
   <p class="muted">Your selected token is reserved and the payment amount is locked when the request is created. Pay only after checking the recipient name. Ownership changes only after admin verifies the actual payment.</p>
-  <div class="notice" id="initialBuyNotice">UPI ID: 7814244038@ptyes. Pay using any UPI app (Paytm, PhonePe, Google Pay, BHIM, etc.). Before paying, verify the recipient's registered name and the exact token ID and amount. Do not rely on a screenshot or typed UTR as proof.</div>
+  <div class="notice" id="initialBuyNotice">UPI ID: NOT_CONFIGURED. Pay using any UPI app (Paytm, PhonePe, Google Pay, BHIM, etc.). Before paying, verify the recipient's registered name and the exact token ID and amount. Do not rely on a screenshot or typed UTR as proof.</div>
   <div class="muted" id="initialBuyAvailability" style="margin:12px 0">Choose a LEFT token above.</div>
   <label class="field hidden"><span>Selected token</span><select id="initialBuyToken"><option value="">Loading…</option></select></label>
   <div class="muted" id="initialBuyPrice">Current price: loading…</div>
@@ -393,7 +393,7 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 <section class="panel hidden" id="buyPanel" style="margin-top:16px">
   <h3>2. Buy from Another Owner</h3>
   <p class="muted">Choose a token currently owned by another buyer. The price is locked when your request is submitted. Ownership changes only after payment verification.</p>
-  <div id="upiInstructions" class="notice" style="margin:12px 0">Pay using any UPI app with UPI ID 7814244038@ptyes. Verify the recipient name in your UPI app before paying. Token ownership changes only after admin verifies the actual credit.</div>
+  <div id="upiInstructions" class="notice" style="margin:12px 0">Pay using any UPI app with UPI ID NOT_CONFIGURED. Verify the recipient name in your UPI app before paying. Token ownership changes only after admin verifies the actual credit.</div>
   <a id="upiPayNow" class="button secondary hidden" href="#" style="display:inline-block;text-decoration:none;margin:0 0 12px" rel="nofollow">Open UPI App to Pay</a>
   <label class="field"><span>Token ID (currently owned)</span><select id="buyToken"><option value="">Loading available tokens…</option></select></label>
   <div class="muted" id="buyPriceInfo">Current price: loading…</div>
@@ -717,14 +717,14 @@ const verifyParam=new URLSearchParams(location.search).get("verify");
 if(verifyParam){const tokenNum=Number(verifyParam);if(Number.isInteger(tokenNum)&&tokenNum>=1&&tokenNum<=100){verifyToken(tokenNum)}else{$("verificationPanel").classList.remove("hidden");$("verificationDetails").textContent="Invalid token verification link."}}
 
 
-const QZIX_UPI_ID = "7814244038@ptyes"; // Owner-provided Paytm UPI ID; verify recipient account ownership before accepting live payments.
+const QZIX_UPI_ID = "NOT_CONFIGURED"; // Owner-provided Paytm UPI ID; verify recipient account ownership before accepting live payments.
 let activeInitialManualRequestId = null;
 function showUpiInstructions(){
  const box=$("upiInstructions");
  if(QZIX_UPI_ID.trim()){
    box.innerHTML="Pay only to <b>"+safeText(QZIX_UPI_ID)+"</b> using your UPI app. Pay the exact amount shown below and keep your UTR/reference. Do not pay a personal account unless you have independently confirmed it belongs to QZIX COIN.";
  }else{
-   box.textContent="Pay using any UPI app with UPI ID 7814244038@ptyes. Verify the recipient name in your UPI app before paying. Token ownership changes only after admin verifies the actual credit.";
+   box.textContent="Pay using any UPI app with UPI ID NOT_CONFIGURED. Verify the recipient name in your UPI app before paying. Token ownership changes only after admin verifies the actual credit.";
  }
 }
 
@@ -988,5 +988,7 @@ $("manualPaymentQueue").addEventListener("click",e=>{
 });
 </script>
 <section class="qzix-contact-email" aria-label="QZIX contact" style="max-width:900px;margin:24px auto 12px;padding:14px 16px;text-align:center;border:1px solid #806b3e66;border-radius:13px;background:#f4c76b0b;color:#c5d1e0;font:13px system-ui,sans-serif">QZIX COIN · CONTACT &amp; SUPPORT<br><a href="mailto:qzixcoin@gmail.com" style="display:inline-block;margin-top:6px;color:#ffe2a0;font-weight:800;text-decoration:none">qzixcoin@gmail.com</a></section>
+
+<style id="qzix-payment-safety-lock">/* Keep every live-money path disabled pending legal and gateway verification. */#initialBuyPanel,#buyPanel,#manualPaymentAdminPanel,#requestWithdrawal,#withdrawAmount,#confirmInitialPayment,#initialBuyUpiPayNow,#upiPayNow,#submitManualPayment,.payment-identity{display:none!important;visibility:hidden!important;pointer-events:none!important}</style>
 </body>
 </html>
