@@ -726,17 +726,30 @@ async function startGridResalePurchase(tokenNumber){
  updateUpiPayLink();
  $("buyStatus").textContent="You are buying this same token from its current owner. After admin verifies the actual UPI payment, ownership transfers automatically. The previous owner receives original purchase cost plus 80% of net profit in their QZIX wallet. Bank withdrawal is processed separately by admin.";
 }
+function openGridTokenFromTap(tokenNumber){
+ const card=$("qzix-token-"+tokenNumber);
+ if(!card)return;
+ if(card.classList.contains("reserved")){
+  $("tokenAvailabilitySummary").textContent="QZIX-"+String(tokenNumber).padStart(3,"0")+" is reserved and cannot be selected right now.";
+  return;
+ }
+ selectGridToken(tokenNumber);
+ // A direct token tap now opens the relevant purchase flow; payment still requires
+ // the buyer to review the request and tap the UPI payment link themselves.
+ if(card.classList.contains("bought"))startGridResalePurchase(tokenNumber);
+ else if(card.classList.contains("available"))startGridTokenPurchase(tokenNumber);
+}
 $("tokens").addEventListener("click",e=>{
  const card=e.target.closest(".token");
  if(!card)return;
- selectGridToken(Number(card.id.replace("qzix-token-","")));
+ openGridTokenFromTap(Number(card.id.replace("qzix-token-","")));
 });
 $("tokens").addEventListener("keydown",e=>{
  if(e.key!=="Enter"&&e.key!==" ")return;
  const card=e.target.closest(".token");
  if(!card)return;
  e.preventDefault();
- selectGridToken(Number(card.id.replace("qzix-token-","")));
+ openGridTokenFromTap(Number(card.id.replace("qzix-token-","")));
 });
 $("buySelectedToken").addEventListener("click",()=>{
  const number=qzixSelectedTokenNumber;
