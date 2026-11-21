@@ -332,7 +332,12 @@ function selectToken(code,id,el){
  const label=$("selected-"+code);if(label)label.textContent=districtTokenCode(code,id);
  $("districtPayToken").textContent=districtTokenCode(code,id);
  $("districtPayName").textContent=(districtNames[code]||code)+" ("+code+")";
- $("districtPaymentStatus").textContent="Selected "+districtTokenCode(code,id)+". Tap BUY TOKEN in this district to create a ₹2 payment request.";
+ if(districtUser){
+  demoBuy(code);
+ }else{
+  $("districtPaymentStatus").textContent="Selected "+districtTokenCode(code,id)+". Please sign in first; tap this token again after login to open your UPI app.";
+  $("districtAccountPanel").scrollIntoView({behavior:"smooth",block:"center"});
+ }
 }
 function setDistrictPaymentLink(request){
  const link=$("districtUpiPayNow");
@@ -346,6 +351,8 @@ async function demoBuy(code){
  if(!districtSupabase){$("districtPaymentStatus").textContent="Payment service is connecting. Please wait and try again.";return;}
  if(!districtUser){$("districtPaymentStatus").textContent="Please log in or sign up first. Your selected token is "+districtTokenCode(code,selectedTokenNumber)+"."; $("districtAccountPanel").scrollIntoView({behavior:"smooth",block:"center"});return;}
  if(code!==selectedDistrictCode){$("districtPaymentStatus").textContent="Please select a token in this district first.";return;}
+ // Open a temporary tab synchronously from the user's tap so Android can hand off to an installed UPI app after the secure request is created.
+ const paymentWindow=window.open("about:blank","_blank");
  $("districtPaymentPanel").style.display="block";
  $("districtPayToken").textContent=districtTokenCode(code,selectedTokenNumber);
  $("districtPaymentStatus").textContent="Creating secure payment request…";
@@ -354,10 +361,20 @@ async function demoBuy(code){
   if(error)throw error;
   activeDistrictRequestId=data.request_id;
   setDistrictPaymentLink(data);
-  $("districtPaymentStatus").textContent="Request created for "+data.token_code+". Pay exactly ₹2 using the UPI button, verify recipient name, then return and tap I HAVE PAID. Request expires at "+new Date(data.expires_at).toLocaleTimeString()+".";
+  let opened=false;
+  if(paymentWindow){
+   try{paymentWindow.location.href=$("districtUpiPayNow").href;districtUpiOpened=true;opened=true;}
+   catch(e){try{paymentWindow.close();}catch(_e){}}
+  }
+  $("districtPaymentStatus").textContent=opened
+   ?"Payment request created for "+data.token_code+". Your UPI app is opening with ₹2 prefilled. Check the recipient name and amount, then approve the payment yourself. Return here after paying. Request expires at "+new Date(data.expires_at).toLocaleTimeString()+"."
+   :"Payment request created for "+data.token_code+". Tap OPEN UPI APP below to continue. Check the recipient name and amount, then approve the payment yourself. Request expires at "+new Date(data.expires_at).toLocaleTimeString()+".";
   await refreshDistrictOrders();await refreshDistrictTokenStatus();
   $("districtPaymentPanel").scrollIntoView({behavior:"smooth",block:"center"});
- }catch(e){$("districtPaymentStatus").textContent=e.message||"Could not create payment request.";}
+ }catch(e){
+  if(paymentWindow){try{paymentWindow.close();}catch(_e){}}
+  $("districtPaymentStatus").textContent=e.message||"Could not create payment request.";
+ }
 }
 $("districtUpiPayNow").addEventListener("click",()=>{if(activeDistrictRequestId)districtUpiOpened=true;});
 $("districtConfirmPaid").addEventListener("click",async()=>{
