@@ -40,7 +40,13 @@ h1{font-size:clamp(21px,4vw,30px);margin:0;letter-spacing:1.2px}.sub{color:var(-
 .token:disabled{opacity:.9}
 #districtAccountPanel .search-controls input{flex:1;min-width:145px}
 
-</style></head><body><main class="wrap">
+</style></head><body>
+<section id="qzix-safety-status" role="status" aria-live="polite" style="max-width:1180px;margin:12px auto 18px;padding:16px 18px;border:1px solid #d7a84b;border-radius:14px;background:linear-gradient(120deg,#332817,#172337);color:#fff0c2;font:14px/1.6 system-ui,sans-serif;box-shadow:0 6px 18px #0005">
+<strong style="display:block;font-size:15px">QZIX COIN — PAYMENTS PAUSED FOR SAFETY REVIEW</strong>
+<span style="display:block;margin-top:5px">This is an early-stage token project, not a bank deposit or guaranteed investment. No payments, deposits, UPI transfers, resale payments or withdrawals are currently accepted. Do not send money to any UPI ID or personal account claiming to represent QZIX.</span>
+<span style="display:block;margin-top:5px">Displayed token prices are project values only; they do not establish market value, liquidity, redemption rights or guaranteed profit. Token ownership is not confirmed until an independently verified transaction and official ownership record are completed.</span>
+</section>
+<main class="wrap">
 <div class="top"><div class="brand"><div class="coin">Q</div><div><h1>QZIX COIN</h1><p class="sub">Punjab District Tokens · Live Payment</p></div></div><a href="./">← Main Website</a></div>
 <section class="hero"><h2>Punjab — 23 Districts</h2><p class="sub">Choose your district, select one of its 100 unique tokens and pay securely through your UPI app. Ownership is confirmed only after payment verification.</p><div class="price">Token Price: ₹2 per Token</div><div class="stats"><div class="stat"><b>23</b><span>Districts</span></div><div class="stat"><b>100</b><span>Tokens / district</span></div><div class="stat"><b>0</b><span>Bought (demo)</span></div><div class="stat"><b>₹2</b><span>Per token</span></div></div></section>
 <section class="search-panel">
@@ -70,7 +76,7 @@ h1{font-size:clamp(21px,4vw,30px);margin:0;letter-spacing:1.2px}.sub{color:var(-
     <div class="pay-token" id="districtPayToken">QZIX-PB02-001</div>
     <div class="pay-row"><span>District</span><b id="districtPayName">Amritsar (PB02)</b></div>
     <div class="pay-row"><span>Exact amount</span><b>₹2.00</b></div>
-    <div class="pay-row"><span>Pay to (UPI ID)</span><b>7814244038@ptyes</b></div>
+    <div class="pay-row"><span>Pay to (UPI ID)</span><b>NOT_CONFIGURED</b></div>
     <div class="pay-warning">Verify the token ID, amount and recipient name inside your UPI app before paying. A screenshot or “I Have Paid” tap is not proof of payment.</div>
   </div>
   <a id="districtUpiPayNow" class="buy" href="#" style="display:none;text-align:center;text-decoration:none;margin:10px 0">OPEN UPI APP TO PAY ₹2</a>
@@ -300,7 +306,7 @@ h1{font-size:clamp(21px,4vw,30px);margin:0;letter-spacing:1.2px}.sub{color:var(-
 
 const QZIX_SUPABASE_URL="https://rxjrsbkqytovjqnijqek.supabase.co";
 const QZIX_SUPABASE_KEY="sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q";
-const QZIX_DISTRICT_UPI="7814244038@ptyes";
+const QZIX_DISTRICT_UPI="NOT_CONFIGURED";
 let districtSupabase=null,districtUser=null,districtAdmin=false;
 let selectedDistrictCode="PB02",selectedTokenNumber=1;
 let activeDistrictRequestId=null,districtUpiOpened=false;
@@ -516,4 +522,6 @@ document.querySelectorAll(".district[data-code]").forEach(section=>{
 initDistrictPayments();
 
 </script><section class="qzix-contact-email" aria-label="QZIX contact" style="max-width:900px;margin:24px auto 12px;padding:14px 16px;text-align:center;border:1px solid #806b3e66;border-radius:13px;background:#f4c76b0b;color:#c5d1e0;font:13px system-ui,sans-serif">QZIX COIN · CONTACT &amp; SUPPORT<br><a href="mailto:qzixcoin@gmail.com" style="display:inline-block;margin-top:6px;color:#ffe2a0;font-weight:800;text-decoration:none">qzixcoin@gmail.com</a></section>
+
+<style id="qzix-payment-safety-lock">/* Keep every live-money path disabled pending legal and gateway verification. */#districtPaymentPanel,#districtUpiPayNow,[id*='paymentSubmit'],[id*='PaymentSubmit'],[id*='payNow'],[id*='PayNow']{display:none!important;visibility:hidden!important;pointer-events:none!important}</style>
 </body></html>
