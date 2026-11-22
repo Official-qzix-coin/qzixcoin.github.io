@@ -50,12 +50,12 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 <section class="hero">
 <h2 id="stateTitle">State Token IDs</h2>
 <p class="sub">100 numbered token IDs for the selected state.</p>
-<div class="stats" aria-label="Price information"><div class="stat"><span>Live Price (Display Only)</span><strong>₹2.00</strong></div><div class="stat"><span>Next Price (after 100 tokens sold)</span><strong>₹4.00</strong></div></div>
+<div class="stats" aria-label="Price information"><div class="stat"><span>Live Price (Confirmed Purchases)</span><strong id="livePriceLabel">₹2.00</strong></div><div class="stat"><span>Next Price (after 100 tokens sold)</span><strong id="nextPriceLabel">₹4.00</strong></div></div>
 <div class="progress-panel" aria-label="Token availability percentage">
  <div class="progress-heading"><strong>Token Availability</strong><span id="progressSummary">0% Bought · 100% Left</span></div>
  <div class="progress-track" role="img" aria-label="0 percent bought, 100 percent left"><div class="progress-fill" id="progressFill"></div></div>
  <div class="progress-labels"><span id="boughtLabel">Bought: 0 / 100 (0%)</span><span id="leftLabel">Left: 100 / 100 (100%)</span></div>
- <p class="progress-note">Display only — purchase tracking is not connected.</p>
+ <p class="progress-note" id="progressNote">Connecting to confirmed-purchase records…</p>
 </div>
 </section>
 <section class="search-panel" aria-label="Search token IDs">
@@ -88,6 +88,7 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
    const id=selected+'-'+String(i).padStart(3,'0');
    const card=document.createElement('div');
    card.className='token';
+   card.dataset.tokenNumber=String(i);
    card.dataset.id=id;
    const label=document.createElement('span');
    label.textContent='TOKEN ID '+String(i).padStart(3,'0');
@@ -115,6 +116,59 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
    });
    status.textContent=q?(count?'Found '+count+' token ID'+(count===1?'':'s')+'.':'No matching token ID found.'):'Showing all 100 token IDs.';
  });
+})();
+</script>
+
+<script>
+(async function(){
+ const params=new URLSearchParams(location.search);
+ const state=(params.get('state')||'').trim();
+ if(!state)return;
+ const url='https://rxjrsbkqytovjqnijqek.supabase.co';
+ const key='sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q';
+ const summary=document.getElementById('progressSummary');
+ const fill=document.getElementById('progressFill');
+ const track=fill&&fill.parentElement;
+ const note=document.getElementById('progressNote');
+ async function refresh(){
+  try{
+   const mod=await import('https://esm.sh/@supabase/supabase-js@2');
+   const client=mod.createClient(url,key);
+   const [marketResult,tokenResult]=await Promise.all([
+    client.rpc('qzix_state_market_summary'),
+    client.rpc('qzix_state_token_status',{p_state_name:state})
+   ]);
+   if(marketResult.error)throw marketResult.error;
+   if(tokenResult.error)throw tokenResult.error;
+   const market=(marketResult.data||[]).find(x=>x.state_name.toLowerCase()===state.toLowerCase());
+   if(!market)throw new Error('State market record not found');
+   const bought=Number(market.bought_count),left=Number(market.left_count);
+   const bp=Number(market.bought_percent),lp=Number(market.left_percent);
+   document.getElementById('livePriceLabel').textContent='₹'+Number(market.current_price).toLocaleString('en-IN');
+   document.getElementById('nextPriceLabel').textContent='₹'+Number(market.next_price).toLocaleString('en-IN');
+   summary.textContent=bp+'% Bought · '+lp+'% Left';
+   fill.style.width=bp+'%';
+   track.setAttribute('aria-label',bp+' percent bought, '+lp+' percent left');
+   document.getElementById('boughtLabel').textContent='Bought: '+bought+' / 100 ('+bp+'%)';
+   document.getElementById('leftLabel').textContent='Left: '+left+' / 100 ('+lp+'%)';
+   const tokens=new Map((tokenResult.data||[]).map(t=>[Number(t.token_number),Boolean(t.is_bought)]));
+   Array.from(document.querySelectorAll('.token')).forEach(card=>{
+    const n=Number(card.dataset.tokenNumber),isBought=tokens.get(n)===true;
+    card.classList.toggle('bought',isBought);
+    const button=card.querySelector('.token-open');
+    if(button){
+     button.disabled=isBought;
+     button.textContent=isBought?'ALREADY BOUGHT':'OPEN UPI APP';
+     button.setAttribute('aria-label',isBought?'Token already purchased':'Open blank UPI app chooser in test mode');
+    }
+   });
+   note.textContent='Live database status. Only admin-confirmed payments count as bought; opening UPI does not count as a purchase.';
+  }catch(e){
+   note.textContent='Live status unavailable: '+(e&&e.message?e.message:'Connection error')+'. Display values are not verified.';
+  }
+ }
+ await refresh();
+ setInterval(refresh,30000);
 })();
 </script>
 </body>
