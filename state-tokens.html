@@ -18,6 +18,13 @@ h1{font-size:clamp(23px,4vw,32px);margin:0;letter-spacing:1px}
 .hero{padding:22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(120deg,#142c49,#0b1a2e);margin-bottom:16px}
 .hero h2{margin:0 0 7px;color:var(--gold);font-size:20px}
 .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}.stat{padding:17px;border:1px solid #314764;border-radius:15px;background:linear-gradient(145deg,#14243b,#0d192b)}.stat span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:750}.stat strong{display:block;color:var(--gold);font-size:26px;margin-top:7px}@media(max-width:600px){.stats{gap:8px}.stat{padding:14px 11px}.stat strong{font-size:23px}}
+.progress-panel{padding:15px;margin-top:14px;border:1px solid #314764;border-radius:14px;background:#0b1a2e}
+.progress-heading,.progress-labels{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.progress-heading strong{color:var(--gold);font-size:14px}.progress-heading span{font-size:13px;font-weight:800}
+.progress-track{height:16px;margin:12px 0 9px;border-radius:999px;background:#314764;overflow:hidden;border:1px solid #49617e}
+.progress-fill{height:100%;width:0%;background:var(--gold);border-radius:999px;transition:width .25s ease}
+.progress-labels{color:var(--muted);font-size:11px;font-weight:700}
+.progress-note{margin:9px 0 0;color:var(--muted);font-size:10px}
 .search-panel{padding:15px;margin:0 0 16px;border:1px solid var(--gold);border-radius:14px;background:linear-gradient(130deg,#182b43,#0a1728)}
 .search-panel label{display:block;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:1px;margin-bottom:9px}
 .search-panel input{width:100%;padding:12px;border:1px solid #49617e;border-radius:9px;background:#071426;color:#fff;font-size:15px;outline:none}
@@ -44,6 +51,12 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 <h2 id="stateTitle">State Token IDs</h2>
 <p class="sub">100 numbered token IDs for the selected state.</p>
 <div class="stats" aria-label="Price information"><div class="stat"><span>Live Price (Display Only)</span><strong>₹2.00</strong></div><div class="stat"><span>Next Price (after 100 tokens sold)</span><strong>₹4.00</strong></div></div>
+<div class="progress-panel" aria-label="Token availability percentage">
+ <div class="progress-heading"><strong>Token Availability</strong><span id="progressSummary">0% Bought · 100% Left</span></div>
+ <div class="progress-track" role="img" aria-label="0 percent bought, 100 percent left"><div class="progress-fill" id="progressFill"></div></div>
+ <div class="progress-labels"><span id="boughtLabel">Bought: 0 / 100 (0%)</span><span id="leftLabel">Left: 100 / 100 (100%)</span></div>
+ <p class="progress-note">Display only — purchase tracking is not connected.</p>
+</div>
 </section>
 <section class="search-panel" aria-label="Search token IDs">
 <label for="tokenSearch">SEARCH TOKEN ID</label>
