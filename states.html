@@ -153,6 +153,12 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 
 
 <script>
+function qzixNextPlannedPrice(currentPrice){
+ const ladder=[2,4,8,12,16,20,25,30,35,40,50,60,75,100];
+ const price=Number(currentPrice);
+ const index=ladder.findIndex(step=>Math.abs(step-price)<0.000001);
+ return index>=0&&index<ladder.length-1?ladder[index+1]:null;
+}
 (async function(){
  const cards=Array.from(document.querySelectorAll('.state'));
  try{
@@ -167,7 +173,7 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
     const m=markets.get((state||'').toLowerCase());
     if(!m)return;
     card.querySelector('[data-current-price]').textContent='₹'+Number(m.current_price).toLocaleString('en-IN');
-    card.querySelector('[data-next-price]').textContent='₹'+Number(m.next_price).toLocaleString('en-IN');
+    const nextPlanned=qzixNextPlannedPrice(m.current_price);card.querySelector('[data-next-price]').textContent=nextPlanned===null?'—':'₹'+Number(nextPlanned).toLocaleString('en-IN');
     card.querySelector('[data-bought]').textContent=Number(m.bought_count)+' / 100';
     let panel=card.querySelector('.state-progress');
     if(!panel){
