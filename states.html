@@ -20,6 +20,12 @@ h1{font-size:clamp(23px,4vw,32px);margin:0;letter-spacing:1px}
 .states{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
 .state{padding:15px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,#11243d,#0a1728);font-weight:700}
 .state span{display:inline-grid;place-items:center;width:27px;height:27px;margin-right:9px;border:1px solid #806b3e;border-radius:50%;color:var(--gold);font-size:12px}
+.search-panel{padding:15px;margin:0 0 16px;border:1px solid var(--gold);border-radius:14px;background:linear-gradient(130deg,#182b43,#0a1728)}
+.search-panel label{display:block;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:1px;margin-bottom:9px}
+.search-panel input{width:100%;padding:12px;border:1px solid #49617e;border-radius:9px;background:#071426;color:#fff;font-size:15px;outline:none}
+.search-panel input:focus{border-color:var(--gold)}
+#searchStatus{font-size:11px;color:var(--muted);margin:9px 0 0;line-height:1.5}
+.state[hidden]{display:none}
 footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 @media(max-width:600px){.wrap{padding:15px 11px 32px}.hero{padding:17px}.states{grid-template-columns:1fr 1fr;gap:8px}.state{padding:12px 9px;font-size:13px}.state span{width:23px;height:23px;margin-right:5px}}
 </style>
@@ -34,7 +40,12 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 <h2>India — 28 States</h2>
 <p class="sub">Select or view the names of all 28 Indian states. Union Territories are not included in this list.</p>
 </section>
-<section class="states" aria-label="All 28 Indian states">
+<section class="search-panel" aria-label="Search states">
+<label for="stateSearch">SEARCH STATE</label>
+<input id="stateSearch" type="search" placeholder="Type a state name…" autocomplete="off" aria-label="Search state">
+<p id="searchStatus" role="status">Showing all 28 states.</p>
+</section>
+<section class="states" id="statesList" aria-label="All 28 Indian states">
 <div class="state"><span>01</span>Andhra Pradesh</div>
 <div class="state"><span>02</span>Arunachal Pradesh</div>
 <div class="state"><span>03</span>Assam</div>
@@ -66,5 +77,25 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 </section>
 <footer>QZIX COIN · State list only</footer>
 </main>
+<script>
+(function(){
+ const search=document.getElementById('stateSearch');
+ const list=document.getElementById('statesList');
+ const status=document.getElementById('searchStatus');
+ if(!search||!list||!status)return;
+ const states=Array.from(list.querySelectorAll('.state'));
+ search.addEventListener('input',function(){
+   const query=search.value.trim().toLocaleLowerCase();
+   let shown=0;
+   states.forEach(function(item){
+     const match=item.textContent.toLocaleLowerCase().includes(query);
+     item.hidden=!match;
+     if(match)shown++;
+   });
+   status.textContent=query ? (shown ? 'Found '+shown+' state'+(shown===1?'':'s')+'.' : 'No matching state found.') : 'Showing all 28 states.';
+ });
+})();
+</script>
+
 </body>
 </html>
