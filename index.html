@@ -734,16 +734,14 @@ async function startGridResalePurchase(tokenNumber){
 }
 function openGridTokenFromTap(tokenNumber){
  const card=$("qzix-token-"+tokenNumber);
- if(!card)return;
- if(card.classList.contains("reserved")){
-  $("tokenAvailabilitySummary").textContent="QZIX-"+String(tokenNumber).padStart(3,"0")+" is reserved and cannot be selected right now.";
-  return;
- }
- selectGridToken(tokenNumber);
- // A direct token tap now opens the relevant purchase flow; payment still requires
- // the buyer to review the request and tap the UPI payment link themselves.
- if(card.classList.contains("bought"))startGridResalePurchase(tokenNumber);
- else if(card.classList.contains("available"))startGridTokenPurchase(tokenNumber);
+ if(!card||!Number.isInteger(tokenNumber)||tokenNumber<1||tokenNumber>100)return;
+ qzixSelectedTokenNumber=tokenNumber;
+ const info=$("selectedTokenInfo");
+ if(info)info.textContent="Selected Token: QZIX-"+String(tokenNumber).padStart(3,"0");
+ // TEST ONLY: open the Android UPI app chooser without payee, amount, or payment request.
+ const summary=$("tokenAvailabilitySummary");
+ if(summary)summary.textContent="TEST MODE: Opening an installed UPI app. No payee, amount, or payment request is attached.";
+ window.location.href="upi://pay";
 }
 $("tokens").addEventListener("click",e=>{
  const card=e.target.closest(".token");
