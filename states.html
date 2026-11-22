@@ -42,6 +42,24 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 .state-progress-fill{display:block;height:100%;min-width:0;width:0;background:linear-gradient(90deg,#25b887,#71e0b5);border-radius:999px;transition:width .25s ease}
 .state-progress small{display:block;width:100%;font-size:10px;line-height:1.5;color:#c1cee0;font-weight:650;white-space:normal}
 </style>
+
+<style id="qzix-states-leaderboard-css">
+.state-leaderboard{margin:0 0 16px;padding:17px;border:1px solid #8b6c37;border-radius:16px;background:linear-gradient(145deg,#172b45,#0a1728);box-shadow:0 10px 28px #0002}
+.leaderboard-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.leaderboard-kicker{color:#f4c76b;font-size:10px;font-weight:900;letter-spacing:1.5px}
+.leaderboard-heading h2{margin:6px 0;font-size:clamp(16px,3vw,21px);color:#ffe3a0}
+.leaderboard-heading p{margin:0 0 12px;color:#9eb0c8;font-size:11px;line-height:1.55;max-width:700px}
+.leaderboard-live{flex-shrink:0;padding:6px 9px;border:1px solid #328e70;border-radius:99px;color:#8af0c6;background:#103c3233;font-size:9px;font-weight:900;letter-spacing:1px}
+.leaderboard-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.leaderboard-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:9px;padding:10px;border:1px solid #344d6a;border-radius:11px;background:linear-gradient(110deg,#10233b,#0b192b)}
+.leaderboard-rank{display:grid;place-items:center;width:29px;height:29px;border-radius:9px;background:#382d1b;color:#ffe09a;font-size:11px;font-weight:950}
+.leaderboard-name{min-width:0;color:#edf4ff;font-size:12px;font-weight:800;overflow-wrap:anywhere}
+.leaderboard-price{text-align:right;color:#ffe09a;font-size:15px;font-weight:950;white-space:nowrap}
+.leaderboard-price small{display:block;color:#9aacc5;font-size:9px;font-weight:650}
+#stateLeaderboardStatus{margin:10px 0 0;font-size:10px}
+@media(max-width:560px){.leaderboard-list{grid-template-columns:1fr}.state-leaderboard{padding:13px}.leaderboard-heading h2{font-size:16px}}
+</style>
+
 </head>
 <body>
 <main class="wrap">
@@ -59,6 +77,11 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 <label for="stateSearch">SEARCH STATE</label>
 <input id="stateSearch" type="search" placeholder="Type a state name…" autocomplete="off" aria-label="Search state">
 <p id="searchStatus" role="status">Showing all 28 states.</p>
+</section>
+<section class="state-leaderboard panel" aria-labelledby="stateLeaderboardTitle">
+ <div class="leaderboard-heading"><div><span class="leaderboard-kicker">STATE PRICE LEADERBOARD</span><h2 id="stateLeaderboardTitle">🏆 TOP 10 STATES — HIGHEST PRICE</h2><p>States ranked by current displayed price, highest first. Prices are indicative display values only; no market value or profit is guaranteed.</p></div><span class="leaderboard-live">LIVE DATA</span></div>
+ <div id="stateLeaderboardList" class="leaderboard-list" aria-live="polite"><p class="leaderboard-muted">Loading state price rankings…</p></div>
+ <p id="stateLeaderboardStatus" class="leaderboard-muted" role="status">Connecting to state price data…</p>
 </section>
 <section class="states" id="statesList" aria-label="All 28 Indian states">
 <a class="state" href="state-tokens.html?state=Andhra%20Pradesh"><span>01</span>Andhra Pradesh<div class="price-info"><div>Live price<b data-current-price>₹2.00</b></div><div>Next price<b data-next-price>₹4.00</b></div><div>Tokens bought<b data-bought>0 / 100</b></div></div></a>
@@ -151,5 +174,34 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
  }
 })();
 </script>
+
+<script id="qzix-states-leaderboard-data">
+(async function(){
+ const list=document.getElementById('stateLeaderboardList');
+ const status=document.getElementById('stateLeaderboardStatus');
+ if(!list||!status)return;
+ try{
+  const mod=await import('https://esm.sh/@supabase/supabase-js@2');
+  const client=mod.createClient('https://rxjrsbkqytovjqnijqek.supabase.co','sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q');
+  async function refresh(){
+   const {data,error}=await client.rpc('qzix_state_market_summary');
+   if(error)throw error;
+   const ranked=(data||[]).slice().sort((a,b)=>{
+    const diff=Number(b.current_price||0)-Number(a.current_price||0);
+    return diff||String(a.state_name||'').localeCompare(String(b.state_name||''));
+   }).slice(0,10);
+   if(!ranked.length){list.innerHTML='<p class="leaderboard-muted">State price data is not available yet.</p>';status.textContent='No ranking data returned.';return}
+   list.innerHTML=ranked.map((m,i)=>'<div class="leaderboard-row"><span class="leaderboard-rank">'+String(i+1).padStart(2,'0')+'</span><span class="leaderboard-name">'+String(m.state_name||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))+'</span><span class="leaderboard-price">₹'+Number(m.current_price||0).toLocaleString('en-IN',{maximumFractionDigits:2})+'<small>per token</small></span></div>').join('');
+   status.textContent='Updated '+new Date().toLocaleTimeString('en-IN')+' · Highest displayed price first. Ties are alphabetical.';
+  }
+  await refresh();
+  setInterval(()=>refresh().catch(e=>{status.textContent='Could not refresh rankings: '+e.message}),30000);
+ }catch(e){
+  list.innerHTML='<p class="leaderboard-muted">State price rankings could not be loaded. Please refresh the page.</p>';
+  status.textContent='Ranking data unavailable: '+e.message;
+ }
+})();
+</script>
+
 </body>
 </html>
