@@ -31,6 +31,7 @@ h1{font-size:clamp(23px,4vw,32px);margin:0;letter-spacing:1px}
 .state[hidden]{display:none}
 footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 @media(max-width:600px){.wrap{padding:15px 11px 32px}.hero{padding:17px}.states{grid-template-columns:1fr 1fr;gap:8px}.state{padding:12px 9px;font-size:13px}.state span{width:23px;height:23px;margin-right:5px}}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 22px}.stat{position:relative;overflow:hidden;padding:19px 17px;border:1px solid #314764;border-radius:17px;background:linear-gradient(145deg,#14243b,#0d192b);box-shadow:0 10px 28px #0002;min-height:104px}.stat-label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:750}.stat strong{display:block;color:var(--gold);font-size:27px;margin-top:7px}.stat small{display:block;color:var(--muted);font-size:10px;margin-top:4px}@media(max-width:650px){.stats{grid-template-columns:1fr 1fr;gap:9px}.stat:last-child{grid-column:1/-1}.stat{padding:15px 13px}.stat strong{font-size:24px}}
 </style>
 </head>
 <body>
@@ -43,7 +44,8 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 <h2>India — 28 States</h2>
 <p class="sub">Select or view the names of all 28 Indian states. Union Territories are not included in this list.</p>
 </section>
-<div class="price-note">PRICE DISPLAY ONLY — Current display/token price: ₹2.00 per token for directory reference. This is not a verified live market price. Next display price: ₹4.00 per token. This is an indicative display only, not a guaranteed market price or profit. No profit or future price is guaranteed.</div>
+
+<section class="stats" aria-label="QZIX token summary"><div class="stat"><span class="stat-label">↗ Next Price (after 100 tokens sold)</span><strong>₹4</strong><small>Indicative next display price</small></div><div class="stat"><span class="stat-label">↗ Total Token Supply</span><strong>100</strong><small>Tokens per state</small></div><div class="stat"><span class="stat-label">◇ Token IDs</span><strong>001 – 100</strong><small>Available ID range per state</small></div></section>
 <section class="search-panel" aria-label="Search states">
 <label for="stateSearch">SEARCH STATE</label>
 <input id="stateSearch" type="search" placeholder="Type a state name…" autocomplete="off" aria-label="Search state">
