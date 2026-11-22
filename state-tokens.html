@@ -17,7 +17,7 @@ h1{font-size:clamp(23px,4vw,32px);margin:0;letter-spacing:1px}
 .sub{color:var(--muted);margin:6px 0 0;font-size:13px}
 .hero{padding:22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(120deg,#142c49,#0b1a2e);margin-bottom:16px}
 .hero h2{margin:0 0 7px;color:var(--gold);font-size:20px}
-.notice{padding:12px 14px;border:1px solid #806b3e;border-radius:12px;color:#f8dfaa;background:#251f16;font-size:12px;line-height:1.6;margin:14px 0}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}.stat{padding:17px;border:1px solid #314764;border-radius:15px;background:linear-gradient(145deg,#14243b,#0d192b)}.stat span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:750}.stat strong{display:block;color:var(--gold);font-size:26px;margin-top:7px}@media(max-width:600px){.stats{gap:8px}.stat{padding:14px 11px}.stat strong{font-size:23px}}
 .search-panel{padding:15px;margin:0 0 16px;border:1px solid var(--gold);border-radius:14px;background:linear-gradient(130deg,#182b43,#0a1728)}
 .search-panel label{display:block;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:1px;margin-bottom:9px}
 .search-panel input{width:100%;padding:12px;border:1px solid #49617e;border-radius:9px;background:#071426;color:#fff;font-size:15px;outline:none}
@@ -27,8 +27,8 @@ h1{font-size:clamp(23px,4vw,32px);margin:0;letter-spacing:1px}
 .token{padding:14px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,#11243d,#0a1728);font-weight:800;text-align:center;letter-spacing:.3px}
 .token span{display:block;color:var(--gold);font-size:10px;font-weight:700;margin-bottom:5px}
 .token[hidden]{display:none}
-.upi-test{display:block;margin-top:11px;padding:9px 8px;border:1px solid #b58b3d;border-radius:8px;background:#20334a;color:#ffe2a0;font-size:11px;font-weight:900;text-decoration:none;letter-spacing:.2px}
-.upi-test:active{background:#314b68}
+
+
 footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 @media(max-width:600px){.wrap{padding:15px 11px 32px}.hero{padding:17px}.tokens{grid-template-columns:repeat(2,minmax(0,1fr))}.token{padding:12px 7px;font-size:13px}}
 </style>
@@ -42,7 +42,7 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 <section class="hero">
 <h2 id="stateTitle">State Token IDs</h2>
 <p class="sub">100 numbered token IDs for the selected state.</p>
-<div class="notice">DISPLAY DIRECTORY ONLY — These IDs are shown for identification/demo purposes. TEST ONLY — The button below may open an installed UPI app or app chooser. It has no payee, amount, or payment request; no payment is taken. No token purchase, sale, transfer, or profit is enabled or promised.</div>
+<div class="stats" aria-label="Price information"><div class="stat"><span>Current Display Price</span><strong>₹2.00</strong></div><div class="stat"><span>Next Price (after 100 tokens sold)</span><strong>₹4.00</strong></div></div>
 </section>
 <section class="search-panel" aria-label="Search token IDs">
 <label for="tokenSearch">SEARCH TOKEN ID</label>
@@ -79,13 +79,7 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
    label.textContent='TOKEN ID '+String(i).padStart(3,'0');
    card.appendChild(label);
    card.appendChild(document.createTextNode(id));
-   const testLink=document.createElement('a');
-   testLink.className='upi-test';
-   testLink.href='upi://pay';
-   testLink.textContent='OPEN UPI APP · TEST ONLY';
-   testLink.setAttribute('aria-label','Open installed UPI app for testing only; no payment details');
-   card.appendChild(testLink);
-   list.appendChild(card);
+    list.appendChild(card);
  }
  search.addEventListener('input',function(){
    const q=search.value.trim().toLocaleLowerCase();
