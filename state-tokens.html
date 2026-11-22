@@ -131,6 +131,12 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 </script>
 
 <script>
+function qzixNextPlannedPrice(currentPrice){
+ const ladder=[2,4,8,12,16,20,25,30,35,40,50,60,75,100];
+ const price=Number(currentPrice);
+ const index=ladder.findIndex(step=>Math.abs(step-price)<0.000001);
+ return index>=0&&index<ladder.length-1?ladder[index+1]:null;
+}
 (async function(){
  const params=new URLSearchParams(location.search);
  const state=(params.get('state')||'').trim();
@@ -156,7 +162,7 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
    const bought=Number(market.bought_count),left=Number(market.left_count);
    const bp=Number(market.bought_percent),lp=Number(market.left_percent);
    document.getElementById('livePriceLabel').textContent='₹'+Number(market.current_price).toLocaleString('en-IN');
-   document.getElementById('nextPriceLabel').textContent='₹'+Number(market.next_price).toLocaleString('en-IN');
+   const nextPlanned=qzixNextPlannedPrice(market.current_price);document.getElementById('nextPriceLabel').textContent=nextPlanned===null?'Final planned level':'₹'+Number(nextPlanned).toLocaleString('en-IN');
    summary.textContent=bp+'% Bought · '+lp+'% Left';
    fill.style.width=bp+'%';
    track.setAttribute('aria-label',bp+' percent bought, '+lp+' percent left');
