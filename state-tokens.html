@@ -27,6 +27,7 @@ h1{font-size:clamp(23px,4vw,32px);margin:0;letter-spacing:1px}
 .token{padding:14px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,#11243d,#0a1728);font-weight:800;text-align:center;letter-spacing:.3px}
 .token span{display:block;color:var(--gold);font-size:10px;font-weight:700;margin-bottom:5px}
 .token[hidden]{display:none}
+.token-open{display:block;width:100%;margin-top:10px;padding:9px 7px;border:0;border-radius:8px;background:var(--gold);color:#172238;font-size:11px;font-weight:900;letter-spacing:.35px;cursor:pointer}.token-open:active{transform:scale(.98)}
 
 
 footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
@@ -79,7 +80,17 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
    label.textContent='TOKEN ID '+String(i).padStart(3,'0');
    card.appendChild(label);
    card.appendChild(document.createTextNode(id));
-    list.appendChild(card);
+   const openButton=document.createElement('button');
+   openButton.type='button';
+   openButton.className='token-open';
+   openButton.textContent='OPEN UPI APP';
+   openButton.setAttribute('aria-label','Open UPI app chooser for '+id+' (test mode)');
+   openButton.addEventListener('click',function(){
+     status.textContent='TEST MODE: Opening an installed UPI app. No payee, amount, or payment request is attached.';
+     window.location.href='upi://pay';
+   });
+   card.appendChild(openButton);
+   list.appendChild(card);
  }
  search.addEventListener('input',function(){
    const q=search.value.trim().toLocaleLowerCase();
