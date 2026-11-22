@@ -33,11 +33,11 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 @media(max-width:600px){.wrap{padding:15px 11px 32px}.hero{padding:17px}.states{grid-template-columns:1fr 1fr;gap:8px}.state{padding:12px 9px;font-size:13px}.state span{width:23px;height:23px;margin-right:5px}}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 22px}.stat{position:relative;overflow:hidden;padding:19px 17px;border:1px solid #314764;border-radius:17px;background:linear-gradient(145deg,#14243b,#0d192b);box-shadow:0 10px 28px #0002;min-height:104px}.stat-label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:750}.stat strong{display:block;color:var(--gold);font-size:27px;margin-top:7px}.stat small{display:block;color:var(--muted);font-size:10px;margin-top:4px}@media(max-width:650px){.stats{grid-template-columns:1fr 1fr;gap:9px}.stat:last-child{grid-column:1/-1}.stat{padding:15px 13px}.stat strong{font-size:24px}}
 
-.state-progress{margin-top:9px;padding-top:8px;border-top:1px solid #263d5b}
-.state-progress-head{display:flex;justify-content:space-between;gap:6px;font-size:10px;color:#dce7f5;font-weight:800}
-.state-progress-track{height:8px;background:#314764;border-radius:99px;overflow:hidden;margin:6px 0}
-.state-progress-fill{height:100%;width:0;background:#f4c76b;border-radius:99px}
-.state-progress small{display:block;color:#9eb0c8;font-size:9px}
+.state-progress{display:block;clear:both;width:100%;box-sizing:border-box;margin:14px 0 2px;padding:12px 0 2px;border-top:1px solid #3b5270}
+.state-progress-head{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;font-size:12px;line-height:1.5;color:#e5edf8;font-weight:800;white-space:normal}
+.state-progress-track{display:block;position:relative;width:100%;height:13px;background:#344a66;border:1px solid #617895;box-sizing:border-box;border-radius:999px;overflow:hidden;margin:9px 0 8px}
+.state-progress-fill{display:block;height:100%;min-width:0;width:0;background:linear-gradient(90deg,#25b887,#71e0b5);border-radius:999px;transition:width .25s ease}
+.state-progress small{display:block;width:100%;font-size:11px;line-height:1.5;color:#c1cee0;font-weight:650;white-space:normal}
 </style>
 </head>
 <body>
