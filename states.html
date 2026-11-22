@@ -77,6 +77,7 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 <label for="stateSearch">SEARCH STATE</label>
 <input id="stateSearch" type="search" placeholder="Type a state name…" autocomplete="off" aria-label="Search state">
 <p id="searchStatus" role="status">Showing all 28 states.</p>
+<div id="stateSearchResults" class="states" aria-live="polite" hidden></div>
 </section>
 <section class="state-leaderboard panel" aria-labelledby="stateLeaderboardTitle">
  <div class="leaderboard-heading"><div><span class="leaderboard-kicker">STATE PRICE LEADERBOARD</span><h2 id="stateLeaderboardTitle">🏆 TOP 10 STATES — HIGHEST PRICE</h2><p>States ranked by current displayed price, highest first. Prices are indicative display values only; no market value or profit is guaranteed.</p></div><span class="leaderboard-live">LIVE DATA</span></div>
@@ -130,18 +131,22 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 (function(){
  const search=document.getElementById('stateSearch');
  const list=document.getElementById('statesList');
+ const results=document.getElementById('stateSearchResults');
  const status=document.getElementById('searchStatus');
- if(!search||!list||!status)return;
+ if(!search||!list||!results||!status)return;
  const states=Array.from(list.querySelectorAll('.state'));
  search.addEventListener('input',function(){
    const query=search.value.trim().toLocaleLowerCase();
    let shown=0;
    states.forEach(function(item){
-     const match=item.textContent.toLocaleLowerCase().includes(query);
-     item.hidden=!match;
+     const match=!query||item.textContent.toLocaleLowerCase().includes(query);
+     if(query&&match){results.appendChild(item);item.hidden=false;}
+     else{list.appendChild(item);item.hidden=!match;}
      if(match)shown++;
    });
-   status.textContent=query ? (shown ? 'Found '+shown+' state'+(shown===1?'':'s')+'.' : 'No matching state found.') : 'Showing all 28 states.';
+   results.hidden=!query||shown===0;
+   list.hidden=!!query;
+   status.textContent=query ? (shown ? 'Found '+shown+' state'+(shown===1?'':'s')+'. Showing result below.' : 'No matching state found.') : 'Showing all 28 states.';
  });
 })();
 </script>
