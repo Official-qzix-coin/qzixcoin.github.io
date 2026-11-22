@@ -477,15 +477,22 @@ hi:{language:"भाषा",fixedTag:"100 निश्चित टोकन",he
 };
 let currentLang="en";
 
+const QZIX_PRICE_LADDER=[2,4,8,12,16,20,25,30,35,40,50,60,75,100];
+function qzixNextPlannedPrice(currentPrice){
+ const price=Number(currentPrice);
+ const index=QZIX_PRICE_LADDER.findIndex(step=>Math.abs(step-price)<0.000001);
+ return index>=0&&index<QZIX_PRICE_LADDER.length-1?QZIX_PRICE_LADDER[index+1]:null;
+}
+
 function renderPricePlan(level,sales,currentPrice){
+ const price=Number(currentPrice||2);
+ const next=qzixNextPlannedPrice(price);
  const ladder=$("pricePlanLadder");
  if(ladder){
-   const price=Number(currentPrice||2);
-   ladder.innerHTML="<div class='price-step active' aria-current='step'><b>CURRENT REFERENCE</b><span>₹"+price+"</span><small>Admin-confirmed market price</small></div><div class='price-step'><b>NEXT REFERENCE</b><span>₹"+(price+2)+"</span><small>After next verified resale</small></div>";
+   ladder.innerHTML="<div class='price-step active' aria-current='step'><b>CURRENT DISPLAY PRICE</b><span>₹"+price+"</span><small>Database-reported reference</small></div><div class='price-step'><b>NEXT PLANNED PRICE</b><span>"+(next===null?"Final planned level":"₹"+next)+"</span><small>Indicative ladder only; not a market quote</small></div>";
  }
- const price=Number(currentPrice||2);
  const status=$("pricePlanStatus");
- if(status)status.textContent="Current reference price: ₹"+price+" · Next reference price: ₹"+(price+2)+". Only an admin-verified buyer-to-buyer resale advances the reference price by ₹2. Initial company purchases do not advance it. No profit or resale buyer is guaranteed.";
+ if(status)status.textContent="Current displayed reference: ₹"+price+" · Next planned step: "+(next===null?"No further step in the published ladder":"₹"+next)+". This is a planning display only. Price movement is not automatic and no buyer, resale, liquidity or profit is guaranteed.";
 }
 
 function tr(key){return translations[currentLang][key]||translations.en[key]||key}
@@ -574,7 +581,7 @@ async function refreshMarket(){
  $("marketStatus").textContent=tr("marketLoading");
  const {data,error}=await supabase.from("qzix_v2_market").select("current_level,sales_in_level,total_sales,current_price").eq("id",1).single();
  if(error){$("marketStatus").textContent=tr("marketError")+error.message;return}
- $("price").textContent="₹"+Number(data.current_price).toLocaleString("en-IN");const nextPrice=Number(data.current_price)+2;$("nextPrice").textContent="₹"+nextPrice.toLocaleString("en-IN");window.qzixCurrentPrice=Number(data.current_price);document.querySelectorAll(".token-price").forEach(el=>el.textContent="₹"+Number(window.qzixCurrentPrice).toLocaleString("en-IN")+" / TOKEN");updateQrGate();$("level").textContent=data.current_level;$("sales").textContent=data.sales_in_level;$("totalSales").textContent=data.total_sales;renderPricePlan(data.current_level,data.sales_in_level,data.current_price);$("marketStatus").textContent=tr("marketUpdated");
+ $("price").textContent="₹"+Number(data.current_price).toLocaleString("en-IN");const nextPrice=qzixNextPlannedPrice(data.current_price);$("nextPrice").textContent=nextPrice===null?"—":"₹"+nextPrice.toLocaleString("en-IN");window.qzixCurrentPrice=Number(data.current_price);document.querySelectorAll(".token-price").forEach(el=>el.textContent="₹"+Number(window.qzixCurrentPrice).toLocaleString("en-IN")+" / TOKEN");updateQrGate();$("level").textContent=data.current_level;$("sales").textContent=data.sales_in_level;$("totalSales").textContent=data.total_sales;renderPricePlan(data.current_level,data.sales_in_level,data.current_price);$("marketStatus").textContent=tr("marketUpdated");
 }
 async function checkUser(){
  if(!supabase)return;
