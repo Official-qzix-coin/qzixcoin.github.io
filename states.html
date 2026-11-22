@@ -33,11 +33,13 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 @media(max-width:600px){.wrap{padding:15px 11px 32px}.hero{padding:17px}.states{grid-template-columns:1fr 1fr;gap:8px}.state{padding:12px 9px;font-size:13px}.state span{width:23px;height:23px;margin-right:5px}}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0 22px}.stat{position:relative;overflow:hidden;padding:19px 17px;border:1px solid #314764;border-radius:17px;background:linear-gradient(145deg,#14243b,#0d192b);box-shadow:0 10px 28px #0002;min-height:104px}.stat-label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:750}.stat strong{display:block;color:var(--gold);font-size:27px;margin-top:7px}.stat small{display:block;color:var(--muted);font-size:10px;margin-top:4px}@media(max-width:650px){.stats{grid-template-columns:1fr 1fr;gap:9px}.stat:last-child{grid-column:1/-1}.stat{padding:15px 13px}.stat strong{font-size:24px}}
 
-.state-progress{display:block;clear:both;width:100%;box-sizing:border-box;margin:14px 0 2px;padding:12px 0 2px;border-top:1px solid #3b5270}
-.state-progress-head{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;font-size:12px;line-height:1.5;color:#e5edf8;font-weight:800;white-space:normal}
+.state-progress{display:block;clear:both;width:100%;box-sizing:border-box;margin:14px 0 2px;padding:11px 9px 9px;border:1px solid #3b5270;border-radius:10px;background:#09182a}
+.state-progress-head{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:7px;width:100%;font-size:11px;line-height:1.45;color:#e5edf8;font-weight:800;white-space:normal}
+.state-progress-head span{display:block;min-width:0;overflow-wrap:anywhere}
+.state-progress-head span:last-child{text-align:right}
 .state-progress-track{display:block;position:relative;width:100%;height:13px;background:#344a66;border:1px solid #617895;box-sizing:border-box;border-radius:999px;overflow:hidden;margin:9px 0 8px}
 .state-progress-fill{display:block;height:100%;min-width:0;width:0;background:linear-gradient(90deg,#25b887,#71e0b5);border-radius:999px;transition:width .25s ease}
-.state-progress small{display:block;width:100%;font-size:11px;line-height:1.5;color:#c1cee0;font-weight:650;white-space:normal}
+.state-progress small{display:block;width:100%;font-size:10px;line-height:1.5;color:#c1cee0;font-weight:650;white-space:normal}
 </style>
 </head>
 <body>
@@ -130,11 +132,12 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
     let panel=card.querySelector('.state-progress');
     if(!panel){
      panel=document.createElement('div');panel.className='state-progress';
-     panel.innerHTML='<div class="state-progress-head"><span data-progress-summary></span></div><div class="state-progress-track"><div class="state-progress-fill"></div></div><small data-progress-detail></small>';
+     panel.innerHTML='<div class="state-progress-head"><span data-bought-percent></span><span data-left-percent></span></div><div class="state-progress-track"><div class="state-progress-fill"></div></div><small data-progress-detail></small>';
      card.appendChild(panel);
     }
     const bp=Number(m.bought_percent),lp=Number(m.left_percent);
-    panel.querySelector('[data-progress-summary]').textContent=bp+'% Bought · '+lp+'% Left';
+    panel.querySelector('[data-bought-percent]').textContent='Bought '+bp+'%';
+    panel.querySelector('[data-left-percent]').textContent='Left '+lp+'%';
     panel.querySelector('.state-progress-fill').style.width=bp+'%';
     panel.querySelector('[data-progress-detail]').textContent='Bought '+m.bought_count+' · Left '+m.left_count;
    });
