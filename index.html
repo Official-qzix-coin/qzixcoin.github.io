@@ -1200,6 +1200,7 @@ function updateUpiPayLink(){
 }
 $("buyToken").addEventListener("change",updateUpiPayLink);
 async function submitManualPayment(){
+ return; // BUY-only project: buyer-to-buyer resale is disabled.
  if(!supabase||!currentQzixUser){$("buyStatus").textContent="Please log in first.";return}
  if(!QZIX_UPI_ID.trim()){$("buyStatus").textContent="UPI details are not configured yet. Do not make a payment. Ask admin to add the official UPI ID first.";return}
  const tokenNumber=Number($("buyToken").value);
@@ -1318,6 +1319,7 @@ $("initialManualPaymentQueue").addEventListener("click",e=>{
 });
 
 async function refreshManualPaymentQueue(){
+ return; // BUY-only project: buyer-to-buyer resale is disabled.
  if(!supabase)return;
  $("manualAdminStatus").textContent="Loading payment requests…";
  const {data,error}=await supabase.from("qzix_manual_payment_submissions").select("id,token_number,buyer_id,seller_id,amount,payment_reference,status,created_at").eq("status","pending").order("created_at",{ascending:true}).limit(100);
@@ -1327,6 +1329,7 @@ async function refreshManualPaymentQueue(){
  $("manualAdminStatus").textContent="Check each payment in your bank/UPI app before approving.";
 }
 async function reviewManualPayment(id,decision){
+ return; // BUY-only project: buyer-to-buyer resale is disabled.
  const message=decision==="approve"?"Confirm only after you have verified the exact amount and UTR in your bank/UPI account. Approval transfers the token and credits the previous owner with original cost plus 80% of net profit; the company receives 20% of net profit only. No profit is guaranteed.":"Reject this payment request?";
  if(!confirm(message))return;
  $("manualAdminStatus").textContent="Processing…";
