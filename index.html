@@ -353,6 +353,23 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 
 .token.reserved{background:linear-gradient(145deg,#44351a,#211d17);border-color:#c69a43;cursor:not-allowed;opacity:.96}.token.reserved b,.token.reserved small{color:#ffe09a}
 </style>
+
+<style id="qzix-top-states-ranking">
+#topStatesPricePanel{margin:16px 0;border-color:#8b6c37;background:linear-gradient(145deg,#172b45,#0a1728)}
+.top-states-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.top-states-heading h3{margin:7px 0;font-size:18px;color:#ffe3a0}
+.top-states-heading p{max-width:680px;margin:0 0 12px}
+.top-states-live{flex-shrink:0;padding:6px 9px;border:1px solid #328e70;border-radius:99px;color:#8af0c6;background:#103c3233;font-size:9px;font-weight:900;letter-spacing:1px}
+.top-states-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.top-state-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 12px;border:1px solid #344d6a;border-radius:12px;background:linear-gradient(110deg,#10233b,#0b192b)}
+.top-state-rank{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#382d1b;color:#ffe09a;font-size:12px;font-weight:950}
+.top-state-name{min-width:0;color:#edf4ff;font-size:13px;font-weight:800;overflow-wrap:anywhere}
+.top-state-price{text-align:right;color:#ffe09a;font-size:16px;font-weight:950;white-space:nowrap}
+.top-state-price small{display:block;color:#9aacc5;font-size:9px;font-weight:650}
+#topStatesPriceStatus{margin:10px 0 0;font-size:11px}
+@media(max-width:560px){.top-states-list{grid-template-columns:1fr}.top-states-heading h3{font-size:16px}.top-state-row{padding:10px}}
+</style>
+
 </head>
 <body>
 <section id="qzix-safety-status" role="status" aria-live="polite" style="max-width:1180px;margin:12px auto 18px;padding:16px 18px;border:1px solid #d7a84b;border-radius:14px;background:linear-gradient(120deg,#332817,#172337);color:#fff0c2;font:14px/1.6 system-ui,sans-serif;box-shadow:0 6px 18px #0005">
@@ -390,6 +407,11 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
       <div class="stat stat-supply"><span id="supplyLabel">Total Token Supply</span><strong>100</strong><em>◇</em></div>
       <div class="stat stat-ids"><span id="tokenIdsLabel">Token IDs</span><strong style="font-size:19px">001 – 100</strong><em>▦</em></div>
     </div>
+  </section>
+  <section class="panel" id="topStatesPricePanel" aria-labelledby="topStatesPriceTitle">
+    <div class="top-states-heading"><div><div class="eyebrow">STATE PRICE LEADERBOARD</div><h3 id="topStatesPriceTitle">🏆 TOP 10 STATES — HIGHEST PRICE</h3><p class="muted">States ranked by current displayed price, highest first. Prices are indicative display values only; no market value or profit is guaranteed.</p></div><span class="top-states-live">LIVE DATA</span></div>
+    <div id="topStatesPriceList" class="top-states-list" aria-live="polite"><p class="muted">Loading state price rankings…</p></div>
+    <p id="topStatesPriceStatus" class="muted" role="status">Connecting to state price data…</p>
   </section>
   <section class="dashboard-actions">
     <div class="price-chart panel">
@@ -1379,6 +1401,35 @@ $("manualPaymentQueue").addEventListener("click",e=>{
 /* Payment UI stays hidden until legal, gateway, and ownership verification checks are completed. */
 #initialBuyPanel,#buyPanel,#manualPaymentAdminPanel,#initialBuyUpiPayNow,#upiPayNow,#initialUpiAppChoices,#resaleUpiAppChoices,#submitManualPayment,#createInitialManualRequest,.payment-identity{display:none!important;visibility:hidden!important;pointer-events:none!important}
 </style>
+
+<script id="qzix-top-states-ranking-data">
+(async function(){
+ const list=document.getElementById('topStatesPriceList');
+ const status=document.getElementById('topStatesPriceStatus');
+ if(!list||!status)return;
+ try{
+  const mod=await import('https://esm.sh/@supabase/supabase-js@2');
+  const client=mod.createClient('https://rxjrsbkqytovjqnijqek.supabase.co','sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q');
+  async function refresh(){
+   const {data,error}=await client.rpc('qzix_state_market_summary');
+   if(error)throw error;
+   const ranked=(data||[]).slice().sort((a,b)=>{
+    const diff=Number(b.current_price||0)-Number(a.current_price||0);
+    return diff || String(a.state_name||'').localeCompare(String(b.state_name||''));
+   }).slice(0,10);
+   if(!ranked.length){list.innerHTML='<p class="muted">State price data is not available yet.</p>';status.textContent='No ranking data returned.';return}
+   list.innerHTML=ranked.map((m,i)=>'<div class="top-state-row"><span class="top-state-rank">'+String(i+1).padStart(2,'0')+'</span><span class="top-state-name">'+String(m.state_name||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))+'</span><span class="top-state-price">₹'+Number(m.current_price||0).toLocaleString('en-IN',{maximumFractionDigits:2})+'<small>per token</small></span></div>').join('');
+   status.textContent='Updated '+new Date().toLocaleTimeString('en-IN')+' · Highest displayed price first. Ties are alphabetical.';
+  }
+  await refresh();
+  setInterval(()=>refresh().catch(e=>{status.textContent='Could not refresh rankings: '+e.message}),30000);
+ }catch(e){
+  list.innerHTML='<p class="muted">State price rankings could not be loaded. Please refresh the dashboard.</p>';
+  status.textContent='Ranking data unavailable: '+e.message;
+ }
+})();
+</script>
+
 </body>
 </html>
 
