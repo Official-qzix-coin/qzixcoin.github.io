@@ -357,8 +357,8 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
     <span class="muted">Available Balance</span>
     <strong id="walletBalance" class="gold" style="display:block;font-size:28px;margin-top:5px">₹0.00</strong>
   </div>
-  <label class="field"><span>Withdrawal Amount (₹)</span><input id="withdrawAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Enter any amount up to your available balance"></label><p class="muted">You may request any amount from ₹0.01 up to your full available wallet balance. Pending withdrawal requests are reserved and cannot be withdrawn again.</p>
-  <div class="actions"><button id="requestWithdrawal">Request Withdrawal</button><button class="secondary" id="refreshWallet">Refresh Wallet</button></div>
+  <label class="field"><span>Withdrawal Amount (₹)</span><input id="withdrawAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Withdrawals paused" disabled></label><p class="muted">Withdrawals are paused for safety review. No withdrawal requests or payouts are currently being accepted.</p>
+  <div class="actions"><button id="requestWithdrawal" disabled>Withdrawals Paused</button><button class="secondary" id="refreshWallet">Refresh Wallet</button></div>
   <div class="status" id="walletStatus" aria-live="polite"></div>
   <h3 style="margin-top:18px">Wallet History</h3>
   <div id="walletHistory" class="muted">Log in to view your wallet history.</div>
