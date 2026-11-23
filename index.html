@@ -353,42 +353,33 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 
 .token.reserved{background:linear-gradient(145deg,#44351a,#211d17);border-color:#c69a43;cursor:not-allowed;opacity:.96}.token.reserved b,.token.reserved small{color:#ffe09a}
 
-/* QZIX FULL-WIDTH DASHBOARD LAYOUT — keep the page open, not squeezed */
-.wrap{
+/* Keep the Main Dashboard page at its original centered width.
+   Only the Main Dashboard token IDs use a horizontal, swipeable row. */
+.wrap{width:auto;max-width:1180px;margin-left:auto;margin-right:auto}
+#token-showcase .token-row-scroll{
   width:100%;
-  max-width:1560px;
-  margin-left:auto;
-  margin-right:auto;
-  padding:28px clamp(16px,2.2vw,32px) 60px;
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:8px 2px 14px;
+  scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch;
 }
-.wrap > *,
-.qzix-dashboard,
-.dashboard-hero,
-.dashboard-actions,
-.panel,
-.purchase-orders-layout{
-  min-width:0;
+#token-showcase .token-row-scroll .token-list{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  width:max-content;
+  min-width:100%;
 }
-.qzix-dashboard,
-.dashboard-hero,
-.dashboard-actions,
-#token-showcase,
-#token-showcase .panel,
-#token-showcase .token-list{
-  width:100%;
-  max-width:none;
+#token-showcase .token-row-scroll .token{
+  flex:0 0 48px;
 }
 @media(max-width:760px){
-  .wrap{
-    width:100%;
-    max-width:none;
-    padding:16px 12px 38px;
-  }
+  .wrap{width:auto;max-width:1180px;padding:18px 13px 40px}
 }
-@media(max-width:380px){
-  .wrap{padding-left:9px;padding-right:9px}
+@media(max-width:600px){
+  .wrap{padding:16px 12px 35px}
 }
-
 </style>
 
 <style id="qzix-top-states-ranking">
