@@ -353,26 +353,45 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 
 .token.reserved{background:linear-gradient(145deg,#44351a,#211d17);border-color:#c69a43;cursor:not-allowed;opacity:.96}.token.reserved b,.token.reserved small{color:#ffe09a}
 
-/* Keep the Main Dashboard page at its original centered width.
-   Only the Main Dashboard token IDs use a horizontal, swipeable row. */
-.wrap{width:auto;max-width:1180px;margin-left:auto;margin-right:auto}
-#token-showcase .token-row-scroll{
+/* Main Dashboard: contain horizontal scrolling inside the token strip only */
+.wrap{
+  width:auto;
+  max-width:1180px;
+  margin-left:auto;
+  margin-right:auto;
+  min-width:0;
+}
+#token-showcase,
+#token-showcase .token-showcase{
+  display:block;
   width:100%;
   max-width:100%;
+  min-width:0;
+  overflow:hidden;
+}
+#token-showcase .token-row-scroll{
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0;
   overflow-x:auto;
   overflow-y:hidden;
-  padding:8px 2px 14px;
-  scrollbar-width:thin;
+  overscroll-behavior-x:contain;
   -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  padding:8px 2px 14px;
 }
-#token-showcase .token-row-scroll .token-list{
+#token-showcase #tokens.token-list{
   display:flex!important;
   flex-wrap:nowrap!important;
-  width:max-content;
-  min-width:100%;
+  width:max-content!important;
+  min-width:0!important;
+  max-width:none!important;
+  gap:9px!important;
 }
-#token-showcase .token-row-scroll .token{
-  flex:0 0 48px;
+#token-showcase #tokens.token-list .token{
+  flex:0 0 48px!important;
+  width:48px!important;
 }
 @media(max-width:760px){
   .wrap{width:auto;max-width:1180px;padding:18px 13px 40px}
