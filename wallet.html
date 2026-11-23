@@ -585,7 +585,7 @@ async function checkUser(){
  if(currentQzixUser){
    $("userInfo").textContent="Logged in: "+currentQzixUser.email;
    $("logout").classList.remove("hidden");
-   $("myWalletTab").classList.add("hidden");
+   $("myWalletTab")?.classList.add("hidden");
    $("walletPanel").classList.remove("hidden");
    await refreshWallet();
    await initializeInitialBuy();
@@ -596,8 +596,8 @@ async function checkUser(){
    $("userInfo").textContent=tr("noUser");
    $("logout").classList.add("hidden");
    $("walletPanel").classList.add("hidden");
-   $("myWalletTab").classList.add("hidden");
-   $("myWalletTab").setAttribute("aria-expanded","false");
+   $("myWalletTab")?.classList.add("hidden");
+   $("myWalletTab")?.setAttribute("aria-expanded","false");
    $("initialBuyPanel").classList.add("hidden");
    $("buyPanel").classList.add("hidden");
    $("manualPaymentAdminPanel").classList.add("hidden");
