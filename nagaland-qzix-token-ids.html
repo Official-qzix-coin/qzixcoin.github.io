@@ -158,7 +158,7 @@ function qzixNextPlannedPrice(currentPrice){
    const bought=Number(market.bought_count),left=Number(market.left_count);
    const bp=Number(market.bought_percent),lp=Number(market.left_percent);
    document.getElementById('livePriceLabel').textContent='₹'+Number(market.current_price).toLocaleString('en-IN');
-   const nextPlanned=qzixNextPlannedPrice(market.current_price);document.getElementById('nextPriceLabel').textContent=nextPlanned===null?'Final planned level':'₹'+Number(nextPlanned).toLocaleString('en-IN');
+   document.getElementById('nextPriceLabel').textContent='₹'+Number(market.next_price).toLocaleString('en-IN');
    summary.textContent=bp+'% Bought · '+lp+'% Left';
    fill.style.width=bp+'%';
    track.setAttribute('aria-label',bp+' percent bought, '+lp+' percent left');
