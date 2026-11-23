@@ -109,11 +109,10 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
    const openButton=document.createElement('button');
    openButton.type='button';
    openButton.className='token-open';
-   openButton.textContent='OPEN UPI APP';
-   openButton.setAttribute('aria-label','Open UPI app chooser for '+id+' (test mode)');
+   openButton.textContent='PAYMENT NOT ENABLED';
+   openButton.setAttribute('aria-label','Payment setup required for '+id);
    openButton.addEventListener('click',function(){
-     status.textContent='TEST MODE: Opening an installed UPI app. No payee, amount, or payment request is attached.';
-     window.location.href='upi://pay';
+     status.textContent='Online payment is not enabled yet. No money has been requested or collected. Please contact the project administrator.';
    });
    card.appendChild(openButton);
    list.appendChild(card);
@@ -140,7 +139,7 @@ function qzixNextPlannedPrice(currentPrice){
 }
 (async function(){
  const params=new URLSearchParams(location.search);
- const state=(params.get('state')||'').trim();
+ const state=(params.get('state')||'Meghalaya').trim();
  if(!state)return;
  const url='https://rxjrsbkqytovjqnijqek.supabase.co';
  const key='sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q';
@@ -176,8 +175,8 @@ function qzixNextPlannedPrice(currentPrice){
     const button=card.querySelector('.token-open');
     if(button){
      button.disabled=isBought;
-     button.textContent=isBought?'ALREADY BOUGHT':'OPEN UPI APP';
-     button.setAttribute('aria-label',isBought?'Token already purchased':'Open blank UPI app chooser in test mode');
+     button.textContent=isBought?'ALREADY BOUGHT':'PAYMENT NOT ENABLED';
+     button.setAttribute('aria-label',isBought?'Token already purchased':'Payment setup required');
     }
    });
    note.textContent='Live database status. Only admin-confirmed payments count as bought; opening UPI does not count as a purchase.';
