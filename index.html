@@ -1483,6 +1483,73 @@ $("manualPaymentQueue").addEventListener("click",e=>{
 })();
 </script>
 
+
+<style id="qzix-mobile-overflow-final-fix">
+/* Keep the dashboard viewport fixed; only the token strip may scroll sideways. */
+html,body{
+  width:100%;
+  max-width:100%;
+  overflow-x:clip!important;
+}
+.wrap{
+  width:100%!important;
+  max-width:1180px!important;
+  min-width:0!important;
+}
+.qzix-dashboard{
+  display:grid;
+  grid-template-columns:minmax(0,1fr)!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+}
+.qzix-dashboard>*,
+#token-showcase,
+#token-showcase>.token-showcase{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+}
+#token-showcase{
+  overflow:hidden!important;
+}
+#token-showcase .token-row-scroll{
+  box-sizing:border-box!important;
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  touch-action:pan-x!important;
+  overscroll-behavior-x:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  contain:inline-size;
+}
+#token-showcase #tokens.token-list{
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  width:max-content!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+#token-showcase #tokens.token-list>.token{
+  flex:0 0 45px!important;
+  width:45px!important;
+}
+.dashboard-actions,
+.price-chart,
+.chart-graphic{
+  min-width:0!important;
+  max-width:100%!important;
+}
+@media(max-width:650px){
+  .wrap{padding-left:12px!important;padding-right:12px!important}
+  .qzix-dashboard{gap:13px}
+}
+</style>
 </body>
 </html>
 
