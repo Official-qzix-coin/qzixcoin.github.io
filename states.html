@@ -166,7 +166,7 @@ function qzixNextPlannedPrice(currentPrice){
     const m=markets.get((state||'').toLowerCase());
     if(!m)return;
     card.querySelector('[data-current-price]').textContent='₹'+Number(m.current_price).toLocaleString('en-IN');
-    const nextPlanned=qzixNextPlannedPrice(m.current_price);card.querySelector('[data-next-price]').textContent=nextPlanned===null?'—':'₹'+Number(nextPlanned).toLocaleString('en-IN');
+    const nextPlanned=Number(m.next_price);card.querySelector('[data-next-price]').textContent=Number.isFinite(nextPlanned)?'₹'+nextPlanned.toLocaleString('en-IN'):'—';
     let panel=card.querySelector('.state-progress');
     if(!panel){
      panel=document.createElement('div');panel.className='state-progress';
