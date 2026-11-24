@@ -161,7 +161,7 @@ function qzixNextPlannedPrice(currentPrice){
    if(error)throw error;
    const markets=new Map((data||[]).map(x=>[x.state_name.toLowerCase(),x]));
    cards.forEach(card=>{
-    const slug=new URL(card.href).pathname.split('/').pop().replace(/-qzix-token-ids\\.html$/,'');
+    const slug=new URL(card.href).pathname.split('/').pop().replace(/-qzix-token-ids\.html$/,'');
      const state=slug.replace(/-/g,' ');
     const m=markets.get((state||'').toLowerCase());
     if(!m)return;
