@@ -49,7 +49,28 @@
 <div class="stat"><small>Profit Promise</small><strong>None</strong></div>
 </div>
 </section>
-<div class="layout" id="calculator" style="margin-top:16px">
+
+<section class="panel" id="buyerAccess" style="margin-top:16px">
+  <h2>Buyer Login</h2>
+  <p class="muted">Login with your registered email. The BUY option appears only after successful login. New buyers can register first.</p>
+  <div id="loginForm">
+    <label class="field"><span>Registered Email Address</span><input id="buyerEmail" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com"></label>
+    <button id="sendLoginOtp" type="button">Send Login OTP</button>
+    <p class="muted"><a href="buyer-registration.html">New buyer? Register here</a></p>
+    <div id="otpArea" class="hidden">
+      <label class="field"><span>Six-digit Email OTP</span><input id="buyerOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP"></label>
+      <button id="verifyLoginOtp" type="button">Verify & Login</button>
+    </div>
+  </div>
+  <div id="buyerLoggedIn" class="hidden">
+    <p class="muted" id="buyerWelcome">You are logged in.</p>
+    <button id="buyButton" type="button">BUY</button>
+    <button id="buyerLogout" type="button" class="secondary">Logout</button>
+    <p class="muted" id="buyStatus">BUY is shown after login. Online payment and order confirmation are not activated yet.</p>
+  </div>
+  <div id="buyerAuthStatus" class="status" role="status" aria-live="polite">Connecting securely…</div>
+</section>
+\n<div class="layout" id="calculator" style="margin-top:16px">
 <section class="panel">
 <h2>Contribution Calculator</h2>
 <p class="muted">₹20 = 1%. Enter an amount from the minimum investment of ₹20.</p>
@@ -66,7 +87,61 @@
 <div class="foot">QZIX CIRCULAR · Information page · No guaranteed profit</div>
 </div>
 <script>
-const amount=document.getElementById('amount'),percent=document.getElementById('percent'),bar=document.getElementById('bar'),remaining=document.getElementById('remaining');
+
+const AUTH_URL="https://rxjrsbkqytovjqnijqek.supabase.co";
+const AUTH_KEY="sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q";
+const authStatus=document.getElementById('buyerAuthStatus');
+let authClient=null;
+(async()=>{
+ try{
+  const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
+  authClient=createClient(AUTH_URL,AUTH_KEY);
+  const {data:{session}}=await authClient.auth.getSession();
+  showBuyerSession(session);
+  authStatus.textContent=session?"Login session restored.":"Enter your registered email to login.";
+ }catch(e){authStatus.textContent="Secure login service could not load. Please refresh.";}
+})();
+function showBuyerSession(session){
+ const logged=!!session;
+ document.getElementById('loginForm').classList.toggle('hidden',logged);
+ document.getElementById('buyerLoggedIn').classList.toggle('hidden',!logged);
+ if(logged)document.getElementById('buyerWelcome').textContent="Logged in as "+(session.user.email||"registered buyer")+".";
+}
+document.getElementById('sendLoginOtp').addEventListener('click',async()=>{
+ if(!authClient)return;
+ const email=document.getElementById('buyerEmail').value.trim().toLowerCase();
+ if(!email){authStatus.textContent="Please enter your registered email address.";return;}
+ const btn=document.getElementById('sendLoginOtp');btn.disabled=true;authStatus.textContent="Sending login OTP…";
+ try{
+  const {error}=await authClient.auth.signInWithOtp({email,options:{shouldCreateUser:false}});
+  if(error)throw error;
+  document.getElementById('otpArea').classList.remove('hidden');
+  authStatus.textContent="Login OTP sent. Check your inbox and spam folder.";
+ }catch(e){authStatus.textContent="Could not send login OTP: "+(e.message||"Please try again.");}
+ finally{btn.disabled=false;}
+});
+document.getElementById('verifyLoginOtp').addEventListener('click',async()=>{
+ if(!authClient)return;
+ const email=document.getElementById('buyerEmail').value.trim().toLowerCase(),token=document.getElementById('buyerOtp').value.trim();
+ if(!/^[0-9]{6}$/.test(token)){authStatus.textContent="Enter the six-digit OTP.";return;}
+ const btn=document.getElementById('verifyLoginOtp');btn.disabled=true;authStatus.textContent="Verifying OTP…";
+ try{
+  const {data,error}=await authClient.auth.verifyOtp({email,token,type:"email"});
+  if(error)throw error;
+  showBuyerSession(data.session);authStatus.textContent="Login successful.";
+ }catch(e){authStatus.textContent="Login failed: "+(e.message||"Check the OTP and try again.");}
+ finally{btn.disabled=false;}
+});
+document.getElementById('buyerLogout').addEventListener('click',async()=>{
+ if(!authClient)return;
+ const {error}=await authClient.auth.signOut();
+ if(error){authStatus.textContent="Logout failed: "+error.message;return;}
+ showBuyerSession(null);authStatus.textContent="You are logged out.";
+});
+document.getElementById('buyButton').addEventListener('click',()=>{
+ document.getElementById('buyStatus').textContent="Your login is active, but real BUY orders and online payments are not enabled yet. No money has been collected and no ownership is created.";
+});
+\nconst amount=document.getElementById('amount'),percent=document.getElementById('percent'),bar=document.getElementById('bar'),remaining=document.getElementById('remaining');
 const vault=document.getElementById('glassVault'), contents=document.getElementById('vaultContents');
 let angle=0, velocity=0, dragging=false, lastX=0, lastTime=0, raf=0;
 vault.addEventListener('pointerdown',e=>{dragging=true;vault.classList.add('dragging');vault.setPointerCapture(e.pointerId);lastX=e.clientX;lastTime=performance.now();velocity=0;if(raf)cancelAnimationFrame(raf);});
