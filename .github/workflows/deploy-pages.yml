@@ -29,7 +29,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes clamav
       - name: Update malware signatures
-        run: sudo freshclam --stdout
+        run: |
+          # Ubuntu may start freshclam automatically during package installation.
+          # Stop that service to release its log lock before updating signatures.
+          sudo systemctl stop clamav-freshclam || true
+          sudo freshclam --stdout --log=/dev/null
       - name: Scan repository for malware
         run: |
           set -o pipefail
