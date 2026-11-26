@@ -5,7 +5,7 @@
 <title>QZIX COIN — 3D Glass Vault</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:radial-gradient(ellipse at 50% 28%,#183653,#091725 58%,#040a12);color:#eef5ff;font-family:system-ui,sans-serif}
-#stage{position:relative;width:100%;height:100%;touch-action:none}canvas{display:block;width:100%;height:100%}
+#stage{position:relative;width:100%;height:100%;touch-action:pan-y}canvas{display:block;width:100%;height:100%;touch-action:pan-y}
 .hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:#b5c9da;font-size:12px;pointer-events:none;text-shadow:0 2px 8px #000}
 .controls{position:absolute;top:12px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:2;flex-wrap:wrap}
 button{border:1px solid #54c9df88;border-radius:10px;padding:9px 13px;background:linear-gradient(#1d4967,#102b41);color:#effaff;font-weight:750;font-size:12px}
@@ -29,7 +29,7 @@ import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cann
 const stage=document.getElementById('stage'), status=document.getElementById('status');
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(35,stage.clientWidth/stage.clientHeight,.1,100);camera.position.set(0,.2,7.7);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(stage.clientWidth,stage.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;renderer.physicallyCorrectLights=true;stage.appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.25));renderer.setSize(stage.clientWidth,stage.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;renderer.physicallyCorrectLights=true;stage.appendChild(renderer.domElement);
 const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;RectAreaLightUniformsLib.init();
 scene.add(new THREE.HemisphereLight(0xdaf4ff,0x18263a,1.35));
 const key=new THREE.DirectionalLight(0xffffff,4.2);key.position.set(-3,5,6);scene.add(key);
@@ -39,19 +39,19 @@ const rim=new THREE.PointLight(0x37cfff,35,14);rim.position.set(3,1,3);scene.add
 const blue=new THREE.PointLight(0x5d9dff,24,12);blue.position.set(-4,-2,-2);scene.add(blue);
 const vault=new THREE.Group();scene.add(vault);
 // Thick, physically shaded crystal shell with studio reflections and visible edge highlights.
-const shellGeo=new THREE.SphereGeometry(2.05,128,96);
+const shellGeo=new THREE.SphereGeometry(2.05,64,48);
 const glass=new THREE.Mesh(shellGeo,new THREE.MeshPhysicalMaterial({
  color:0xe5f8ff,metalness:0,roughness:.018,transmission:1,thickness:.62,ior:1.48,
  envMapIntensity:1.65,clearcoat:1,clearcoatRoughness:.012,
  attenuationColor:0xb8eaff,attenuationDistance:4.5,side:THREE.DoubleSide
 }));vault.add(glass);
 // A subtle inner contour gives the glass wall a believable thick edge.
-const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,96,72),new THREE.MeshBasicMaterial({color:0x9bdfff,side:THREE.BackSide,transparent:true,opacity:.075}));vault.add(innerRim);
-const edge=new THREE.Mesh(new THREE.SphereGeometry(2.058,96,72),new THREE.MeshBasicMaterial({color:0xdaf8ff,wireframe:true,transparent:true,opacity:.045}));vault.add(edge);
+const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,48,36),new THREE.MeshBasicMaterial({color:0x9bdfff,side:THREE.BackSide,transparent:true,opacity:.075}));vault.add(innerRim);
+const edge=new THREE.Mesh(new THREE.SphereGeometry(2.058,48,36),new THREE.MeshBasicMaterial({color:0xdaf8ff,wireframe:true,transparent:true,opacity:.045}));vault.add(edge);
 const arc=new THREE.Mesh(new THREE.TorusGeometry(1.985,.012,8,160,Math.PI*.72),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.72}));arc.position.set(-.1,.08,.24);arc.rotation.set(.45,.2,-.5);vault.add(arc);
 const glint=new THREE.Mesh(new THREE.TorusGeometry(2.005,.006,6,140,Math.PI*.26),new THREE.MeshBasicMaterial({color:0x8ceaff,transparent:true,opacity:.8}));glint.position.set(.04,-.02,.18);glint.rotation.set(1.1,.4,.8);vault.add(glint);
-const world=new CANNON.World({gravity:new CANNON.Vec3(0,-2.8,0)});world.broadphase=new CANNON.NaiveBroadphase();world.solver.iterations=12;world.defaultContactMaterial.friction=.42;world.defaultContactMaterial.restitution=.34;
-const radius=1.78,wallCount=48;
+const world=new CANNON.World({gravity:new CANNON.Vec3(0,-2.8,0)});world.broadphase=new CANNON.NaiveBroadphase();world.solver.iterations=6;world.defaultContactMaterial.friction=.42;world.defaultContactMaterial.restitution=.34;
+const radius=1.78,wallCount=24;
 for(let i=0;i<wallCount;i++){const a=i/wallCount*Math.PI*2,mid=a+Math.PI/wallCount;const b=new CANNON.Body({mass:0});b.addShape(new CANNON.Box(new CANNON.Vec3(.14,.12,1.65)));b.position.set(Math.cos(mid)*radius,Math.sin(mid)*radius,0);b.quaternion.setFromEuler(0,0,mid+Math.PI/2);world.addBody(b)}
 for(const z of [-1.55,1.55]){const b=new CANNON.Body({mass:0});b.addShape(new CANNON.Plane());b.position.z=z;b.quaternion.setFromEuler(z<0?Math.PI/2:-Math.PI/2,0,0);world.addBody(b)}
 const values=[10,20,15,25,5,25], meshes=[], bodies=[];
@@ -76,12 +76,39 @@ values.forEach((pct,i)=>{const w=.94,h=.47,d=.075;const shape=new THREE.Shape();
  const geo=new THREE.ExtrudeGeometry(shape,{depth:d,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.012,bevelThickness:.012,curveSegments:8});geo.center();
  const noteMat=new THREE.MeshStandardMaterial({map:texture(pct,i),roughness:.62,metalness:.015});
  const mesh=new THREE.Mesh(geo,[noteMat,new THREE.MeshStandardMaterial({color:0xc6b98d,roughness:.72,metalness:.08})]);vault.add(mesh);meshes.push(mesh);const body=new CANNON.Body({mass:.42,linearDamping:.12,angularDamping:.18});body.addShape(new CANNON.Box(new CANNON.Vec3(w/2,h/2,d/2)));const a=i/6*Math.PI*2;body.position.set(Math.cos(a)*.72,Math.sin(a)*.78,i%2?.48:-.48);body.velocity.set((i-2.5)*.16,(2-i)*.12,i%2?.08:-.08);body.angularVelocity.set(.1*(i+1),.12*(i-2),i%2?.2:-.2);world.addBody(body);bodies.push(body)});
-const orbit=new OrbitControls(camera,renderer.domElement);orbit.enablePan=false;orbit.enableZoom=false;orbit.enableDamping=true;orbit.dampingFactor=.07;orbit.rotateSpeed=.65;
-let automatic=true,last=performance.now(),acc=0;
-document.getElementById('auto').onclick=()=>{automatic=!automatic;document.getElementById('auto').textContent='Automatic: '+(automatic?'ON':'OFF');document.getElementById('auto').classList.toggle('primary',automatic);status.textContent=automatic?'Automatic movement enabled':'Automatic vault rotation paused; physics continues'};
-document.getElementById('shake').onclick=()=>{bodies.forEach(b=>b.applyImpulse(new CANNON.Vec3((Math.random()-.5)*1.3,Math.random()*1.1,(Math.random()-.5)*.8),b.position));status.textContent='Gentle movement applied'};
-document.getElementById('reset').onclick=()=>{bodies.forEach((b,i)=>{const a=i/6*Math.PI*2;b.position.set(Math.cos(a)*.72,Math.sin(a)*.78,i%2?.48:-.48);b.velocity.set(0,0,0);b.angularVelocity.set(0,0,0);b.quaternion.set(0,0,0,1)});status.textContent='Notes reset to starting positions'};
-function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.033);last=now;acc+=dt;while(acc>=1/60){world.step(1/60);acc-=1/60}if(automatic){vault.rotation.y+=dt*.16;vault.rotation.x=Math.sin(now*.00025)*.055}bodies.forEach((b,i)=>{meshes[i].position.set(b.position.x,b.position.y,b.position.z);meshes[i].quaternion.set(b.quaternion.x,b.quaternion.y,b.quaternion.z,b.quaternion.w)});orbit.update();renderer.render(scene,camera)}
+const orbit=new OrbitControls(camera,renderer.domElement);orbit.enablePan=false;orbit.enableZoom=false;orbit.enableDamping=true;orbit.dampingFactor=.07;orbit.rotateSpeed=.65;renderer.domElement.style.touchAction="pan-y";
+let automatic=true,last=performance.now(),acc=0,raf=0,visible=true,lastFrame=0;
+const frameInterval=1000/30;
+function syncNoteMeshes(){
+ bodies.forEach((b,i)=>{
+  meshes[i].position.set(b.position.x,b.position.y,b.position.z);
+  meshes[i].quaternion.set(b.quaternion.x,b.quaternion.y,b.quaternion.z,b.quaternion.w);
+ });
+}
+function stopLoop(){if(raf){cancelAnimationFrame(raf);raf=0}}
+function startLoop(){if(!raf&&visible&&!document.hidden)raf=requestAnimationFrame(animate)}
+function animate(now){
+ raf=0;
+ if(!visible||document.hidden)return;
+ if(now-lastFrame<frameInterval){raf=requestAnimationFrame(animate);return}
+ const dt=Math.min((now-last)/1000,.033);last=now;lastFrame=now;acc+=dt;
+ while(acc>=1/30){world.step(1/30);acc-=1/30}
+ if(automatic){vault.rotation.y+=dt*.16;vault.rotation.x=Math.sin(now*.00025)*.055}
+ syncNoteMeshes();orbit.update();renderer.render(scene,camera);
+ raf=requestAnimationFrame(animate);
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopLoop();else{last=performance.now();startLoop()}});
+if('IntersectionObserver' in window){
+ const observer=new IntersectionObserver(entries=>{
+  visible=entries.some(entry=>entry.isIntersecting);
+  if(visible){last=performance.now();startLoop()}else stopLoop();
+ },{threshold:.05});
+ observer.observe(stage);
+}
 requestAnimationFrame(animate);
-new ResizeObserver(()=>{const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}).observe(stage);
+new ResizeObserver(()=>{
+ const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
+ camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);
+ if(visible&&!document.hidden)renderer.render(scene,camera);
+}).observe(stage);
 </script></body></html>
