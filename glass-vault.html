@@ -41,13 +41,13 @@ const vault=new THREE.Group();scene.add(vault);
 // Thick, physically shaded crystal shell with studio reflections and visible edge highlights.
 const shellGeo=new THREE.SphereGeometry(2.05,64,48);
 const glass=new THREE.Mesh(shellGeo,new THREE.MeshPhysicalMaterial({
- color:0xe8f8ff,metalness:0,roughness:.012,transmission:1,thickness:.72,ior:1.52,
- envMapIntensity:1.45,clearcoat:1,clearcoatRoughness:.012,
- attenuationColor:0xc9f4ff,attenuationDistance:18,side:THREE.DoubleSide
+ color:0xf0fbff,metalness:0,roughness:.035,transmission:.86,thickness:.48,ior:1.49,
+ envMapIntensity:1.8,clearcoat:1,clearcoatRoughness:.018,
+ attenuationColor:0xd9f5ff,attenuationDistance:28,side:THREE.DoubleSide
 }));vault.add(glass);
 // A subtle inner contour gives the glass wall a believable thick edge.
-const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,48,36),new THREE.MeshBasicMaterial({color:0x38bfff,side:THREE.BackSide,transparent:true,opacity:.065,depthWrite:false}));vault.add(innerRim);
-const edge=new THREE.Mesh(new THREE.SphereGeometry(2.058,48,36),new THREE.MeshBasicMaterial({color:0x65d9ff,wireframe:true,transparent:true,opacity:.085}));vault.add(edge);
+const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,48,36),new THREE.MeshBasicMaterial({color:0x38bfff,side:THREE.BackSide,transparent:true,opacity:.09,depthWrite:false}));vault.add(innerRim);
+const edge=new THREE.Mesh(new THREE.SphereGeometry(2.058,48,36),new THREE.MeshBasicMaterial({color:0x65d9ff,wireframe:true,transparent:true,opacity:.055}));vault.add(edge);
 const arc=new THREE.Mesh(new THREE.TorusGeometry(1.985,.012,8,160,Math.PI*.72),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.72}));arc.position.set(-.1,.08,.24);arc.rotation.set(.45,.2,-.5);vault.add(arc);
 const glint=new THREE.Mesh(new THREE.TorusGeometry(2.005,.006,6,140,Math.PI*.26),new THREE.MeshBasicMaterial({color:0x8ceaff,transparent:true,opacity:.8}));glint.position.set(.04,-.02,.18);glint.rotation.set(1.1,.4,.8);vault.add(glint);
 const world=new CANNON.World({gravity:new CANNON.Vec3(0,-3.6,0)});world.broadphase=new CANNON.NaiveBroadphase();world.solver.iterations=10;world.defaultContactMaterial.friction=.24;world.defaultContactMaterial.restitution=.62;
