@@ -13,9 +13,13 @@
 
 .vault-wrap{display:flex;justify-content:center;align-items:center;padding:22px 0 8px}
 .glass-vault{position:relative;width:min(68vw,300px);aspect-ratio:1;border-radius:50%;overflow:hidden;isolation:isolate;background:radial-gradient(circle at 32% 24%,#ffffffaa 0 2%,#bce8ff44 9%,transparent 26%),radial-gradient(circle at 68% 76%,#4b9ac855,transparent 38%),radial-gradient(circle at 50% 50%,#153451 0 47%,#8fd8f044 65%,#e9faffaa 70%,#39789d 73%,#071426 77%);border:2px solid #d9f4ffcc;box-shadow:inset -16px -18px 28px #020b18aa,inset 12px 10px 22px #e5f8ff88,0 18px 45px #0009,0 0 25px #83d9ff44}
+.glass-vault{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}.glass-vault.dragging{cursor:grabbing}
+.vault-contents{position:absolute;inset:0;border-radius:50%;transform:rotate(0deg);will-change:transform}
 .glass-vault:before{content:"";position:absolute;inset:4%;border-radius:50%;border:1px solid #e8fbff99;box-shadow:inset 0 0 20px #b7efff55;pointer-events:none}
 .glass-vault:after{content:"";position:absolute;top:8%;left:16%;width:32%;height:13%;border-radius:50%;transform:rotate(-32deg);background:linear-gradient(90deg,transparent,#fff9,transparent);filter:blur(2px)}
 .bill{position:absolute;width:29%;height:14%;border:1px solid #e7d5a0;border-radius:5px;background:linear-gradient(135deg,#f2dfaa,#b9c995 48%,#f6e6b7);color:#315344;display:flex;align-items:center;justify-content:center;font-size:clamp(10px,2.3vw,15px);font-weight:900;text-shadow:0 1px #fff8;box-shadow:0 4px 8px #0008,inset 0 0 0 2px #ffffff66}
+.bill{animation:floatNote 2.4s ease-in-out infinite;will-change:transform}.b2{animation-delay:-.7s}.b3{animation-delay:-1.2s}.b4{animation-delay:-1.8s}.b5{animation-delay:-.3s}
+@keyframes floatNote{0%,100%{translate:0 0}50%{translate:0 -11px}}
 .bill:before{content:"";position:absolute;inset:3px;border:1px dashed #597a60aa;border-radius:3px}
 .b1{left:13%;top:30%;transform:rotate(-18deg)}.b2{right:12%;top:26%;transform:rotate(14deg)}.b3{left:34%;top:51%;transform:rotate(7deg)}.b4{left:15%;bottom:17%;transform:rotate(12deg)}.b5{right:10%;bottom:17%;transform:rotate(-13deg)}
 .vault-label{position:absolute;z-index:2;left:0;right:0;bottom:7%;text-align:center;color:#eaf8ff;font-size:11px;font-weight:800;letter-spacing:2px;text-shadow:0 2px 5px #000}
@@ -31,10 +35,12 @@
 <p>A structured circular participation concept. Review the stated circular value and use the calculator to understand what percentage a contribution represents.</p>
 
 <div class="vault-wrap" aria-label="Decorative transparent glass vault containing illustrative banknotes">
-  <div class="glass-vault">
-    <div class="bill b1">₹500</div><div class="bill b2">₹200</div>
-    <div class="bill b3">₹100</div><div class="bill b4">₹500</div><div class="bill b5">₹200</div>
-    <div class="vault-label">QZIX CIRCULAR VAULT</div>
+  <div class="glass-vault" id="glassVault" role="img" aria-label="Touch and drag the glass vault to spin it; percentage notes float inside">
+    <div class="vault-contents" id="vaultContents">
+      <div class="bill b1">10%</div><div class="bill b2">20%</div>
+      <div class="bill b3">5%</div><div class="bill b4">25%</div><div class="bill b5">40%</div>
+    </div>
+    <div class="vault-label">TOUCH & SPIN · 360°</div>
   </div>
 </div>
 <div class="stats">
@@ -61,6 +67,12 @@
 </div>
 <script>
 const amount=document.getElementById('amount'),percent=document.getElementById('percent'),bar=document.getElementById('bar'),remaining=document.getElementById('remaining');
+const vault=document.getElementById('glassVault'), contents=document.getElementById('vaultContents');
+let angle=0, velocity=0, dragging=false, lastX=0, lastTime=0, raf=0;
+vault.addEventListener('pointerdown',e=>{dragging=true;vault.classList.add('dragging');vault.setPointerCapture(e.pointerId);lastX=e.clientX;lastTime=performance.now();velocity=0;if(raf)cancelAnimationFrame(raf);});
+vault.addEventListener('pointermove',e=>{if(!dragging)return;const now=performance.now(),dt=Math.max(1,now-lastTime),dx=e.clientX-lastX;angle+=dx*.9;velocity=(dx*.9)/dt;contents.style.transform='rotate('+angle+'deg)';lastX=e.clientX;lastTime=now;});
+function releaseVault(){if(!dragging)return;dragging=false;vault.classList.remove('dragging');let prev=performance.now();function coast(now){const dt=Math.min(32,now-prev);prev=now;angle+=velocity*dt;velocity*=Math.pow(.985,dt/16.67);contents.style.transform='rotate('+angle+'deg)';if(Math.abs(velocity)>.008){raf=requestAnimationFrame(coast)}else{velocity=0;raf=0}}raf=requestAnimationFrame(coast)}
+vault.addEventListener('pointerup',releaseVault);vault.addEventListener('pointercancel',releaseVault);vault.addEventListener('lostpointercapture',releaseVault);
 function update(){const n=Math.max(0,Math.min(100000,Number(amount.value)||0));const p=n/100000*100;percent.textContent=p.toFixed(2)+'%';bar.style.width=p+'%';remaining.textContent='Remaining amount: ₹'+(100000-n).toLocaleString('en-IN');}
 amount.addEventListener('input',update);update();
 </script>
