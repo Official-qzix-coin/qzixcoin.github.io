@@ -531,7 +531,7 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
       <button id="signup">Sign Up</button><button class="secondary" id="login">Login</button><button class="secondary hidden" id="logout">Logout</button>
     </div>
     <button type="button" class="secondary" id="forgotPassword" style="margin-top:10px;padding:9px 12px">Forgot Password?</button>
-    <div style="margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#081426">
+    <div id="mobileOtpLoginSection" style="margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#081426">
       <b style="color:var(--gold)">Mobile Login — SMS OTP</b>
       <p class="muted" style="margin:6px 0 10px">Enter your verified Indian mobile number to receive a six-digit SMS code. Existing buyers must first link and verify their mobile number while logged in with email.</p>
       <label class="field"><span>Mobile Number</span><input id="mobileLoginPhone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" placeholder="10-digit Indian mobile number"></label>
@@ -751,7 +751,7 @@ function selectGridToken(tokenNumber){
  const buy=$("buySelectedToken");
  if(buy){buy.disabled=false;buy.textContent=card.classList.contains("bought")?"BUY FROM OWNER":"BUY TOKEN";}
 }
-window.qzixSupabaseReady.then(()=>{if(configured){try{supabase=window.qzixCreateClient(SUPABASE_URL,SUPABASE_ANON_KEY);supabase.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY"){$("passwordRecoveryPanel").classList.remove("hidden");$("authStatus").textContent="Password reset link verified. Enter your new password below.";$("newPassword").focus()}});$("authStatus").textContent=tr("ready");refreshMarket();refreshTokenStatus();setInterval(refreshTokenStatus,30000);checkUser()}catch(e){$("authStatus").textContent="Supabase client failed to start: "+(e?.message||"Unknown error");$("marketStatus").textContent=tr("marketUnavailable")}}else{$("authStatus").textContent=tr("notConfigured");$("marketStatus").textContent=tr("marketUnavailable")}}).catch(e=>{$("authStatus").textContent="Supabase SDK import failed: "+(e?.message||"Check internet connection or browser support");$("marketStatus").textContent=tr("marketUnavailable")});
+window.qzixSupabaseReady.then(()=>{if(configured){try{supabase=window.qzixCreateClient(SUPABASE_URL,SUPABASE_ANON_KEY);supabase.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY"){$("passwordRecoveryPanel").classList.remove("hidden");$("authStatus").textContent="Password reset link verified. Enter your new password below.";$("newPassword").focus()}});$("authStatus").textContent=tr("ready");refreshMarket();refreshTokenStatus();setInterval(refreshTokenStatus,120000);checkUser()}catch(e){$("authStatus").textContent="Supabase client failed to start: "+(e?.message||"Unknown error");$("marketStatus").textContent=tr("marketUnavailable")}}else{$("authStatus").textContent=tr("notConfigured");$("marketStatus").textContent=tr("marketUnavailable")}}).catch(e=>{$("authStatus").textContent="Supabase SDK import failed: "+(e?.message||"Check internet connection or browser support");$("marketStatus").textContent=tr("marketUnavailable")});
 async function startGridTokenPurchase(tokenNumber){
  if(!Number.isInteger(tokenNumber)||tokenNumber<1||tokenNumber>100)return;
  const card=$("qzix-token-"+tokenNumber);
@@ -1657,6 +1657,36 @@ html,body{
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+</style>
+
+
+<style id="qzix-mobile-freeze-fix">
+/* Keep the mobile page scrollable and reduce expensive GPU painting. */
+@media (max-width: 760px) {
+  html, body {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100% !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  #mobileOtpLoginSection, #mobileLinkPanel { display: none !important; }
+  .dashboard-hero, .hero-coin, .coin-orbit, .orbit-two, .stage-glow,
+  .chart-graphic, .chart-graphic svg, .chart-line, .chart-dots circle,
+  .coin, .panel, .stat, .token, .price-step, button, .button,
+  .main-nav, .benefit-strip, .dashboard-button {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    will-change: auto !important;
+  }
+  .dashboard-hero, .panel, .stat, .benefit-strip, .dashboard-button {
+    box-shadow: none !important;
   }
 }
 </style>
