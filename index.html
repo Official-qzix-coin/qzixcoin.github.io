@@ -1651,6 +1651,39 @@ html,body{
   <span style="color:#9eb0c8"> · How buyer information is handled</span>
 </section>
 
+
+<style id="qzix-mobile-performance-fix">
+/* Reduce GPU-heavy effects on phones so the dashboard stays responsive. */
+@media (max-width: 760px) {
+  html, body { background-attachment: scroll !important; }
+  .coin, .hero, .stat, .panel, .token, .price-step,
+  button, .button, .about-link {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .coin, .hero, .stat, .panel, .token, .price-step,
+  button, .button, .about-link {
+    box-shadow: 0 2px 5px #0005 !important;
+  }
+  .stat:hover, .panel:hover, .token:hover, .price-step:hover,
+  button:hover, .button:hover, .about-link:hover {
+    transform: none !important;
+    filter: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+
 </body>
 </html>
 
