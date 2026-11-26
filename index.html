@@ -531,7 +531,24 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
       <button id="signup">Sign Up</button><button class="secondary" id="login">Login</button><button class="secondary hidden" id="logout">Logout</button>
     </div>
     <button type="button" class="secondary" id="forgotPassword" style="margin-top:10px;padding:9px 12px">Forgot Password?</button>
+    <div style="margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#081426">
+      <b style="color:var(--gold)">Mobile Login — SMS OTP</b>
+      <p class="muted" style="margin:6px 0 10px">Enter your verified Indian mobile number to receive a six-digit SMS code. Existing buyers must first link and verify their mobile number while logged in with email.</p>
+      <label class="field"><span>Mobile Number</span><input id="mobileLoginPhone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" placeholder="10-digit Indian mobile number"></label>
+      <button type="button" id="sendMobileLoginOtp" class="secondary">Send SMS OTP</button>
+      <label class="field"><span>Six-digit SMS OTP</span><input id="mobileLoginOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter SMS code"></label>
+      <button type="button" id="verifyMobileLoginOtp">Verify OTP &amp; Login</button>
+    </div>
     <div class="status" id="authStatus">Connecting to Supabase…</div>
+    <div id="mobileLinkPanel" class="hidden" style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#081426">
+      <b style="color:var(--gold)">Link Mobile to This Existing Account</b>
+      <p class="muted" style="margin:6px 0 10px">Log in with your existing email and password first. Then verify your mobile number here so future SMS logins open the same buyer account.</p>
+      <label class="field"><span>Mobile Number</span><input id="mobileLinkPhone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" placeholder="10-digit Indian mobile number"></label>
+      <button type="button" id="sendMobileLinkOtp" class="secondary">Send Verification SMS</button>
+      <label class="field"><span>Six-digit SMS OTP</span><input id="mobileLinkOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter SMS code"></label>
+      <button type="button" id="verifyMobileLinkOtp">Verify &amp; Link Mobile</button>
+      <div class="muted" id="mobileLinkStatus" role="status" aria-live="polite"></div>
+    </div>
     <div id="passwordRecoveryPanel" class="hidden" style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#081426">
       <b style="display:block;margin-bottom:8px;color:var(--gold)">Set a New Password</b>
       <label class="field"><span>New Password</span><input id="newPassword" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters"></label>
@@ -917,6 +934,7 @@ async function checkUser(){
   const info=$("userInfo");
   if(info)info.textContent=signedIn?"Account securely connected.":tr("noUser");
   qzixSetHidden("logout",!signedIn);
+  qzixSetHidden("mobileLinkPanel",!signedIn);
   qzixSetHidden("walletPanel",true);
   qzixSetHidden("initialBuyPanel",!signedIn);
   qzixSetHidden("myInitialOrdersPanel",!signedIn);
@@ -958,6 +976,61 @@ async function auth(action){
  }
 }
 $("signup").onclick=()=>auth("signup");$("login").onclick=()=>auth("login");$("refresh").onclick=refreshMarket;
+
+function normalizeIndianMobile(value){
+ const digits=String(value||"").replace(/\\D/g,"");
+ return /^[6-9][0-9]{9}$/.test(digits)?"+91"+digits:null;
+}
+$("sendMobileLoginOtp").onclick=async()=>{
+ if(!supabase){$("authStatus").textContent=tr("notConfigured");return}
+ const phone=normalizeIndianMobile($("mobileLoginPhone").value);
+ if(!phone){$("authStatus").textContent="Enter a valid 10-digit Indian mobile number.";return}
+ const button=$("sendMobileLoginOtp");button.disabled=true;$("authStatus").textContent="Sending SMS OTP…";
+ try{
+  const {error}=await supabase.auth.signInWithOtp({phone,options:{shouldCreateUser:false}});
+  if(error)throw error;
+  $("authStatus").textContent="SMS OTP sent. Check your messages and enter the six-digit code.";
+ }catch(error){$("authStatus").textContent="Could not send SMS OTP: "+(error?.message||"Please try again.")}
+ finally{button.disabled=false}
+};
+$("verifyMobileLoginOtp").onclick=async()=>{
+ if(!supabase)return;
+ const phone=normalizeIndianMobile($("mobileLoginPhone").value),token=$("mobileLoginOtp").value.trim();
+ if(!phone||!/^\\d{6}$/.test(token)){$("authStatus").textContent="Enter a valid mobile number and six-digit SMS OTP.";return}
+ const button=$("verifyMobileLoginOtp");button.disabled=true;$("authStatus").textContent="Verifying mobile OTP…";
+ try{
+  const {error}=await supabase.auth.verifyOtp({phone,token,type:"sms"});
+  if(error)throw error;
+  $("authStatus").textContent="Mobile login successful.";
+  await checkUser();
+ }catch(error){$("authStatus").textContent="Mobile login failed: "+(error?.message||"Check the OTP and try again.")}
+ finally{button.disabled=false}
+};
+$("sendMobileLinkOtp").onclick=async()=>{
+ if(!supabase||!currentQzixUser){$("mobileLinkStatus").textContent="Log in with your existing email account first.";return}
+ const phone=normalizeIndianMobile($("mobileLinkPhone").value);
+ if(!phone){$("mobileLinkStatus").textContent="Enter a valid 10-digit Indian mobile number.";return}
+ const button=$("sendMobileLinkOtp");button.disabled=true;$("mobileLinkStatus").textContent="Requesting mobile verification SMS…";
+ try{
+  const {error}=await supabase.auth.updateUser({phone});
+  if(error)throw error;
+  $("mobileLinkStatus").textContent="Verification SMS sent. Enter the six-digit code below.";
+ }catch(error){$("mobileLinkStatus").textContent="Could not send verification SMS: "+(error?.message||"Please try again.")}
+ finally{button.disabled=false}
+};
+$("verifyMobileLinkOtp").onclick=async()=>{
+ if(!supabase||!currentQzixUser)return;
+ const phone=normalizeIndianMobile($("mobileLinkPhone").value),token=$("mobileLinkOtp").value.trim();
+ if(!phone||!/^\\d{6}$/.test(token)){$("mobileLinkStatus").textContent="Enter the same mobile number and its six-digit OTP.";return}
+ const button=$("verifyMobileLinkOtp");button.disabled=true;$("mobileLinkStatus").textContent="Verifying and linking mobile…";
+ try{
+  const {error}=await supabase.auth.verifyOtp({phone,token,type:"phone_change"});
+  if(error)throw error;
+  $("mobileLinkStatus").textContent="Mobile number verified and linked to this buyer account. You can now use SMS OTP login.";
+  await checkUser();
+ }catch(error){$("mobileLinkStatus").textContent="Mobile linking failed: "+(error?.message||"Check the OTP and try again.")}
+ finally{button.disabled=false}
+};
 $("forgotPassword").onclick=async()=>{
  if(!supabase){$("authStatus").textContent=tr("notConfigured");return}
  const email=$("email").value.trim();
