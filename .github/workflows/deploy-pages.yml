@@ -33,7 +33,7 @@ jobs:
           # Ubuntu may start freshclam automatically during package installation.
           # Stop that service to release its log lock before updating signatures.
           sudo systemctl stop clamav-freshclam || true
-          sudo freshclam --stdout --log=/dev/null
+          sudo freshclam --stdout
       - name: Scan repository for malware
         run: |
           set -o pipefail
