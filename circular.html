@@ -24,6 +24,16 @@
 .b1{left:13%;top:30%;transform:rotate(-18deg)}.b2{right:12%;top:26%;transform:rotate(14deg)}.b3{left:34%;top:51%;transform:rotate(7deg)}.b4{left:15%;bottom:17%;transform:rotate(12deg)}.b5{right:10%;bottom:17%;transform:rotate(-13deg)}
 .vault-label{position:absolute;z-index:2;left:0;right:0;bottom:7%;text-align:center;color:#eaf8ff;font-size:11px;font-weight:800;letter-spacing:2px;text-shadow:0 2px 5px #000}
 @media(max-width:680px){.vault-wrap{padding:14px 0}}
+.vault-stage{position:relative;width:min(100%,440px);height:390px;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.vault-wrap{padding:12px 0 8px}
+.glass-vault{width:min(62vw,270px);z-index:1;flex:none}
+.vault-control{position:absolute;z-index:3;width:126px;min-height:54px;padding:8px 9px;border:1px solid #e8c879;border-radius:13px;background:linear-gradient(145deg,#263d59,#0a192b);color:#f7d98e;box-shadow:0 7px 18px #0008;font-size:11px;line-height:1.35;white-space:normal}
+.vault-control strong{display:block;font-size:16px;color:#fff;margin-top:3px}
+.vault-control.live{top:4px;left:0}.vault-control.next{top:4px;right:0}.vault-control.minimum{bottom:4px;left:0}.vault-control.buy{bottom:4px;right:0;background:linear-gradient(145deg,#f4c76b,#b98736);color:#172238}
+.vault-control.buy strong{color:#172238}.vault-control:active{transform:scale(.97)}
+.vault-control[hidden]{display:none!important}
+@media(max-width:390px){.vault-stage{height:360px}.vault-control{width:112px;min-height:50px;font-size:10px;padding:7px}.glass-vault{width:min(60vw,235px)}.vault-control strong{font-size:14px}}
+
 </style>
 </head>
 <body>
@@ -34,7 +44,12 @@
 <h1>QZIX CIRCULAR</h1>
 <p>A structured circular participation concept. Review the stated circular value and use the calculator to understand what percentage a contribution represents.</p>
 
-<div class="vault-wrap" aria-label="Decorative transparent glass vault containing illustrative banknotes">
+<div class="vault-wrap" aria-label="Glass vault with circular price and buyer controls">
+  <div class="vault-stage">
+  <button class="vault-control live" id="livePriceControl" type="button">LIVE PRICE<strong>₹20 · 1%</strong></button>
+  <button class="vault-control next" id="nextPriceControl" type="button">NEXT PRICE<strong>₹40 · 2%</strong></button>
+  <button class="vault-control minimum" id="minimumBuyControl" type="button">MINIMUM BUY<strong>₹20</strong></button>
+  <button class="vault-control buy" id="vaultBuyControl" type="button" hidden>BUY<strong>Login required</strong></button>
   <div class="glass-vault" id="glassVault" role="img" aria-label="Touch and drag the glass vault to spin it; percentage notes float inside">
     <div class="vault-contents" id="vaultContents">
       <div class="bill b1">10%</div><div class="bill b2">20%</div>
@@ -42,11 +57,12 @@
     </div>
     <div class="vault-label">TOUCH & SPIN · 360°</div>
   </div>
+  </div>
 </div>
 <div class="stats">
-<div class="stat"><small>Illustrative Circular Value</small><strong>₹2,000</strong></div>
-<div class="stat"><small>Calculation Basis</small><strong>100%</strong></div>
-<div class="stat"><small>Profit Promise</small><strong>None</strong></div>
+<div class="stat"><small>LIVE PRICE</small><strong>₹20</strong></div>
+<div class="stat"><small>NEXT PRICE</small><strong>₹40</strong></div>
+<div class="stat"><small>Circular Value · Profit Promise</small><strong>₹2,000 · None</strong></div>
 </div>
 </section>
 
@@ -106,6 +122,8 @@ function showBuyerSession(session){
  document.getElementById('loginForm').classList.toggle('hidden',logged);
  document.getElementById('buyerLoggedIn').classList.toggle('hidden',!logged);
  if(logged)document.getElementById('buyerWelcome').textContent="Logged in as "+(session.user.email||"registered buyer")+".";
+ document.getElementById('vaultBuyControl').hidden=!logged;
+ document.querySelector('#vaultBuyControl strong').textContent=logged?"Continue":"Login required";
 }
 document.getElementById('sendLoginOtp').addEventListener('click',async()=>{
  if(!authClient)return;
@@ -151,6 +169,17 @@ vault.addEventListener('pointerup',releaseVault);vault.addEventListener('pointer
 function update(){const n=Math.max(20,Math.min(2000,Number(amount.value)||20));amount.value=n;const p=n/2000*100;percent.textContent=p.toFixed(2)+'%';bar.style.width=p+'%';remaining.textContent='Remaining amount: ₹'+(2000-n).toLocaleString('en-IN');}
 
 amount.addEventListener('input',update);update();
+// Glass-vault price controls: selecting a price fills the calculator only.
+function chooseCircularAmount(value){amount.value=String(value);update();document.getElementById('calculator').scrollIntoView({behavior:'smooth',block:'start'});}
+document.getElementById('livePriceControl').addEventListener('click',()=>chooseCircularAmount(20));
+document.getElementById('nextPriceControl').addEventListener('click',()=>chooseCircularAmount(40));
+document.getElementById('minimumBuyControl').addEventListener('click',()=>chooseCircularAmount(20));
+document.getElementById('vaultBuyControl').addEventListener('click',()=>{
+ const loggedIn=!document.getElementById('buyerLoggedIn').classList.contains('hidden');
+ if(!loggedIn){document.getElementById('buyerAccess').scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('buyerAuthStatus').textContent='Please login first to access BUY.';return;}
+ document.getElementById('buyButton').click();document.getElementById('buyerAccess').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
 
 // Newton-inspired gentle motion: gravity, inertia, wall bounce and note-to-note collisions.
 const notes=[...contents.querySelectorAll('.bill')];
