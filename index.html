@@ -978,7 +978,7 @@ async function auth(action){
 $("signup").onclick=()=>auth("signup");$("login").onclick=()=>auth("login");$("refresh").onclick=refreshMarket;
 
 function normalizeIndianMobile(value){
- const digits=String(value||"").replace(/\\D/g,"");
+ const digits=String(value||"").replace(/\D/g,"");
  return /^[6-9][0-9]{9}$/.test(digits)?"+91"+digits:null;
 }
 $("sendMobileLoginOtp").onclick=async()=>{
@@ -996,7 +996,7 @@ $("sendMobileLoginOtp").onclick=async()=>{
 $("verifyMobileLoginOtp").onclick=async()=>{
  if(!supabase)return;
  const phone=normalizeIndianMobile($("mobileLoginPhone").value),token=$("mobileLoginOtp").value.trim();
- if(!phone||!/^\\d{6}$/.test(token)){$("authStatus").textContent="Enter a valid mobile number and six-digit SMS OTP.";return}
+ if(!phone||!/^\d{6}$/.test(token)){$("authStatus").textContent="Enter a valid mobile number and six-digit SMS OTP.";return}
  const button=$("verifyMobileLoginOtp");button.disabled=true;$("authStatus").textContent="Verifying mobile OTP…";
  try{
   const {error}=await supabase.auth.verifyOtp({phone,token,type:"sms"});
@@ -1021,7 +1021,7 @@ $("sendMobileLinkOtp").onclick=async()=>{
 $("verifyMobileLinkOtp").onclick=async()=>{
  if(!supabase||!currentQzixUser)return;
  const phone=normalizeIndianMobile($("mobileLinkPhone").value),token=$("mobileLinkOtp").value.trim();
- if(!phone||!/^\\d{6}$/.test(token)){$("mobileLinkStatus").textContent="Enter the same mobile number and its six-digit OTP.";return}
+ if(!phone||!/^\d{6}$/.test(token)){$("mobileLinkStatus").textContent="Enter the same mobile number and its six-digit OTP.";return}
  const button=$("verifyMobileLinkOtp");button.disabled=true;$("mobileLinkStatus").textContent="Verifying and linking mobile…";
  try{
   const {error}=await supabase.auth.verifyOtp({phone,token,type:"phone_change"});
