@@ -24,12 +24,13 @@ button.primary{background:linear-gradient(#087f8f,#075363)}
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js';
 const stage=document.getElementById('stage'), status=document.getElementById('status');
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(35,stage.clientWidth/stage.clientHeight,.1,100);camera.position.set(0,.2,7.7);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(stage.clientWidth,stage.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;renderer.physicallyCorrectLights=true;stage.appendChild(renderer.domElement);
-const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;RectAreaLightUniformsLib.init();
 scene.add(new THREE.HemisphereLight(0xdaf4ff,0x18263a,1.35));
 const key=new THREE.DirectionalLight(0xffffff,4.2);key.position.set(-3,5,6);scene.add(key);
 const strip1=new THREE.RectAreaLight(0xb9f1ff,5,4.5,.22);strip1.position.set(-3,1.8,2.4);strip1.lookAt(0,0,0);scene.add(strip1);
