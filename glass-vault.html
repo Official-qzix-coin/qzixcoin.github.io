@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>QZIX COIN — 3D Glass Vault</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:radial-gradient(ellipse at 50% 28%,#183653,#091725 58%,#040a12);color:#eef5ff;font-family:system-ui,sans-serif}
+#stage{position:relative;width:100%;height:100%;touch-action:none}canvas{display:block;width:100%;height:100%}
+.hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:#b5c9da;font-size:12px;pointer-events:none;text-shadow:0 2px 8px #000}
+.controls{position:absolute;top:12px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:2;flex-wrap:wrap}
+button{border:1px solid #54c9df88;border-radius:10px;padding:9px 13px;background:linear-gradient(#1d4967,#102b41);color:#effaff;font-weight:750;font-size:12px}
+button.primary{background:linear-gradient(#087f8f,#075363)}
+#status{position:absolute;top:54px;left:8px;right:8px;text-align:center;color:#9db9ca;font-size:11px;pointer-events:none}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+ <div class="controls"><button id="auto" class="primary">Automatic: ON</button><button id="shake">Gentle Shake</button><button id="reset">Reset Notes</button></div>
+ <div id="status">3D physics ready · 6 percentage notes</div>
+ <div class="hint">Drag with your finger or mouse to rotate the glass vault</div>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js';
+const stage=document.getElementById('stage'), status=document.getElementById('status');
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(35,stage.clientWidth/stage.clientHeight,.1,100);camera.position.set(0,.2,7.7);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(stage.clientWidth,stage.clientHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;stage.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xc8edff,0x142238,2));
+const key=new THREE.DirectionalLight(0xffffff,3.2);key.position.set(-3,5,6);scene.add(key);
+const rim=new THREE.PointLight(0x37cfff,35,14);rim.position.set(3,1,3);scene.add(rim);
+const blue=new THREE.PointLight(0x5d9dff,24,12);blue.position.set(-4,-2,-2);scene.add(blue);
+const vault=new THREE.Group();scene.add(vault);
+const glass=new THREE.Mesh(new THREE.SphereGeometry(2.05,96,72),new THREE.MeshPhysicalMaterial({color:0xc9f2ff,metalness:0,roughness:.035,transmission:.96,thickness:.32,ior:1.18,transparent:true,opacity:.30,clearcoat:1,clearcoatRoughness:.025,side:THREE.DoubleSide}));vault.add(glass);
+vault.add(new THREE.Mesh(new THREE.SphereGeometry(2.055,48,32),new THREE.MeshBasicMaterial({color:0x9ceaff,wireframe:true,transparent:true,opacity:.055})));
+const arc=new THREE.Mesh(new THREE.TorusGeometry(1.94,.018,8,120,Math.PI*.68),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.38}));arc.position.set(-.1,.08,.18);arc.rotation.set(.45,.2,-.5);vault.add(arc);
+const world=new CANNON.World({gravity:new CANNON.Vec3(0,-2.8,0)});world.broadphase=new CANNON.NaiveBroadphase();world.solver.iterations=12;world.defaultContactMaterial.friction=.42;world.defaultContactMaterial.restitution=.34;
+const radius=1.78,wallCount=48;
+for(let i=0;i<wallCount;i++){const a=i/wallCount*Math.PI*2,mid=a+Math.PI/wallCount;const b=new CANNON.Body({mass:0});b.addShape(new CANNON.Box(new CANNON.Vec3(.14,.12,1.65)));b.position.set(Math.cos(mid)*radius,Math.sin(mid)*radius,0);b.quaternion.setFromEuler(0,0,mid+Math.PI/2);world.addBody(b)}
+for(const z of [-1.55,1.55]){const b=new CANNON.Body({mass:0});b.addShape(new CANNON.Plane());b.position.z=z;b.quaternion.setFromEuler(z<0?Math.PI/2:-Math.PI/2,0,0);world.addBody(b)}
+const values=[10,20,15,25,5,25], meshes=[], bodies=[];
+function texture(pct,i){const c=document.createElement('canvas');c.width=512;c.height=256;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,512,256);g.addColorStop(0,['#d9fff0','#d6f4ff','#fff0c9','#e5dcff'][i%4]);g.addColorStop(1,['#58b89c','#4e9fca','#c59a4e','#8c78bd'][i%4]);x.fillStyle=g;x.fillRect(0,0,512,256);x.strokeStyle='rgba(255,255,255,.85)';x.lineWidth=9;x.strokeRect(12,12,488,232);x.strokeStyle='rgba(12,45,65,.28)';x.lineWidth=3;x.strokeRect(28,28,456,200);x.fillStyle='#12384a';x.textAlign='center';x.textBaseline='middle';x.font='bold 112px Arial';x.fillText(pct+'%',256,130);x.font='bold 22px Arial';x.fillText('QZIX COIN',256,211);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t}
+values.forEach((pct,i)=>{const w=.94,h=.47,d=.075;const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({map:texture(pct,i),roughness:.48,metalness:.08}));vault.add(mesh);meshes.push(mesh);const body=new CANNON.Body({mass:.42,linearDamping:.12,angularDamping:.18});body.addShape(new CANNON.Box(new CANNON.Vec3(w/2,h/2,d/2)));const a=i/6*Math.PI*2;body.position.set(Math.cos(a)*.72,Math.sin(a)*.78,i%2?.48:-.48);body.velocity.set((i-2.5)*.16,(2-i)*.12,i%2?.08:-.08);body.angularVelocity.set(.1*(i+1),.12*(i-2),i%2?.2:-.2);world.addBody(body);bodies.push(body)});
+const orbit=new OrbitControls(camera,renderer.domElement);orbit.enablePan=false;orbit.enableZoom=false;orbit.enableDamping=true;orbit.dampingFactor=.07;orbit.rotateSpeed=.65;
+let automatic=true,last=performance.now(),acc=0;
+document.getElementById('auto').onclick=()=>{automatic=!automatic;document.getElementById('auto').textContent='Automatic: '+(automatic?'ON':'OFF');document.getElementById('auto').classList.toggle('primary',automatic);status.textContent=automatic?'Automatic movement enabled':'Automatic vault rotation paused; physics continues'};
+document.getElementById('shake').onclick=()=>{bodies.forEach(b=>b.applyImpulse(new CANNON.Vec3((Math.random()-.5)*1.3,Math.random()*1.1,(Math.random()-.5)*.8),b.position));status.textContent='Gentle movement applied'};
+document.getElementById('reset').onclick=()=>{bodies.forEach((b,i)=>{const a=i/6*Math.PI*2;b.position.set(Math.cos(a)*.72,Math.sin(a)*.78,i%2?.48:-.48);b.velocity.set(0,0,0);b.angularVelocity.set(0,0,0);b.quaternion.set(0,0,0,1)});status.textContent='Notes reset to starting positions'};
+function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.033);last=now;acc+=dt;while(acc>=1/60){world.step(1/60);acc-=1/60}if(automatic){vault.rotation.y+=dt*.16;vault.rotation.x=Math.sin(now*.00025)*.055}bodies.forEach((b,i)=>{meshes[i].position.set(b.position.x,b.position.y,b.position.z);meshes[i].quaternion.set(b.quaternion.x,b.quaternion.y,b.quaternion.z,b.quaternion.w)});orbit.update();renderer.render(scene,camera)}
+requestAnimationFrame(animate);
+new ResizeObserver(()=>{const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}).observe(stage);
+</script></body></html>
