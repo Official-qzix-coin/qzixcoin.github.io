@@ -44,7 +44,7 @@
   </div>
 </div>
 <div class="stats">
-<div class="stat"><small>Illustrative Circular Value</small><strong>₹1,00,000</strong></div>
+<div class="stat"><small>Illustrative Circular Value</small><strong>₹2,000</strong></div>
 <div class="stat"><small>Calculation Basis</small><strong>100%</strong></div>
 <div class="stat"><small>Profit Promise</small><strong>None</strong></div>
 </div>
@@ -52,14 +52,14 @@
 <div class="layout" id="calculator" style="margin-top:16px">
 <section class="panel">
 <h2>Contribution Calculator</h2>
-<p class="muted">Enter an amount to calculate its percentage of ₹1,00,000.</p>
-<label class="field"><span>Contribution amount (₹)</span><input id="amount" type="number" min="0" max="100000" step="1" value="200" inputmode="decimal"></label>
-<div class="result"><div class="muted">Calculated percentage</div><strong id="percent">0.20%</strong><div class="bar"><i id="bar"></i></div><p class="muted" id="remaining">Remaining amount: ₹99,800</p></div>
+<p class="muted">₹20 = 1%. Enter an amount from the minimum investment of ₹20.</p>
+<label class="field"><span>Minimum investment ₹20 · Contribution amount (₹)</span><input id="amount" type="number" min="20" max="2000" step="1" value="20" inputmode="decimal"></label>
+<div class="result"><div class="muted">Calculated percentage</div><strong id="percent">1.00%</strong><div class="bar"><i id="bar"></i></div><p class="muted" id="remaining">Remaining amount: ₹1,980</p></div>
 </section>
 <section class="panel">
 <h2>Important Information</h2>
 <p class="muted">This page is an information and calculation interface only. It does not accept payments, issue ownership, verify a buyer, or connect to a live transaction database.</p>
-<p class="muted">A displayed percentage is a mathematical estimate based on the entered amount and the stated circular value. It is not proof of ownership or a promise of income.</p>
+<p class="muted">A displayed percentage is a mathematical estimate based on the entered amount and the stated circular value of ₹2,000. It is not proof of ownership or a promise of income.</p>
 <div class="notice"><b>Risk notice:</b> Profit is not guaranteed. Do not pay anyone based only on this calculator. Any real participation, ownership, refund, resale, or profit-sharing arrangement must be documented and legally reviewed before launch.</div>
 </section>
 </div>
@@ -73,7 +73,7 @@ vault.addEventListener('pointerdown',e=>{dragging=true;vault.classList.add('drag
 vault.addEventListener('pointermove',e=>{if(!dragging)return;const now=performance.now(),dt=Math.max(1,now-lastTime),dx=e.clientX-lastX;angle+=dx*.9;velocity=(dx*.9)/dt;contents.style.transform='rotate('+angle+'deg)';lastX=e.clientX;lastTime=now;});
 function releaseVault(){if(!dragging)return;dragging=false;vault.classList.remove('dragging');let prev=performance.now();function coast(now){const dt=Math.min(32,now-prev);prev=now;angle+=velocity*dt;velocity*=Math.pow(.985,dt/16.67);contents.style.transform='rotate('+angle+'deg)';if(Math.abs(velocity)>.008){raf=requestAnimationFrame(coast)}else{velocity=0;raf=0}}raf=requestAnimationFrame(coast)}
 vault.addEventListener('pointerup',releaseVault);vault.addEventListener('pointercancel',releaseVault);vault.addEventListener('lostpointercapture',releaseVault);
-function update(){const n=Math.max(0,Math.min(100000,Number(amount.value)||0));const p=n/100000*100;percent.textContent=p.toFixed(2)+'%';bar.style.width=p+'%';remaining.textContent='Remaining amount: ₹'+(100000-n).toLocaleString('en-IN');}
+function update(){const n=Math.max(20,Math.min(2000,Number(amount.value)||20));amount.value=n;const p=n/2000*100;percent.textContent=p.toFixed(2)+'%';bar.style.width=p+'%';remaining.textContent='Remaining amount: ₹'+(2000-n).toLocaleString('en-IN');}
 
 amount.addEventListener('input',update);update();
 
