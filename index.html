@@ -1505,30 +1505,7 @@ $("manualPaymentQueue").addEventListener("click",e=>{
 #buySelectedToken{min-width:132px}
 @media(max-width:480px){.token-list .token{flex-basis:45px;width:45px;height:45px}.token-buy-control{align-items:stretch;flex-direction:column}.token-buy-control button{width:100%}}
 </style>
-<script>
-(()=> {
- const gameLinks=[...document.querySelectorAll('a[href="next-gen-city.html"],a[href="next-gen-home.html"]')];
- const original=gameLinks.map(a=>({a,href:a.getAttribute('href'),label:a.textContent.trim()}));
- function setOwner(isOwner){
-  original.forEach(({a,href,label})=>{
-   a.href=isOwner?href:'#qzix-game-locked';
-   a.textContent=isOwner?label:'🔒 '+label;
-   a.setAttribute('aria-label',isOwner?label:label+' — Owner access only');
-   a.title=isOwner?'Open game':'Game locked — only the website owner can open this game';
-   a.onclick=isOwner?null:(e=>{e.preventDefault();alert('🔒 GAME LOCKED\\nOnly the website owner can open this game. Please log in with the owner account.');});
-  });
- }
- setOwner(false);
- const URL='https://rxjrsbkqytovjqnijqek.supabase.co';
- const KEY='sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q';
- import('https://esm.sh/@supabase/supabase-js@2').then(async ({createClient})=>{
-  const client=createClient(URL,KEY);
-  const check=async()=>{const {data}=await client.auth.getSession();setOwner((data.session?.user?.email||'').toLowerCase()==='qzixcoin@gmail.com');};
-  await check();
-  client.auth.onAuthStateChange((_event,session)=>setOwner((session?.user?.email||'').toLowerCase()==='qzixcoin@gmail.com'));
- }).catch(()=>setOwner(false));
-})();
-</script>
+<!-- Removed duplicate Supabase SDK initialization; main client loader above is used. -->
 
 
 <style id="qzix-compact-navigation">
