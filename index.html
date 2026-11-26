@@ -664,13 +664,13 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 
 <div id="manualAdminStatus" hidden></div><div id="manualPaymentQueue" hidden></div><button id="refreshManualQueue" hidden type="button"></button>
 </section>
-<section class="panel" style="margin-top:16px">
+<section class="panel" id="qrOwnershipSection" hidden style="display:none!important;margin-top:16px">
   <h3>QR Ownership Verification</h3><p class="muted">QR verification is locked until the live database market price reaches ₹7,000 through verified market activity. No QR can be generated or verified before that milestone.</p>
   <div class="actions"><label class="field" style="flex:1;min-width:180px;margin:0"><span>Token ID (001–100)</span><input id="verifyToken" type="number" min="1" max="100" placeholder="Available at ₹7,000" disabled></label><button id="makeQR" disabled>Generate QR</button></div>
   <div id="qrStatus" class="status">Locked — QR launch begins only at a verified ₹7,000 market price.</div>
   <div id="qrResult" class="hidden" style="margin-top:12px;padding:14px;background:#0b1a2e;border:1px solid var(--line);border-radius:12px"><div id="qrcode" style="background:white;padding:12px;width:max-content;max-width:100%;border-radius:8px"></div><p id="qrDetails" class="muted"></p><a id="verifyLink" href="#" target="_blank" rel="noopener" style="color:var(--gold);overflow-wrap:anywhere">Open verification page</a></div>
 </section>
-<section class="panel hidden" id="verificationPanel" style="margin-top:16px"><h3>QZIX COIN — Public Token Verification</h3><div id="verificationDetails" class="muted">Loading token verification…</div></section>
+<section class="panel hidden" id="verificationPanel" hidden style="display:none!important;margin-top:16px"><h3>QZIX COIN — Public Token Verification</h3><div id="verificationDetails" class="muted">Loading token verification…</div></section>
 
 <div class="notice" id="noticeText"><b>Important:</b> QZIX COIN has a fixed total supply of 100 Main Dashboard tokens. Payments, deposits, UPI transfers, resale payments and withdrawals are currently disabled; do not send money to any account claiming to represent QZIX. A payment reference or screenshot alone is not proof of payment. No profit or future price is guaranteed. Displayed prices are planning values only. There is no SELL option. Real-money activity requires legal and payment-provider approval.</div>
 <div class="footer" id="footerText">QZIX COIN • Fixed supply concept • Version 1</div>
