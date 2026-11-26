@@ -34,11 +34,20 @@
 .vault-control[hidden]{display:none!important}
 @media(max-width:390px){.vault-stage{height:360px}.vault-control{width:112px;min-height:50px;font-size:10px;padding:7px}.glass-vault{width:min(60vw,235px)}.vault-control strong{font-size:14px}}
 
+
+.hidden{display:none!important}
+#buyerAccess{position:fixed;z-index:1000;inset:0;display:flex;flex-direction:column;justify-content:center;width:min(92vw,480px);max-height:92vh;overflow:auto;margin:auto!important;background:linear-gradient(145deg,#142c49,#0d1d32);box-shadow:0 25px 90px #000d}
+body.authenticated #buyerAccess{display:none!important}
+body:not(.authenticated) .wrap>.top,body:not(.authenticated) .wrap>section:not(#buyerAccess),body:not(.authenticated) .wrap>.layout,body:not(.authenticated) .wrap>.foot{display:none!important}
+body:not(.authenticated){overflow:hidden}
+body.authenticated{overflow:auto}
+#mainBuyButton{background:linear-gradient(145deg,#f4c76b,#b98736);color:#172238}
+#mainBuyStatus{margin:12px 0;padding:12px;border:1px solid #725c35;border-radius:12px;background:#2b2518;color:#f4d99d;font-size:13px;line-height:1.5}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header class="top"><div class="brand">QZIX <span>CIRCULAR</span></div><nav class="nav"><a href="index.html">Main Website</a><a href="#calculator">Calculator</a></nav></header>
+<header class="top"><div class="brand">QZIX <span>CIRCULAR</span></div><nav class="nav"><a href="index.html">Main Website</a><a href="#calculator">Calculator</a><button id="mainBuyButton" type="button" class="hidden">BUY</button></nav></header>
 <section class="hero">
 <div class="eyebrow">CLEAR RULES · TRANSPARENT INFORMATION</div>
 <h1>QZIX CIRCULAR</h1>
@@ -65,10 +74,11 @@
 <div class="stat"><small>CURRENT VALUE · NEXT LEVEL VALUE</small><strong>₹2,000 · ₹4,000</strong></div>
 </div>
 </section>
+<div id="mainBuyStatus" class="hidden" role="status" aria-live="polite"></div>
 
 <section class="panel" id="buyerAccess" style="margin-top:16px">
   <h2>Buyer Login</h2>
-  <p class="muted">Login with your registered email. The BUY option appears only after successful login. New buyers can register first.</p>
+  <p class="muted">Please login to open QZIX CIRCULAR. After successful login, the main page and BUY option will appear. New buyers can register first.</p>
   <div id="loginForm">
     <label class="field"><span>Registered Email Address</span><input id="buyerEmail" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com"></label>
     <button id="sendLoginOtp" type="button">Send Login OTP</button>
@@ -119,6 +129,8 @@ let authClient=null;
 })();
 function showBuyerSession(session){
  const logged=!!session;
+ document.body.classList.toggle('authenticated',logged);
+ document.getElementById('mainBuyButton').classList.toggle('hidden',!logged);
  document.getElementById('loginForm').classList.toggle('hidden',logged);
  document.getElementById('buyerLoggedIn').classList.toggle('hidden',!logged);
  if(logged)document.getElementById('buyerWelcome').textContent="Logged in as "+(session.user.email||"registered buyer")+".";
@@ -156,9 +168,13 @@ document.getElementById('buyerLogout').addEventListener('click',async()=>{
  if(error){authStatus.textContent="Logout failed: "+error.message;return;}
  showBuyerSession(null);authStatus.textContent="You are logged out.";
 });
-document.getElementById('buyButton').addEventListener('click',()=>{
- document.getElementById('buyStatus').textContent="Your login is active, but real BUY orders and online payments are not enabled yet. No money has been collected and no ownership is created.";
-});
+function showBuyNotice(){
+ const message="Your login is active, but real BUY orders and online payments are not enabled yet. No money has been collected and no ownership is created.";
+ document.getElementById('buyStatus').textContent=message;
+ const status=document.getElementById('mainBuyStatus');status.textContent=message;status.classList.remove('hidden');
+}
+document.getElementById('buyButton').addEventListener('click',showBuyNotice);
+document.getElementById('mainBuyButton').addEventListener('click',showBuyNotice);
 \nconst amount=document.getElementById('amount'),percent=document.getElementById('percent'),bar=document.getElementById('bar'),remaining=document.getElementById('remaining');
 let calculatorBasis=2000, calculatorMinimum=20;
 const vault=document.getElementById('glassVault'), contents=document.getElementById('vaultContents');
@@ -178,7 +194,7 @@ document.getElementById('minimumBuyControl').addEventListener('click',()=>choose
 document.getElementById('vaultBuyControl').addEventListener('click',()=>{
  const loggedIn=!document.getElementById('buyerLoggedIn').classList.contains('hidden');
  if(!loggedIn){document.getElementById('buyerAccess').scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('buyerAuthStatus').textContent='Please login first to access BUY.';return;}
- document.getElementById('buyButton').click();document.getElementById('buyerAccess').scrollIntoView({behavior:'smooth',block:'start'});
+ showBuyNotice();
 });
 
 
