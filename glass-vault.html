@@ -41,12 +41,12 @@ const vault=new THREE.Group();scene.add(vault);
 // Thick, physically shaded crystal shell with studio reflections and visible edge highlights.
 const shellGeo=new THREE.SphereGeometry(2.05,64,48);
 const glass=new THREE.Mesh(shellGeo,new THREE.MeshPhysicalMaterial({
- color:0xb8eaff,metalness:0,roughness:.035,transmission:1,thickness:.28,ior:1.48,
- envMapIntensity:.72,clearcoat:1,clearcoatRoughness:.025,
- attenuationColor:0x70cfff,attenuationDistance:7,side:THREE.DoubleSide
+ color:0xe8f8ff,metalness:0,roughness:.012,transmission:1,thickness:.72,ior:1.52,
+ envMapIntensity:1.45,clearcoat:1,clearcoatRoughness:.012,
+ attenuationColor:0xc9f4ff,attenuationDistance:18,side:THREE.DoubleSide
 }));vault.add(glass);
 // A subtle inner contour gives the glass wall a believable thick edge.
-const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,48,36),new THREE.MeshBasicMaterial({color:0x38bfff,side:THREE.BackSide,transparent:true,opacity:.11,depthWrite:false}));vault.add(innerRim);
+const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,48,36),new THREE.MeshBasicMaterial({color:0x38bfff,side:THREE.BackSide,transparent:true,opacity:.065,depthWrite:false}));vault.add(innerRim);
 const edge=new THREE.Mesh(new THREE.SphereGeometry(2.058,48,36),new THREE.MeshBasicMaterial({color:0x65d9ff,wireframe:true,transparent:true,opacity:.085}));vault.add(edge);
 const arc=new THREE.Mesh(new THREE.TorusGeometry(1.985,.012,8,160,Math.PI*.72),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.72}));arc.position.set(-.1,.08,.24);arc.rotation.set(.45,.2,-.5);vault.add(arc);
 const glint=new THREE.Mesh(new THREE.TorusGeometry(2.005,.006,6,140,Math.PI*.26),new THREE.MeshBasicMaterial({color:0x8ceaff,transparent:true,opacity:.8}));glint.position.set(.04,-.02,.18);glint.rotation.set(1.1,.4,.8);vault.add(glint);
@@ -79,6 +79,32 @@ values.forEach((pct,i)=>{const w=.94,h=.47,d=.075;const shape=new THREE.Shape();
 const orbit=new OrbitControls(camera,renderer.domElement);orbit.enablePan=false;orbit.enableZoom=false;orbit.enableDamping=true;orbit.dampingFactor=.07;orbit.rotateSpeed=.65;renderer.domElement.style.touchAction="pan-y";
 let automatic=true,last=performance.now(),acc=0,raf=0,visible=true,lastFrame=0;
 const frameInterval=1000/30;
+const autoButton=document.getElementById('auto');
+const shakeButton=document.getElementById('shake');
+const resetButton=document.getElementById('reset');
+autoButton.addEventListener('click',()=>{
+ automatic=!automatic;
+ autoButton.textContent='Automatic: '+(automatic?'ON':'OFF');
+ autoButton.classList.toggle('primary',automatic);
+});
+shakeButton.addEventListener('click',()=>{
+ bodies.forEach((b)=>{
+  b.applyImpulse(new CANNON.Vec3((Math.random()-.5)*1.25,.45+Math.random()*.85,(Math.random()-.5)*.9),b.position);
+  b.angularVelocity.x+=(Math.random()-.5)*2.2;
+  b.angularVelocity.y+=(Math.random()-.5)*2.2;
+  b.angularVelocity.z+=(Math.random()-.5)*2.2;
+ });
+});
+resetButton.addEventListener('click',()=>{
+ bodies.forEach((b,i)=>{
+  const a=i/6*Math.PI*2,z=(i%3-1)*.72;
+  b.position.set(Math.cos(a)*1.02,Math.sin(a)*1.02,z);
+  b.quaternion.setFromEuler(0,0,(i%2?-.12:.12));
+  b.velocity.set(-Math.sin(a)*(.42+i*.035),Math.cos(a)*(.38+i*.025),(i%2?-.22:.22));
+  b.angularVelocity.set(.22*(i+1),.18*(i-2),i%2?.55:-.48);
+  b.force.set(0,0,0);b.torque.set(0,0,0);b.wakeUp();
+ });
+});
 function syncNoteMeshes(){
  bodies.forEach((b,i)=>{
   meshes[i].position.set(b.position.x,b.position.y,b.position.z);
