@@ -522,7 +522,7 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 
 
 <div class="grid">
-  <section class="panel">
+  <section class="panel" id="accountPanel">
     <h3 id="accountTitle">Account Login / Sign Up</h3>
     <p class="muted" id="accountDesc">Create an account or log in with your email.</p>
     <label class="field"><span id="emailLabel">Email</span><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></label>
@@ -931,6 +931,8 @@ async function checkUser(){
   if(error)throw error;
   currentQzixUser=data?.user||null;
   const signedIn=Boolean(currentQzixUser);
+  const accountPanel=$("accountPanel");
+  if(!signedIn&&accountPanel)accountPanel.classList.remove("hidden");
   const info=$("userInfo");
   if(info)info.textContent=signedIn?"Account securely connected.":tr("noUser");
   qzixSetHidden("logout",!signedIn);
@@ -1420,6 +1422,8 @@ document.addEventListener("visibilitychange",()=>{
 async function initializeManualPayments(){
  $("buyPanel").classList.add("hidden");
  const {data:admin,error}=await supabase.from("qzix_v2_admins").select("user_id").eq("user_id",currentQzixUser.id).maybeSingle();
+ const accountPanel=$("accountPanel");
+ if(accountPanel)accountPanel.classList.toggle("hidden",!error&&Boolean(admin));
  if(!error&&admin){
    $("manualPaymentAdminPanel").classList.remove("hidden");
     await refreshInitialManualQueue();
