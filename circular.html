@@ -80,13 +80,28 @@ body.authenticated{overflow:auto}
   <h2>Buyer Login</h2>
   <p class="muted">Please login to open QZIX CIRCULAR. After successful login, the main page and BUY option will appear. New buyers can register first.</p>
   <div id="loginForm">
-    <label class="field"><span>Registered Email Address</span><input id="buyerEmail" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com"></label>
-    <button id="sendLoginOtp" type="button">Send Login OTP</button>
-    <p class="muted"><a href="buyer-registration.html">New buyer? Register here</a></p>
-    <div id="otpArea" class="hidden">
-      <label class="field"><span>Six-digit Email OTP</span><input id="buyerOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP"></label>
-      <button id="verifyLoginOtp" type="button">Verify & Login</button>
+    <div style="display:flex;gap:8px;margin:12px 0">
+      <button id="emailLoginTab" type="button" aria-pressed="true">Email Login</button>
+      <button id="phoneLoginTab" type="button" class="secondary" aria-pressed="false">Mobile Number Login</button>
     </div>
+    <div id="emailLoginPanel">
+      <label class="field"><span>Registered Email Address</span><input id="buyerEmail" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com"></label>
+      <button id="sendLoginOtp" type="button">Send Email OTP</button>
+      <div id="otpArea" class="hidden">
+        <label class="field"><span>Six-digit Email OTP</span><input id="buyerOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP"></label>
+        <button id="verifyLoginOtp" type="button">Verify & Login</button>
+      </div>
+    </div>
+    <div id="phoneLoginPanel" class="hidden">
+      <label class="field"><span>Registered Mobile Number</span><input id="buyerPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="10-digit mobile number"></label>
+      <p class="muted">India numbers will use +91. Use the mobile number already verified on your account.</p>
+      <button id="sendPhoneOtp" type="button">Send Mobile OTP</button>
+      <div id="phoneOtpArea" class="hidden">
+        <label class="field"><span>Six-digit SMS OTP</span><input id="buyerPhoneOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP"></label>
+        <button id="verifyPhoneOtp" type="button">Verify Mobile & Login</button>
+      </div>
+    </div>
+    <p class="muted"><a href="buyer-registration.html">New buyer? Register here</a></p>
   </div>
   <div id="buyerLoggedIn" class="hidden">
     <p class="muted" id="buyerWelcome">You are logged in.</p>
@@ -137,6 +152,48 @@ function showBuyerSession(session){
  document.getElementById('vaultBuyControl').hidden=!logged;
  document.querySelector('#vaultBuyControl strong').textContent=logged?"Continue":"Login required";
 }
+function setLoginMethod(method){
+ const email=method==='email';
+ document.getElementById('emailLoginPanel').classList.toggle('hidden',!email);
+ document.getElementById('phoneLoginPanel').classList.toggle('hidden',email);
+ document.getElementById('emailLoginTab').setAttribute('aria-pressed',String(email));
+ document.getElementById('phoneLoginTab').setAttribute('aria-pressed',String(!email));
+ document.getElementById('emailLoginTab').classList.toggle('secondary',!email);
+ document.getElementById('phoneLoginTab').classList.toggle('secondary',email);
+ authStatus.textContent=email?'Enter your registered email to login.':'Enter your verified mobile number to login.';
+}
+document.getElementById('emailLoginTab').addEventListener('click',()=>setLoginMethod('email'));
+document.getElementById('phoneLoginTab').addEventListener('click',()=>setLoginMethod('phone'));
+document.getElementById('sendPhoneOtp').addEventListener('click',async()=>{
+ if(!authClient)return;
+ let raw=document.getElementById('buyerPhone').value.trim();
+ let digits=raw.replace(/\\D/g,'');
+ let phone=raw.startsWith('+')?'+'+digits:(digits.length===10?'+91'+digits:(digits.startsWith('91')&&digits.length===12?'+'+digits:''));
+ if(!/^\\+[1-9]\\d{7,14}$/.test(phone)){authStatus.textContent='Enter a valid mobile number with country code, e.g. +91 9876543210.';return;}
+ const btn=document.getElementById('sendPhoneOtp');btn.disabled=true;authStatus.textContent='Sending SMS OTP…';
+ try{
+  const {error}=await authClient.auth.signInWithOtp({phone,options:{shouldCreateUser:false}});
+  if(error)throw error;
+  document.getElementById('buyerPhone').dataset.normalizedPhone=phone;
+  document.getElementById('phoneOtpArea').classList.remove('hidden');
+  authStatus.textContent='SMS OTP sent. Check your mobile messages.';
+ }catch(e){authStatus.textContent='Could not send mobile OTP: '+(e.message||'Check phone login and SMS provider settings.');}
+ finally{btn.disabled=false;}
+});
+document.getElementById('verifyPhoneOtp').addEventListener('click',async()=>{
+ if(!authClient)return;
+ const phone=document.getElementById('buyerPhone').dataset.normalizedPhone||'';
+ const token=document.getElementById('buyerPhoneOtp').value.trim();
+ if(!phone){authStatus.textContent='Enter your mobile number and request an OTP first.';return;}
+ if(!/^[0-9]{6}$/.test(token)){authStatus.textContent='Enter the six-digit SMS OTP.';return;}
+ const btn=document.getElementById('verifyPhoneOtp');btn.disabled=true;authStatus.textContent='Verifying mobile OTP…';
+ try{
+  const {data,error}=await authClient.auth.verifyOtp({phone,token,type:'sms'});
+  if(error)throw error;
+  showBuyerSession(data.session);authStatus.textContent='Mobile login successful.';
+ }catch(e){authStatus.textContent='Mobile login failed: '+(e.message||'Check the OTP and try again.');}
+ finally{btn.disabled=false;}
+});
 document.getElementById('sendLoginOtp').addEventListener('click',async()=>{
  if(!authClient)return;
  const email=document.getElementById('buyerEmail').value.trim().toLowerCase();
