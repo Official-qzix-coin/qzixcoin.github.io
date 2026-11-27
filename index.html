@@ -475,8 +475,8 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
       <a class="game-launch" href="next-gen-home.html" aria-label="Play NEXT GEN HOME game">🎮 PLAY NEXT GEN HOME</a>
     </div>
     <div class="stats">
-      <div class="stat stat-current"><span id="priceLabel">Current Circular Price</span><strong class="gold" id="price">₹2</strong><em>↗</em><a class="stat-cta" href="circular.html">OPEN CIRCULAR</a></div>
-      <div class="stat stat-next"><span id="nextPriceLabel">Next Circular Price</span><strong id="nextPrice">₹4</strong><em>↗</em><a class="stat-cta" href="circular.html">VIEW NEXT LEVEL</a></div>
+      <div class="stat stat-current"><span id="priceLabel">Current Circular Price</span><strong class="gold" id="price">₹20</strong><em>↗</em><a class="stat-cta" href="circular.html">OPEN CIRCULAR</a></div>
+      <div class="stat stat-next"><span id="nextPriceLabel">Next Circular Price</span><strong id="nextPrice">₹40</strong><em>↗</em><a class="stat-cta" href="circular.html">VIEW NEXT LEVEL</a></div>
       <div class="stat stat-supply"><span id="supplyLabel">Total Listed Circular IDs</span><strong>100</strong><em>◇</em></div>
       <div class="stat stat-ids"><span id="tokenIdsLabel">Circular IDs</span><strong style="font-size:19px">100 Fixed Circular IDs</strong><em>▦</em></div>
     </div>
@@ -716,6 +716,7 @@ let currentLang="en";
 const QZIX_PRICE_LADDER=[2,4,8,12,16,20,25,30,35,40,50,60,75,100];
 function qzixNextPlannedPrice(currentPrice){
  const price=Number(currentPrice);
+ if(Math.abs(price-20)<0.000001)return 40;
  const index=QZIX_PRICE_LADDER.findIndex(step=>Math.abs(step-price)<0.000001);
  return index>=0&&index<QZIX_PRICE_LADDER.length-1?QZIX_PRICE_LADDER[index+1]:null;
 }
