@@ -81,9 +81,16 @@ values.forEach((pct,i)=>{
  const group=new THREE.Group();
  const base=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:0xc6b98d,roughness:.72,metalness:.08}));
  group.add(base);
- // A separate full-size face guarantees the artwork fills the note and the % stays centred.
- const face=new THREE.Mesh(new THREE.PlaneGeometry(w-.025,h-.025),new THREE.MeshStandardMaterial({map:texture(pct,i),roughness:.62,metalness:.015,side:THREE.DoubleSide}));
- face.position.z=d/2+.001;group.add(face);
+ // Matching artwork on BOTH sides; rotate the rear face so its text reads normally.
+ const noteTexture=texture(pct,i);
+ const faceMaterial=new THREE.MeshStandardMaterial({map:noteTexture,roughness:.62,metalness:.015,side:THREE.FrontSide});
+ const faceGeometry=new THREE.PlaneGeometry(w-.025,h-.025);
+ const frontFace=new THREE.Mesh(faceGeometry,faceMaterial);
+ frontFace.position.z=d/2+.001;group.add(frontFace);
+ const backFace=new THREE.Mesh(faceGeometry,faceMaterial);
+ backFace.position.z=-d/2-.001;
+ backFace.rotation.y=Math.PI;
+ group.add(backFace);
  vault.add(group);meshes.push(group);
  const body=new CANNON.Body({mass:.42,linearDamping:.035,angularDamping:.055});
  body.addShape(new CANNON.Box(new CANNON.Vec3(w/2,h/2,d/2)));
