@@ -5,9 +5,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#071426">
-<title>QZIX COIN Official Website | Token Dashboard &amp; Project Information</title>
-<meta name="description" content="Explore the QZIX COIN project dashboard, 100 fixed main token IDs and project rules. No profit is guaranteed.">
-<meta name="keywords" content="QZIX COIN, Official QZIX COIN, QZIX digital token, fixed supply token project, QZIX token, QZIX wallet">
+<title>QZIX CIRCULAR | Official Circular Participation Information</title>
+<meta name="description" content="Explore the QZIX CIRCULAR system, circular levels, percentage examples and project rules. No profit is guaranteed.">
+<meta name="keywords" content="QZIX CIRCULAR, circular participation, circular levels, percentage calculator, project information">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://official-qzix-coin.github.io/qzixcoin.github.io/">
 <link rel="preconnect" href="https://esm.sh" crossorigin>
@@ -15,12 +15,12 @@
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="QZIX COIN">
-<meta property="og:title" content="QZIX COIN Official Website | Token Dashboard &amp; Project Information">
+<meta property="og:title" content="QZIX CIRCULAR | Official Circular Participation Information">
 <meta property="og:description" content="Explore the QZIX COIN project dashboard, 100 fixed main token IDs and project rules. No profit is guaranteed.">
 <meta property="og:url" content="https://official-qzix-coin.github.io/qzixcoin.github.io/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="QZIX COIN Official Website | Token Dashboard">
-<meta name="twitter:description" content="Official QZIX COIN project information, 100 fixed token IDs and project rules. No profit is guaranteed.">
+<meta name="twitter:description" content="Official QZIX CIRCULAR system information, circular levels and project rules. No profit is guaranteed.">
 <style>
 :root{--bg:#071426;--panel:#10213a;--panel2:#0b1a2e;--line:#263d5b;--text:#f4f7fb;--muted:#9eb0c8;--gold:#f4c76b;--green:#49d49b;--red:#ff8585}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#173253 0,#071426 48%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
@@ -443,6 +443,14 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 }
 </script>
 
+<style id="qzix-circular-only-mode">
+/* Hide legacy token, state-directory, BUY-order and wallet functionality from the Circular site. */
+#token-showcase,#walletPanel,#initialBuyPanel,#myInitialOrdersPanel,#buyPanel,#manualPaymentAdminPanel,
+#qrOwnershipSection,#verificationPanel,.price-plan,.purchase-orders-layout,
+.grid>section:nth-child(2),.dashboard-buttons .wallet-button{display:none!important}
+#marketTitle,#marketDesc,#levelLabel,#salesLabel,#totalSalesLabel,#level,#sales,#totalSales,#refresh,#marketStatus{display:none!important}
+#accountPanel{display:none!important}
+</style>
 <style id="qzix-circular-price-actions">
 .stat-current,.stat-next{position:relative;padding-bottom:58px!important}
 .stat-cta{position:absolute;left:16px;right:16px;bottom:13px;display:flex;align-items:center;justify-content:center;min-height:34px;padding:8px 10px;border:1px solid #e6bd68;border-radius:10px;background:linear-gradient(135deg,#ffe5a0,#c18b32);color:#172238!important;font-size:10px;font-weight:950;letter-spacing:.8px;text-decoration:none;box-shadow:0 5px 15px #d9a74625}
@@ -452,11 +460,11 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 <body>
 <div class="wrap">
 <header class="top" id="dashboard">
-  <a class="brand brand-home" href="#dashboard" aria-label="QZIX COIN Home"><img class="coin" src="qzix-logo.svg" alt="QZIX COIN logo"><div><h1>QZIX COIN</h1><small>Fixed Supply Token Project</small></div></a>
+  <a class="brand brand-home" href="#dashboard" aria-label="QZIX COIN Home"><img class="coin" src="qzix-logo.svg" alt="QZIX COIN logo"><div><h1>QZIX COIN</h1><small>QZIX CIRCULAR SYSTEM</small></div></a>
   <nav class="main-nav" aria-label="Main navigation">
     <a class="nav-link active" href="#dashboard"><span>⌂</span>Main</a>
     <a class="nav-link" href="about.html"><span>ⓘ</span>About &amp; Terms</a>
-    <a class="nav-link" href="wallet.html"><span>▣</span>My Wallet</a>
+    <a class="nav-link" href="#accountPanel"><span>♙</span>My Account</a>
     <a class="nav-link" href="circular.html"><span>◉</span>QZIX CIRCULAR</a>
 
   </nav>
@@ -470,14 +478,14 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
     <div class="hero-content">
       <div class="eyebrow">QZIX CIRCULAR SYSTEM</div>
       <h2 id="heroTitle">Invest <i>• Own • Grow</i></h2>
-      <p id="heroDesc">A clear, structured dashboard for the QZIX fixed-supply token project.</p>
+      <p id="heroDesc">A clear, structured dashboard for the QZIX CIRCULAR system. Review circular levels and percentage examples.</p>
       <div class="hero-caption">TRANSPARENT <b>•</b> SECURE <b>•</b> TRUSTED</div>
       <a class="game-launch" href="next-gen-home.html" aria-label="Play NEXT GEN HOME game">🎮 PLAY NEXT GEN HOME</a>
     </div>
     <div class="stats">
       <div class="stat stat-current"><span id="priceLabel">Current Circular Price</span><strong class="gold" id="price">₹20 · 1%</strong><em>↗</em><a class="stat-cta" href="circular.html">OPEN CIRCULAR</a></div>
       <div class="stat stat-next"><span id="nextPriceLabel">Next Circular Price</span><strong id="nextPrice">₹40 · 1%</strong><em>↗</em><a class="stat-cta" href="circular.html">VIEW NEXT LEVEL</a></div>
-      <div class="stat stat-supply"><span id="minInvestmentLabel">Minimum Investment</span><strong class="gold">₹20</strong><em>₹</em><a class="stat-cta" href="circular.html">BUY</a></div>
+      <div class="stat stat-supply"><span id="minInvestmentLabel">Minimum Investment</span><strong class="gold">₹20</strong><em>₹</em><a class="stat-cta" href="circular.html">VIEW DETAILS</a></div>
     </div>
 
   </section>
@@ -487,10 +495,10 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 
 
 <section id="qzixGlassVault" aria-label="QZIX COIN 3D Glass Vault">
-  <h2>QZIX COIN — 3D Glass Money Vault</h2>
+  <h2>QZIX CIRCULAR — 3D Glass Percentage Vault</h2>
   <p>Interactive transparent glass sphere with six moving percentage notes. Drag to rotate; switch automatic movement on or off.</p>
   <iframe src="glass-vault.html?v=d0bc9cf4ef9cb9d7" title="QZIX COIN interactive 3D glass vault" loading="lazy" allow="fullscreen"></iframe>
-  <p style="margin:10px 2px 0;font-size:11px">Visual demo only. Percentages are examples; this does not connect to real money, wallet balances or payments. No profit is guaranteed.</p>
+  <p style="margin:10px 2px 0;font-size:11px">Visual demonstration only. Percentages are examples; this does not connect to money, payments or participation records. No profit is guaranteed.</p>
 </section>
 
   <section class="dashboard-actions">
@@ -549,8 +557,8 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
     <div class="muted" id="userInfo"></div>
   </section>
   <section class="panel">
-    <h3 id="marketTitle">Market Overview</h3>
-    <p class="muted" id="marketDesc">Live market data, BUY-only payment requests and buyer wallet tools. Token ownership changes only after admin payment verification. No SELL option.</p>
+    <h3 id="marketTitle">Circular Information</h3>
+    <p class="muted" id="marketDesc">Circular price examples and planned levels are informational only. No participation, payment, ownership or payout is currently enabled.</p>
     <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)"><span class="muted" id="levelLabel">Market Level</span><b id="level">—</b></div>
     <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)"><span class="muted" id="salesLabel">Sales in Level</span><b id="sales">—</b></div>
     <div style="display:flex;justify-content:space-between;padding:11px 0"><span class="muted" id="totalSalesLabel">Total Recorded Sales</span><b id="totalSales">—</b></div>
@@ -560,8 +568,8 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 </div>
 
 <section class="panel price-plan">
-  <h3 id="pricePlanTitle">QZIX COIN — Gradual Price Plan</h3>
-  <p class="muted" id="pricePlanDesc">100 fixed QZIX COIN tokens in total. No additional tokens are created.</p>
+  <h3 id="pricePlanTitle">QZIX CIRCULAR — Planned Levels</h3>
+  <p class="muted" id="pricePlanDesc">Circular levels and percentage examples are shown for information only. No fixed token supply or token IDs apply.</p>
   <div class="price-ladder" id="pricePlanLadder"></div>
   <div class="price-plan-note" id="pricePlanStatus">Planning only: total supply is fixed at 100 tokens. No profit or future price is guaranteed.</div>
 </section>
@@ -664,8 +672,8 @@ button.secondary:hover{box-shadow:0 6px 0 #0a1422,0 12px 20px #0006}
 </section>
 <section class="panel hidden" id="verificationPanel" hidden style="display:none!important;margin-top:16px"><h3>QZIX COIN — Public Token Verification</h3><div id="verificationDetails" class="muted">Loading token verification…</div></section>
 
-<div class="notice" id="noticeText"><b>Important:</b> QZIX COIN has a fixed total supply of 100 Main Dashboard tokens. Payments, deposits, UPI transfers, resale payments and withdrawals are currently disabled; do not send money to any account claiming to represent QZIX. A payment reference or screenshot alone is not proof of payment. No profit or future price is guaranteed. Displayed prices are planning values only. There is no SELL option. Real-money activity requires legal and payment-provider approval.</div>
-<div class="footer" id="footerText">QZIX COIN • Fixed supply concept • Version 1</div>
+<div class="notice" id="noticeText"><b>Important:</b> QZIX CIRCULAR is currently an informational concept only. Circular prices and percentages are illustrative; no participation, payment, ownership, resale, withdrawal or payout is enabled. Do not send money to anyone claiming to represent QZIX. No profit or future price is guaranteed. Any real-money model requires legal review and written payment-provider approval before launch.</div>
+<div class="footer" id="footerText">QZIX CIRCULAR • Circular participation concept • Version 1</div>
 </div>
 <script>
 window.qzixSupabaseReady=(async()=>{
