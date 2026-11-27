@@ -726,7 +726,7 @@ function renderPricePlan(level,sales,currentPrice){
  const next=qzixNextPlannedPrice(price);
  const ladder=$("pricePlanLadder");
  if(ladder){
-   ladder.innerHTML="<div class='price-step active' aria-current='step'><b>CURRENT DISPLAY PRICE</b><span>₹"+price+"</span><small>Database-reported reference</small></div><div class='price-step'><b>NEXT PLANNED PRICE</b><span>"+(next===null?"Final planned level":"₹"+next)+"</span><small>Indicative ladder only; not a market quote</small></div>";
+   ladder.innerHTML="<div class='price-step active' aria-current='step'><b>CURRENT DISPLAY PRICE</b><span>₹"+price+" · 1%</span><small>1% illustrative share at this level</small></div><div class='price-step'><b>NEXT PLANNED PRICE</b><span>"+(next===null?"Final planned level":"₹"+next+" · 1%")+"</span><small>"+(next===null?"No next level is currently listed":"1% illustrative share at the next level")+"</small></div>";
  }
  const status=$("pricePlanStatus");
  if(status)status.textContent="Current displayed reference: ₹"+price+" · Next planned step: "+(next===null?"No further step in the published ladder":"₹"+next)+". This is a planning display only. Price movement is not automatic and no buyer, resale, liquidity or profit is guaranteed.";
