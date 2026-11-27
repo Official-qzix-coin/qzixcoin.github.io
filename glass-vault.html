@@ -68,8 +68,8 @@ function texture(pct,i){
  x.fillStyle='rgba(255,255,255,.90)';x.beginPath();x.arc(384,184,130,0,Math.PI*2);x.fill();
  x.strokeStyle='rgba(24,33,61,.42)';x.lineWidth=4;x.beginPath();x.arc(384,184,112,0,Math.PI*2);x.stroke();
  x.save();x.textAlign='center';x.textBaseline='middle';x.lineJoin='round';
- x.font='1000 238px system-ui,Arial';x.lineWidth=9;x.strokeStyle='rgba(255,255,255,.98)';x.strokeText(pct+'%',384,174);
- x.shadowColor='rgba(10,20,45,.48)';x.shadowBlur=16;x.shadowOffsetY=7;x.fillStyle='#101a38';x.fillText(pct+'%',384,174);x.restore();
+ x.font='1000 238px system-ui,Arial';x.lineWidth=9;x.strokeStyle='rgba(255,255,255,.98)';x.strokeText(pct+'%',384,192);
+ x.shadowColor='rgba(10,20,45,.48)';x.shadowBlur=16;x.shadowOffsetY=7;x.fillStyle='#101a38';x.fillText(pct+'%',384,192);x.restore();
  x.font='1000 29px system-ui,Arial';x.fillStyle='#101a38';x.textAlign='center';x.fillText('QZIX COIN  •  SHARE %',384,310);
  x.font='900 18px Arial';x.textAlign='left';x.fillText('QZIX',52,68);x.textAlign='right';x.fillText('SHARE NOTE',716,68);
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t
