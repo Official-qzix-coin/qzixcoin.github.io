@@ -41,9 +41,9 @@ const vault=new THREE.Group();scene.add(vault);
 // Thick, physically shaded crystal shell with studio reflections and visible edge highlights.
 const shellGeo=new THREE.SphereGeometry(2.05,64,48);
 const glass=new THREE.Mesh(shellGeo,new THREE.MeshPhysicalMaterial({
- color:0xffffff,metalness:0,roughness:.018,transmission:.98,thickness:.22,ior:1.49,
- envMapIntensity:2.15,clearcoat:1,clearcoatRoughness:.012,
- attenuationColor:0xffffff,attenuationDistance:90,side:THREE.DoubleSide
+ color:0xeaf5ff,metalness:0.08,roughness:.045,transmission:.96,thickness:.10,ior:1.49,
+ envMapIntensity:1.35,clearcoat:1,clearcoatRoughness:.025,
+ attenuationColor:0xeaf4ff,attenuationDistance:160,side:THREE.DoubleSide
 }));vault.add(glass);
 // Neutral-white acrylic edge reflections: clear centre, polished thick rim.
 const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,64,48),new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.BackSide,transparent:true,opacity:.035,depthWrite:false}));vault.add(innerRim);
@@ -57,17 +57,17 @@ for(const z of [-1.55,1.55]){const b=new CANNON.Body({mass:0});b.addShape(new CA
 const values=[10,20,15,25,5,25], meshes=[], bodies=[];
 function texture(pct,i){
  const c=document.createElement('canvas');c.width=768;c.height=384;const x=c.getContext('2d');
- const palettes=[['#ffffff','#dcefe8'],['#ffffff','#dcecf5'],['#fffdf7','#f5e5bd'],['#ffffff','#e9e2f8'],['#fffafb','#f4dfe5'],['#ffffff','#dcefe9']];
+ const palettes=[['#ffe36e','#f6a800'],['#73e6ff','#087bd6'],['#ff9cba','#e93478'],['#c9a2ff','#7138c8'],['#75f0c4','#079b83'],['#ffbd83','#e85a36']];
  const [p1,p2]=palettes[i%palettes.length],g=x.createLinearGradient(0,0,768,384);g.addColorStop(0,p1);g.addColorStop(1,p2);
  x.fillStyle=g;x.fillRect(0,0,768,384);
  // Fine engraved guilloche-style lines and security border.
- x.save();x.strokeStyle='rgba(18,65,72,.13)';x.lineWidth=1.5;
+ x.save();x.strokeStyle='rgba(255,255,255,.30)';x.lineWidth=1.5;
  for(let k=0;k<22;k++){x.beginPath();for(let a=0;a<=Math.PI*2+.01;a+=.04){const r=54+k*5.3,px=384+Math.cos(a)*r,py=190+Math.sin(a)*r*.47;if(a===0)x.moveTo(px,py);else x.lineTo(px,py)}x.stroke()}x.restore();
- x.strokeStyle='#ffffff';x.lineWidth=12;x.strokeRect(13,13,742,358);
- x.strokeStyle='rgba(30,55,75,.32)';x.lineWidth=3;x.strokeRect(30,30,708,324);
- x.fillStyle='rgba(255,255,255,.82)';x.beginPath();x.arc(384,184,130,0,Math.PI*2);x.fill();
- x.strokeStyle='rgba(35,65,82,.34)';x.lineWidth=4;x.beginPath();x.arc(384,184,112,0,Math.PI*2);x.stroke();
- x.save();x.shadowColor='rgba(7,39,55,.22)';x.shadowBlur=12;x.shadowOffsetY=5;x.fillStyle='#173b4d';x.textAlign='center';x.textBaseline='middle';x.font='950 178px system-ui,Arial';x.fillText(pct+'%',384,176);x.restore();
+ x.strokeStyle='rgba(255,255,255,.95)';x.lineWidth=12;x.strokeRect(13,13,742,358);
+ x.strokeStyle='rgba(20,35,65,.42)';x.lineWidth=3;x.strokeRect(30,30,708,324);
+ x.fillStyle='rgba(255,255,255,.90)';x.beginPath();x.arc(384,184,130,0,Math.PI*2);x.fill();
+ x.strokeStyle='rgba(24,33,61,.42)';x.lineWidth=4;x.beginPath();x.arc(384,184,112,0,Math.PI*2);x.stroke();
+ x.save();x.shadowColor='rgba(10,20,45,.38)';x.shadowBlur=12;x.shadowOffsetY=5;x.fillStyle='#18213d';x.textAlign='center';x.textBaseline='middle';x.font='950 178px system-ui,Arial';x.fillText(pct+'%',384,176);x.restore();
  x.font='900 25px Arial';x.fillStyle='#173b4d';x.fillText('QZIX COIN  •  SHARE %',384,310);
  x.font='900 18px Arial';x.textAlign='left';x.fillText('QZIX',52,68);x.textAlign='right';x.fillText('SHARE NOTE',716,68);
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t
