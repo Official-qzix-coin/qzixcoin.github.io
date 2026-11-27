@@ -42,9 +42,9 @@ const vault=new THREE.Group();scene.add(vault);
 // Thick, physically shaded crystal shell with studio reflections and visible edge highlights.
 const shellGeo=new THREE.SphereGeometry(2.05,64,48);
 const glass=new THREE.Mesh(shellGeo,new THREE.MeshPhysicalMaterial({
- color:0xffffff,metalness:0.02,roughness:.012,transmission:1,thickness:.025,ior:1.52,
- envMapIntensity:3.4,clearcoat:1,clearcoatRoughness:.008,
- attenuationColor:0xffffff,attenuationDistance:1000,side:THREE.DoubleSide
+ color:0xcbd8e8,metalness:0.28,roughness:.035,transmission:.78,thickness:.16,ior:1.52,
+ envMapIntensity:4.2,clearcoat:1,clearcoatRoughness:.012,
+ attenuationColor:0xb9cbe0,attenuationDistance:7,side:THREE.DoubleSide
 }));vault.add(glass);
 // Neutral-white acrylic edge reflections: clear centre, polished thick rim.
 const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,64,48),new THREE.MeshBasicMaterial({color:0xdceeff,side:THREE.BackSide,transparent:true,opacity:.012,depthWrite:false}));vault.add(innerRim);
