@@ -65,11 +65,15 @@ function texture(pct,i){
  for(let k=0;k<18;k++){x.beginPath();for(let a=0;a<=Math.PI*2+.01;a+=.04){const r=55+k*6,px=384+Math.cos(a)*r,py=192+Math.sin(a)*r*.5;if(a===0)x.moveTo(px,py);else x.lineTo(px,py)}x.stroke()}x.restore();
  x.strokeStyle='rgba(255,255,255,.95)';x.lineWidth=12;x.strokeRect(13,13,742,358);
  x.strokeStyle='rgba(20,35,65,.42)';x.lineWidth=3;x.strokeRect(30,30,708,324);
- // The percentage is placed at the exact visual centre of the note face.
+ // Draw ONLY the percentage in the centre: no side labels or footer text.
  x.save();x.textAlign='center';x.textBaseline='middle';x.lineJoin='round';
- x.font='1000 250px system-ui,Arial';x.lineWidth=10;x.strokeStyle='rgba(255,255,255,.95)';x.strokeText(pct+'%',384,178);
- x.shadowColor='rgba(10,20,45,.42)';x.shadowBlur=12;x.shadowOffsetY=5;x.fillStyle='#101a38';x.fillText(pct+'%',384,178);x.restore();
- x.font='900 24px system-ui,Arial';x.fillStyle='#101a38';x.textAlign='center';x.fillText('QZIX COIN  •  SHARE NOTE',384,330);
+ let fontSize=250;
+ x.font='1000 '+fontSize+'px system-ui,Arial';
+ while(x.measureText(pct+'%').width>690 && fontSize>100){fontSize-=5;x.font='1000 '+fontSize+'px system-ui,Arial';}
+ x.lineWidth=10;x.strokeStyle='rgba(255,255,255,.98)';
+ x.strokeText(pct+'%',384,192);
+ x.shadowColor='rgba(10,20,45,.35)';x.shadowBlur=10;x.shadowOffsetY=3;
+ x.fillStyle='#101a38';x.fillText(pct+'%',384,192);x.restore();
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t
 }
 values.forEach((pct,i)=>{
