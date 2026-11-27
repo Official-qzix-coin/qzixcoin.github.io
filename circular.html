@@ -1,284 +1,45 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#071426">
-<title>QZIX CIRCULAR | Participation Calculator</title>
-<meta name="description" content="QZIX CIRCULAR information and contribution percentage calculator. No profit is guaranteed.">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#071426">
+<title>QZIX CIRCULAR | Levels & Percentage Guide</title>
+<meta name="description" content="Review QZIX CIRCULAR's illustrative levels, percentage examples and participation information. No payments or participation are currently enabled.">
+<link rel="canonical" href="https://official-qzix-coin.github.io/qzixcoin.github.io/circular.html">
 <style>
-:root{color-scheme:dark;--bg:#071426;--panel:#10213a;--line:#294360;--gold:#f4c76b;--text:#f4f7fb;--muted:#a8b8cc}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#173253,#071426 60%);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text)}
-.wrap{max-width:980px;margin:auto;padding:22px 16px 48px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}.brand{font-size:21px;font-weight:850;letter-spacing:1.2px}.brand span{color:var(--gold)}a{color:var(--gold);text-decoration:none}.nav{display:flex;gap:15px;flex-wrap:wrap;font-size:13px}.hero,.panel{background:linear-gradient(145deg,#142c49,#0d1d32);border:1px solid var(--line);border-radius:20px;padding:23px;box-shadow:0 16px 42px #0003}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--gold);font-weight:800}.hero h1{font-size:clamp(28px,6vw,44px);margin:9px 0}.hero p,.muted{color:var(--muted);line-height:1.65}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:15px 0}.stat{background:#0a192b;border:1px solid var(--line);border-radius:14px;padding:15px}.stat small{display:block;color:var(--muted)}.stat strong{display:block;font-size:clamp(20px,4vw,28px);color:var(--gold);margin-top:5px}.layout{display:grid;grid-template-columns:1fr 1fr;gap:15px}.panel h2{font-size:19px;margin:0 0 10px}.field{display:block;margin:16px 0}.field span{display:block;color:var(--muted);font-size:13px;margin-bottom:7px}.field input{width:100%;padding:14px;border-radius:11px;border:1px solid var(--line);background:#071426;color:white;font-size:18px}.result{border-radius:14px;background:#08182a;border:1px solid #6c5b36;padding:18px;margin-top:14px}.result strong{font-size:32px;color:var(--gold)}.bar{height:12px;background:#263b54;border-radius:20px;overflow:hidden;margin-top:12px}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#b98736,#ffe09a);transition:width .2s}.notice{margin-top:15px;padding:13px;border-radius:12px;border:1px solid #725c35;background:#2b2518;color:#f4d99d;font-size:12px;line-height:1.6}.foot{text-align:center;color:#8296af;font-size:12px;margin-top:24px}button{border:0;border-radius:10px;padding:12px 16px;background:var(--gold);color:#172238;font-weight:800;cursor:pointer}@media(max-width:680px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.hero,.panel{padding:18px}}
-
-.vault-wrap{display:flex;justify-content:center;align-items:center;padding:22px 0 8px}
-.glass-vault{position:relative;width:min(68vw,300px);aspect-ratio:1;border-radius:50%;overflow:hidden;isolation:isolate;background:radial-gradient(circle at 32% 24%,#ffffffaa 0 2%,#bce8ff44 9%,transparent 26%),radial-gradient(circle at 68% 76%,#4b9ac855,transparent 38%),radial-gradient(circle at 50% 50%,#153451 0 47%,#8fd8f044 65%,#e9faffaa 70%,#39789d 73%,#071426 77%);border:2px solid #d9f4ffcc;box-shadow:inset -16px -18px 28px #020b18aa,inset 12px 10px 22px #e5f8ff88,0 18px 45px #0009,0 0 25px #83d9ff44}
-.glass-vault{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}.glass-vault.dragging{cursor:grabbing}
-.vault-contents{position:absolute;inset:0;border-radius:50%;transform:rotate(0deg);will-change:transform}
-.glass-vault:before{content:"";position:absolute;inset:4%;border-radius:50%;border:1px solid #e8fbff99;box-shadow:inset 0 0 20px #b7efff55;pointer-events:none}
-.glass-vault:after{content:"";position:absolute;top:8%;left:16%;width:32%;height:13%;border-radius:50%;transform:rotate(-32deg);background:linear-gradient(90deg,transparent,#fff9,transparent);filter:blur(2px)}
-.bill{position:absolute;width:29%;height:14%;border:1px solid #e7d5a0;border-radius:5px;background:linear-gradient(135deg,#f2dfaa,#b9c995 48%,#f6e6b7);color:#315344;display:flex;align-items:center;justify-content:center;font-size:clamp(10px,2.3vw,15px);font-weight:900;text-shadow:0 1px #fff8;box-shadow:0 4px 8px #0008,inset 0 0 0 2px #ffffff66}
-.bill{animation:none;will-change:left,top,transform}
-@keyframes floatNote{0%,100%{translate:0 0}50%{translate:0 -11px}}
-.bill:before{content:"";position:absolute;inset:3px;border:1px dashed #597a60aa;border-radius:3px}
-.b1{left:13%;top:30%;transform:rotate(-18deg)}.b2{right:12%;top:26%;transform:rotate(14deg)}.b3{left:34%;top:51%;transform:rotate(7deg)}.b4{left:15%;bottom:17%;transform:rotate(12deg)}.b5{right:10%;bottom:17%;transform:rotate(-13deg)}
-.vault-label{position:absolute;z-index:2;left:0;right:0;bottom:7%;text-align:center;color:#eaf8ff;font-size:11px;font-weight:800;letter-spacing:2px;text-shadow:0 2px 5px #000}
-@media(max-width:680px){.vault-wrap{padding:14px 0}}
-.vault-stage{position:relative;width:min(100%,440px);height:390px;margin:0 auto;display:flex;align-items:center;justify-content:center}
-.vault-wrap{padding:12px 0 8px}
-.glass-vault{width:min(62vw,270px);z-index:1;flex:none}
-.vault-control{position:absolute;z-index:3;width:126px;min-height:54px;padding:8px 9px;border:1px solid #e8c879;border-radius:13px;background:linear-gradient(145deg,#263d59,#0a192b);color:#f7d98e;box-shadow:0 7px 18px #0008;font-size:11px;line-height:1.35;white-space:normal}
-.vault-control strong{display:block;font-size:16px;color:#fff;margin-top:3px}
-.vault-control.live{top:4px;left:0}.vault-control.next{top:4px;right:0}.vault-control.minimum{bottom:4px;left:0}.vault-control.buy{bottom:4px;right:0;background:linear-gradient(145deg,#f4c76b,#b98736);color:#172238}
-.vault-control.buy strong{color:#172238}.vault-control:active{transform:scale(.97)}
-.vault-control[hidden]{display:none!important}
-@media(max-width:390px){.vault-stage{height:360px}.vault-control{width:112px;min-height:50px;font-size:10px;padding:7px}.glass-vault{width:min(60vw,235px)}.vault-control strong{font-size:14px}}
-
-
-.hidden{display:none!important}
-#buyerAccess{position:fixed;z-index:1000;inset:0;display:flex;flex-direction:column;justify-content:center;width:min(92vw,480px);max-height:92vh;overflow:auto;margin:auto!important;background:linear-gradient(145deg,#142c49,#0d1d32);box-shadow:0 25px 90px #000d}
-body.authenticated #buyerAccess{display:none!important}
-body:not(.authenticated) .wrap>.top,body:not(.authenticated) .wrap>section:not(#buyerAccess),body:not(.authenticated) .wrap>.layout,body:not(.authenticated) .wrap>.foot{display:none!important}
-body:not(.authenticated){overflow:hidden}
-body.authenticated{overflow:auto}
-#mainBuyButton{background:linear-gradient(145deg,#f4c76b,#b98736);color:#172238}
-#mainBuyStatus{margin:12px 0;padding:12px;border:1px solid #725c35;border-radius:12px;background:#2b2518;color:#f4d99d;font-size:13px;line-height:1.5}
+:root{color-scheme:dark;--bg:#060d19;--panel:#101d31;--line:#314764;--muted:#a9bad0;--gold:#f5c66d;--text:#f4f7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1b3556,#060d19 65%);color:var(--text);font:15px system-ui,sans-serif}
+main{max-width:850px;margin:auto;padding:22px 15px 48px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}.brand{font-weight:900;letter-spacing:1.5px;color:#ffe2a0}.back{color:#ffe2a0;text-decoration:none;border:1px solid #806b3e;border-radius:10px;padding:9px 12px;font-weight:700}
+.hero,.panel{border:1px solid var(--line);border-radius:19px;background:linear-gradient(145deg,#142b46,#0b192b);padding:22px;margin:14px 0;box-shadow:0 12px 30px #0004}
+.kicker{color:var(--gold);font-size:11px;font-weight:900;letter-spacing:2px}.hero h1{font-size:clamp(27px,6vw,40px);margin:9px 0}.muted{color:var(--muted);line-height:1.65;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.stat{padding:15px;border:1px solid #465d79;border-radius:14px;background:#0a1729}.stat small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px}.stat strong{display:block;color:var(--gold);font-size:25px;margin-top:6px}
+.levels{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.level{padding:15px;border:1px solid #465d79;border-radius:13px;background:#0a1729}.level b{display:block;color:var(--gold);font-size:20px}.level span{font-size:12px;color:var(--muted)}
+label{display:block;margin:14px 0 6px;color:#ffe2a0;font-size:13px;font-weight:700}input{width:100%;padding:13px;border:1px solid #465d79;border-radius:10px;background:#071426;color:white;font-size:16px}.result{margin-top:12px;padding:13px;border-radius:11px;background:#091628;border:1px solid #465d79;color:#ffe2a0;font-weight:800}
+.notice{padding:14px;border:1px solid #806536;border-radius:12px;background:#302817;color:#f4dca7;font-size:12px;line-height:1.6}
+footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
+@media(max-width:560px){main{padding:15px 11px 35px}.hero,.panel{padding:17px}.stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:span 2}.levels{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
-<div class="wrap">
-<header class="top"><div class="brand">QZIX <span>CIRCULAR</span></div><nav class="nav"><a href="index.html">Main Website</a><a href="#calculator">Calculator</a><button id="mainBuyButton" type="button" class="hidden">BUY</button></nav></header>
-<section class="hero">
-<div class="eyebrow">CLEAR RULES · TRANSPARENT INFORMATION</div>
-<h1>QZIX CIRCULAR</h1>
-<p>A structured circular participation concept. Review the stated circular value and use the calculator to understand what percentage a contribution represents.</p>
-
-<div class="vault-wrap" aria-label="Glass vault with circular price and buyer controls">
-  <div class="vault-stage">
-  <button class="vault-control live" id="livePriceControl" type="button">LIVE PRICE<strong>₹20 · 1%</strong></button>
-  <button class="vault-control next" id="nextPriceControl" type="button">NEXT PRICE<strong>₹40 · 1%</strong></button>
-  <button class="vault-control minimum" id="minimumBuyControl" type="button">MINIMUM BUY<strong>₹20</strong></button>
-  <button class="vault-control buy" id="vaultBuyControl" type="button" hidden>BUY<strong>Login required</strong></button>
-  <div class="glass-vault" id="glassVault" role="img" aria-label="Touch and drag the glass vault to spin it; percentage notes float inside">
-    <div class="vault-contents" id="vaultContents">
-      <div class="bill b1">10%</div><div class="bill b2">20%</div>
-      <div class="bill b3">5%</div><div class="bill b4">25%</div><div class="bill b5">40%</div>
-    </div>
-    <div class="vault-label">TOUCH & SPIN · 360°</div>
-  </div>
-  </div>
-</div>
-<div class="stats">
-<div class="stat"><small>LIVE PRICE</small><strong>₹20</strong></div>
-<div class="stat"><small>NEXT LEVEL · AFTER CURRENT 100% IS COMPLETE</small><strong>₹40 = 1%</strong></div>
-<div class="stat"><small>CURRENT VALUE · NEXT LEVEL VALUE</small><strong>₹2,000 · ₹4,000</strong></div>
-</div>
+<body><main>
+<header class="top"><div class="brand">QZIX CIRCULAR SYSTEM</div><a class="back" href="./">← Dashboard</a></header>
+<section class="hero"><div class="kicker">SIMPLE · STRUCTURED · TRANSPARENT</div><h1>QZIX CIRCULAR</h1><p class="muted">Explore the circular levels and percentage examples. This page explains the proposed structure only; it does not create a financial interest or confirm participation.</p></section>
+<section class="stats" aria-label="Circular reference values">
+<div class="stat"><small>Current Circular Reference</small><strong>₹20 · 1%</strong></div>
+<div class="stat"><small>Next Planned Reference</small><strong>₹40 · 1%</strong></div>
+<div class="stat"><small>Minimum Amount Example</small><strong>₹20</strong></div>
 </section>
-<div id="mainBuyStatus" class="hidden" role="status" aria-live="polite"></div>
-
-<section class="panel" id="buyerAccess" style="margin-top:16px">
-  <h2>Buyer Login</h2>
-  <p class="muted">Please login to open QZIX CIRCULAR. After successful login, the main page and BUY option will appear. New buyers can register first.</p>
-  <div id="loginForm">
-    <div style="display:flex;gap:8px;margin:12px 0">
-      <button id="emailLoginTab" type="button" aria-pressed="true">Email Login</button>
-      <button id="phoneLoginTab" type="button" class="secondary" aria-pressed="false">Mobile Number Login</button>
-    </div>
-    <div id="emailLoginPanel">
-      <label class="field"><span>Registered Email Address</span><input id="buyerEmail" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com"></label>
-      <button id="sendLoginOtp" type="button">Send Email OTP</button>
-      <div id="otpArea" class="hidden">
-        <label class="field"><span>Six-digit Email OTP</span><input id="buyerOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP"></label>
-        <button id="verifyLoginOtp" type="button">Verify & Login</button>
-      </div>
-    </div>
-    <div id="phoneLoginPanel" class="hidden">
-      <label class="field"><span>Registered Mobile Number</span><input id="buyerPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="10-digit mobile number"></label>
-      <p class="muted">India numbers will use +91. Use the mobile number already verified on your account.</p>
-      <button id="sendPhoneOtp" type="button">Send Mobile OTP</button>
-      <div id="phoneOtpArea" class="hidden">
-        <label class="field"><span>Six-digit SMS OTP</span><input id="buyerPhoneOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP"></label>
-        <button id="verifyPhoneOtp" type="button">Verify Mobile & Login</button>
-      </div>
-    </div>
-    <p class="muted"><a href="buyer-registration.html">New buyer? Register here</a></p>
-  </div>
-  <div id="buyerLoggedIn" class="hidden">
-    <p class="muted" id="buyerWelcome">You are logged in.</p>
-    <button id="buyButton" type="button">BUY</button>
-    <button id="buyerLogout" type="button" class="secondary">Logout</button>
-    <p class="muted" id="buyStatus">BUY is shown after login. Online payment and order confirmation are not activated yet.</p>
-  </div>
-  <div id="buyerAuthStatus" class="status" role="status" aria-live="polite">Connecting securely…</div>
+<section class="panel"><h2>Illustrative Circular Levels</h2><p class="muted">The examples below show a proposed progression. They are not live market prices, guaranteed values, or promised returns.</p>
+<div class="levels"><div class="level"><b>₹20 · 1%</b><span>Current illustrative level</span></div><div class="level"><b>₹40 · 1%</b><span>Next illustrative level</span></div><div class="level"><b>₹2,000</b><span>Example 100% reference value at ₹20</span></div><div class="level"><b>₹4,000</b><span>Example 100% reference value at ₹40</span></div></div>
 </section>
-\n<div class="layout" id="calculator" style="margin-top:16px">
-<section class="panel">
-<h2>Contribution Calculator</h2>
-<p class="muted">Current level: ₹20 = 1% of ₹2,000. The next level starts only after the current 100% is fully completed: ₹40 = 1% of ₹4,000.</p>
-<label class="field"><span id="amountLabel">Current level · Minimum ₹20 · Contribution amount (₹)</span><input id="amount" type="number" min="20" max="2000" step="1" value="20" inputmode="decimal"></label>
-<div class="result"><div class="muted">Calculated percentage</div><strong id="percent">1.00%</strong><div class="bar"><i id="bar"></i></div><p class="muted" id="remaining">Remaining amount: ₹1,980</p></div>
+<section class="panel"><h2>Percentage Calculator</h2><p class="muted">Enter an amount to see what percentage it represents of the selected illustrative circular value.</p>
+<label for="amount">Example amount (₹)</label><input id="amount" type="number" min="0" step="0.01" value="20" inputmode="decimal">
+<label for="basis">Illustrative circular value</label><select id="basis" style="width:100%;padding:13px;border:1px solid #465d79;border-radius:10px;background:#071426;color:white;font-size:16px"><option value="2000">₹2,000</option><option value="4000">₹4,000</option></select>
+<div class="result" id="result" aria-live="polite">₹20 represents 1.00% of ₹2,000.</div>
 </section>
-<section class="panel">
-<h2>Important Information</h2>
-<p class="muted">This page is an information and calculation interface only. It does not accept payments, issue ownership, verify a buyer, or connect to a live transaction database.</p>
-<p class="muted">A displayed percentage is calculated against the selected level value: current level ₹2,000, then next level ₹4,000 after the current level reaches 100%. Each later level is planned to double the previous level's price and total value. This is an illustrative rule only, not an automated live sales system or proof of ownership.</p>
-<div class="notice"><b>Risk notice:</b> Profit is not guaranteed. Do not pay anyone based only on this calculator. Any real participation, ownership, refund, resale, or profit-sharing arrangement must be documented and legally reviewed before launch.</div>
-</section>
-</div>
-<div class="foot">QZIX CIRCULAR · Information page · No guaranteed profit</div>
-</div>
+<div class="notice"><b>Important:</b> QZIX CIRCULAR is currently an informational concept only. No participation, payment collection, ownership, resale, withdrawal or payout is enabled on this page. Do not send money to anyone claiming to represent QZIX. A percentage shown here is only a calculation example, not a legal ownership share, investment entitlement or profit promise. Any real-money model must undergo legal, tax and payment-provider review before launch.</div>
+<footer>QZIX CIRCULAR · Information & calculation only · No profit is guaranteed</footer>
+</main>
 <script>
-
-const AUTH_URL="https://rxjrsbkqytovjqnijqek.supabase.co";
-const AUTH_KEY="sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q";
-const authStatus=document.getElementById('buyerAuthStatus');
-let authClient=null;
-(async()=>{
- try{
-  const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
-  authClient=createClient(AUTH_URL,AUTH_KEY);
-  const {data:{session}}=await authClient.auth.getSession();
-  showBuyerSession(session);
-  authStatus.textContent=session?"Login session restored.":"Enter your registered email to login.";
- }catch(e){authStatus.textContent="Secure login service could not load. Please refresh.";}
-})();
-function showBuyerSession(session){
- const logged=!!session;
- document.body.classList.toggle('authenticated',logged);
- document.getElementById('mainBuyButton').classList.toggle('hidden',!logged);
- document.getElementById('loginForm').classList.toggle('hidden',logged);
- document.getElementById('buyerLoggedIn').classList.toggle('hidden',!logged);
- if(logged)document.getElementById('buyerWelcome').textContent="Logged in as "+(session.user.email||"registered buyer")+".";
- document.getElementById('vaultBuyControl').hidden=!logged;
- document.querySelector('#vaultBuyControl strong').textContent=logged?"Continue":"Login required";
-}
-function setLoginMethod(method){
- const email=method==='email';
- document.getElementById('emailLoginPanel').classList.toggle('hidden',!email);
- document.getElementById('phoneLoginPanel').classList.toggle('hidden',email);
- document.getElementById('emailLoginTab').setAttribute('aria-pressed',String(email));
- document.getElementById('phoneLoginTab').setAttribute('aria-pressed',String(!email));
- document.getElementById('emailLoginTab').classList.toggle('secondary',!email);
- document.getElementById('phoneLoginTab').classList.toggle('secondary',email);
- authStatus.textContent=email?'Enter your registered email to login.':'Enter your verified mobile number to login.';
-}
-document.getElementById('emailLoginTab').addEventListener('click',()=>setLoginMethod('email'));
-document.getElementById('phoneLoginTab').addEventListener('click',()=>setLoginMethod('phone'));
-document.getElementById('sendPhoneOtp').addEventListener('click',async()=>{
- if(!authClient)return;
- let raw=document.getElementById('buyerPhone').value.trim();
- let digits=raw.replace(/\\D/g,'');
- let phone=raw.startsWith('+')?'+'+digits:(digits.length===10?'+91'+digits:(digits.startsWith('91')&&digits.length===12?'+'+digits:''));
- if(!/^\\+[1-9]\\d{7,14}$/.test(phone)){authStatus.textContent='Enter a valid mobile number with country code, e.g. +91 9876543210.';return;}
- const btn=document.getElementById('sendPhoneOtp');btn.disabled=true;authStatus.textContent='Sending SMS OTP…';
- try{
-  const {error}=await authClient.auth.signInWithOtp({phone,options:{shouldCreateUser:false}});
-  if(error)throw error;
-  document.getElementById('buyerPhone').dataset.normalizedPhone=phone;
-  document.getElementById('phoneOtpArea').classList.remove('hidden');
-  authStatus.textContent='SMS OTP sent. Check your mobile messages.';
- }catch(e){authStatus.textContent='Could not send mobile OTP: '+(e.message||'Check phone login and SMS provider settings.');}
- finally{btn.disabled=false;}
-});
-document.getElementById('verifyPhoneOtp').addEventListener('click',async()=>{
- if(!authClient)return;
- const phone=document.getElementById('buyerPhone').dataset.normalizedPhone||'';
- const token=document.getElementById('buyerPhoneOtp').value.trim();
- if(!phone){authStatus.textContent='Enter your mobile number and request an OTP first.';return;}
- if(!/^[0-9]{6}$/.test(token)){authStatus.textContent='Enter the six-digit SMS OTP.';return;}
- const btn=document.getElementById('verifyPhoneOtp');btn.disabled=true;authStatus.textContent='Verifying mobile OTP…';
- try{
-  const {data,error}=await authClient.auth.verifyOtp({phone,token,type:'sms'});
-  if(error)throw error;
-  showBuyerSession(data.session);authStatus.textContent='Mobile login successful.';
- }catch(e){authStatus.textContent='Mobile login failed: '+(e.message||'Check the OTP and try again.');}
- finally{btn.disabled=false;}
-});
-document.getElementById('sendLoginOtp').addEventListener('click',async()=>{
- if(!authClient)return;
- const email=document.getElementById('buyerEmail').value.trim().toLowerCase();
- if(!email){authStatus.textContent="Please enter your registered email address.";return;}
- const btn=document.getElementById('sendLoginOtp');btn.disabled=true;authStatus.textContent="Sending login OTP…";
- try{
-  const {error}=await authClient.auth.signInWithOtp({email,options:{shouldCreateUser:false}});
-  if(error)throw error;
-  document.getElementById('otpArea').classList.remove('hidden');
-  authStatus.textContent="Login OTP sent. Check your inbox and spam folder.";
- }catch(e){authStatus.textContent="Could not send login OTP: "+(e.message||"Please try again.");}
- finally{btn.disabled=false;}
-});
-document.getElementById('verifyLoginOtp').addEventListener('click',async()=>{
- if(!authClient)return;
- const email=document.getElementById('buyerEmail').value.trim().toLowerCase(),token=document.getElementById('buyerOtp').value.trim();
- if(!/^[0-9]{6}$/.test(token)){authStatus.textContent="Enter the six-digit OTP.";return;}
- const btn=document.getElementById('verifyLoginOtp');btn.disabled=true;authStatus.textContent="Verifying OTP…";
- try{
-  const {data,error}=await authClient.auth.verifyOtp({email,token,type:"email"});
-  if(error)throw error;
-  showBuyerSession(data.session);authStatus.textContent="Login successful.";
- }catch(e){authStatus.textContent="Login failed: "+(e.message||"Check the OTP and try again.");}
- finally{btn.disabled=false;}
-});
-document.getElementById('buyerLogout').addEventListener('click',async()=>{
- if(!authClient)return;
- const {error}=await authClient.auth.signOut();
- if(error){authStatus.textContent="Logout failed: "+error.message;return;}
- showBuyerSession(null);authStatus.textContent="You are logged out.";
-});
-function showBuyNotice(){
- const message="Your login is active, but real BUY orders and online payments are not enabled yet. No money has been collected and no ownership is created.";
- document.getElementById('buyStatus').textContent=message;
- const status=document.getElementById('mainBuyStatus');status.textContent=message;status.classList.remove('hidden');
-}
-document.getElementById('buyButton').addEventListener('click',showBuyNotice);
-document.getElementById('mainBuyButton').addEventListener('click',showBuyNotice);
-\nconst amount=document.getElementById('amount'),percent=document.getElementById('percent'),bar=document.getElementById('bar'),remaining=document.getElementById('remaining');
-let calculatorBasis=2000, calculatorMinimum=20;
-const vault=document.getElementById('glassVault'), contents=document.getElementById('vaultContents');
-let angle=0, velocity=0, dragging=false, lastX=0, lastTime=0, raf=0;
-vault.addEventListener('pointerdown',e=>{dragging=true;vault.classList.add('dragging');vault.setPointerCapture(e.pointerId);lastX=e.clientX;lastTime=performance.now();velocity=0;if(raf)cancelAnimationFrame(raf);});
-vault.addEventListener('pointermove',e=>{if(!dragging)return;const now=performance.now(),dt=Math.max(1,now-lastTime),dx=e.clientX-lastX;angle+=dx*.9;velocity=(dx*.9)/dt;contents.style.transform='rotate('+angle+'deg)';lastX=e.clientX;lastTime=now;});
-function releaseVault(){if(!dragging)return;dragging=false;vault.classList.remove('dragging');let prev=performance.now();function coast(now){const dt=Math.min(32,now-prev);prev=now;angle+=velocity*dt;velocity*=Math.pow(.985,dt/16.67);contents.style.transform='rotate('+angle+'deg)';if(Math.abs(velocity)>.008){raf=requestAnimationFrame(coast)}else{velocity=0;raf=0}}raf=requestAnimationFrame(coast)}
-vault.addEventListener('pointerup',releaseVault);vault.addEventListener('pointercancel',releaseVault);vault.addEventListener('lostpointercapture',releaseVault);
-function update(){const n=Math.max(calculatorMinimum,Math.min(calculatorBasis,Number(amount.value)||calculatorMinimum));amount.min=calculatorMinimum;amount.max=calculatorBasis;amount.value=n;const p=n/calculatorBasis*100;percent.textContent=p.toFixed(2)+'%';bar.style.width=p+'%';remaining.textContent='Remaining amount in this level: ₹'+(calculatorBasis-n).toLocaleString('en-IN');document.getElementById('amountLabel').textContent=(calculatorBasis===2000?'Current level':'Next level illustration')+' · Minimum ₹'+calculatorMinimum+' · Contribution amount (₹)';}
-
-amount.addEventListener('input',update);update();
-// Glass-vault price controls: selecting a price fills the calculator only.
-function chooseCircularAmount(value,basis){calculatorBasis=basis;calculatorMinimum=basis===4000?40:20;amount.value=String(value);update();document.getElementById('calculator').scrollIntoView({behavior:'smooth',block:'start'});}
-document.getElementById('livePriceControl').addEventListener('click',()=>chooseCircularAmount(20,2000));
-document.getElementById('nextPriceControl').addEventListener('click',()=>chooseCircularAmount(40,4000));
-document.getElementById('minimumBuyControl').addEventListener('click',()=>chooseCircularAmount(20,2000));
-document.getElementById('vaultBuyControl').addEventListener('click',()=>{
- const loggedIn=!document.getElementById('buyerLoggedIn').classList.contains('hidden');
- if(!loggedIn){document.getElementById('buyerAccess').scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('buyerAuthStatus').textContent='Please login first to access BUY.';return;}
- showBuyNotice();
-});
-
-
-// Newton-inspired gentle motion: gravity, inertia, wall bounce and note-to-note collisions.
-const notes=[...contents.querySelectorAll('.bill')];
-let physicsItems=notes.map((el,i)=>({el,x:el.offsetLeft,y:el.offsetTop,vx:[.34,-.26,.19,-.31,.24][i],vy:[-.08,.13,-.11,.06,-.15][i],a:[-18,14,7,12,-13][i],w:el.offsetWidth,h:el.offsetHeight}));
-notes.forEach(n=>{n.style.left='0px';n.style.top='0px';});
-let physicsLast=0;
-function moveNotes(now){
-  const dt=Math.min(2,(now-(physicsLast||now))/16.67)||1; physicsLast=now;
-  const W=vault.clientWidth,H=vault.clientHeight,cx=W/2,cy=H/2,wall=Math.min(W,H)*.405;
-  for(const p of physicsItems){
-    p.vy+=.018*dt; // gravity
-    p.vx*=Math.pow(.999,dt);p.vy*=Math.pow(.999,dt);
-    p.x+=p.vx*dt;p.y+=p.vy*dt;
-    const nx=p.x+p.w/2-cx,ny=p.y+p.h/2-cy,dist=Math.hypot(nx,ny),limit=wall-Math.max(p.w,p.h)*.55;
-    if(dist>limit){const ux=nx/(dist||1),uy=ny/(dist||1);p.x=cx+ux*limit-p.w/2;p.y=cy+uy*limit-p.h/2;const dot=p.vx*ux+p.vy*uy;if(dot>0){p.vx-=1.55*dot*ux;p.vy-=1.55*dot*uy;} }
-  }
-  for(let i=0;i<physicsItems.length;i++)for(let j=i+1;j<physicsItems.length;j++){
-    const a=physicsItems[i],b=physicsItems[j],ax=a.x+a.w/2,ay=a.y+a.h/2,bx=b.x+b.w/2,by=b.y+b.h/2;
-    let dx=bx-ax,dy=by-ay,d=Math.hypot(dx,dy),min=(Math.min(a.w,a.h)+Math.min(b.w,b.h))*.43;
-    if(d<min){if(d<.01){dx=.01;d=.01;}const ux=dx/d,uy=dy/d,overlap=min-d;a.x-=ux*overlap*.5;a.y-=uy*overlap*.5;b.x+=ux*overlap*.5;b.y+=uy*overlap*.5;const rel=(b.vx-a.vx)*ux+(b.vy-a.vy)*uy;if(rel<0){const impulse=-(1+.62)*rel*.5;a.vx-=impulse*ux;a.vy-=impulse*uy;b.vx+=impulse*ux;b.vy+=impulse*uy;}}
-  }
-  for(const p of physicsItems){p.el.style.left=p.x+'px';p.el.style.top=p.y+'px';p.a+=p.vx*.65*dt;p.el.style.transform='rotate('+p.a+'deg)';}
-  requestAnimationFrame(moveNotes);
-}
-requestAnimationFrame(moveNotes);
-</script>
-</body>
-</html>
+const amount=document.getElementById('amount'),basis=document.getElementById('basis'),result=document.getElementById('result');
+function calculate(){const a=Number(amount.value),b=Number(basis.value);if(!Number.isFinite(a)||a<0||!b){result.textContent='Enter a valid non-negative amount.';return}result.textContent='₹'+a.toLocaleString('en-IN',{maximumFractionDigits:2})+' represents '+(a/b*100).toFixed(2)+'% of ₹'+b.toLocaleString('en-IN')+'.'}
+amount.addEventListener('input',calculate);basis.addEventListener('change',calculate);calculate();
+</script></body></html>
