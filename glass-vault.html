@@ -42,13 +42,13 @@ const vault=new THREE.Group();scene.add(vault);
 // Thick, physically shaded crystal shell with studio reflections and visible edge highlights.
 const shellGeo=new THREE.SphereGeometry(2.05,64,48);
 const glass=new THREE.Mesh(shellGeo,new THREE.MeshPhysicalMaterial({
- color:0xcbd8e8,metalness:0.28,roughness:.035,transmission:.78,thickness:.16,ior:1.52,
- envMapIntensity:4.2,clearcoat:1,clearcoatRoughness:.012,
- attenuationColor:0xb9cbe0,attenuationDistance:7,side:THREE.DoubleSide
+ color:0xffffff,metalness:0,roughness:.022,transmission:1,thickness:.035,ior:1.49,
+ envMapIntensity:.65,clearcoat:.18,clearcoatRoughness:.025,
+ attenuationColor:0xffffff,attenuationDistance:100,side:THREE.DoubleSide
 }));vault.add(glass);
-// Neutral-white acrylic edge reflections: clear centre, polished thick rim.
-const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,64,48),new THREE.MeshBasicMaterial({color:0xdceeff,side:THREE.BackSide,transparent:true,opacity:.012,depthWrite:false}));vault.add(innerRim);
-const edge=new THREE.Mesh(new THREE.SphereGeometry(2.058,64,48),new THREE.MeshBasicMaterial({color:0xb9d9f5,wireframe:true,transparent:true,opacity:.012}));vault.add(edge);
+// Very subtle acrylic edge only: keep the full sphere transparent from every viewing angle.
+const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,64,48),new THREE.MeshBasicMaterial({color:0xeaf6ff,side:THREE.BackSide,transparent:true,opacity:.004,depthWrite:false}));vault.add(innerRim);
+const edge=new THREE.Mesh(new THREE.SphereGeometry(2.058,64,48),new THREE.MeshBasicMaterial({color:0xc9e6ff,wireframe:true,transparent:true,opacity:.006,depthWrite:false}));vault.add(edge);
 const arc=new THREE.Mesh(new THREE.TorusGeometry(1.985,.012,8,160,Math.PI*.72),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.88}));arc.position.set(-.1,.08,.24);arc.rotation.set(.45,.2,-.5);vault.add(arc);
 const glint=new THREE.Mesh(new THREE.TorusGeometry(2.005,.006,6,140,Math.PI*.26),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.9}));glint.position.set(.04,-.02,.18);glint.rotation.set(1.1,.4,.8);vault.add(glint);
 const world=new CANNON.World({gravity:new CANNON.Vec3(0,-3.6,0)});world.broadphase=new CANNON.NaiveBroadphase();world.solver.iterations=10;world.defaultContactMaterial.friction=.24;world.defaultContactMaterial.restitution=.62;
