@@ -18,7 +18,7 @@ button.secondary{background:#12243a;color:#ffe2a0;border-color:#496384}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{border:1px solid #405875;border-radius:13px;background:#09182a;padding:14px}.stat small{display:block;color:var(--muted);font-size:11px}.stat strong{font-size:25px;color:var(--gold)}
 .entry{border:1px solid #344d6c;border-radius:12px;background:#09182a;padding:13px;margin:10px 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.entry strong{color:#ffe2a0}.pill{font-size:11px;padding:4px 8px;border:1px solid #58708c;border-radius:20px;text-transform:uppercase}.warning{border-left:3px solid var(--gold);padding:10px 12px;background:#261f12;color:#f7dfaa;font-size:12px;line-height:1.55}
 @media(max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
-</style>
+.request{border:1px solid #344d6c;border-radius:12px;background:#09182a;padding:13px;margin:10px 0}.request strong{color:#ffe2a0}.request a{color:#ffe2a0}.request button{margin:8px 8px 0 0;padding:8px 11px}.request .msg{white-space:pre-wrap;overflow-wrap:anywhere;color:#c5d2e2;font-size:13px;margin-top:8px}</style>
 </head>
 <body><main>
 <div class="top"><div class="brand">QZIX CIRCULAR · ADMIN</div><a class="link" href="index.html">Back to Website</a></div>
@@ -36,11 +36,11 @@ button.secondary{background:#12243a;color:#ffe2a0;border-color:#496384}
 <div class="stats">
 <div class="stat"><small>Pending</small><strong id="pendingCount">0</strong></div>
 <div class="stat"><small>Confirmed</small><strong id="confirmedCount">0</strong></div>
-<div class="stat"><small>Rejected</small><strong id="rejectedCount">0</strong></div>
+<div class="stat"><small>Rejected</small><strong id="rejectedCount">0</strong></div><div class="stat"><small>New Info Requests</small><strong id="newRequestCount">0</strong></div>
 </div>
 <button id="notifyBtn">Enable Browser Notifications</button><button class="secondary" id="refreshBtn">Refresh Now</button>
 <p id="status" class="muted" aria-live="polite">Connecting…</p>
-<div id="entries"></div>
+<h2 style="color:#ffe2a0;margin:24px 0 8px">Project Information Requests</h2><p class="muted">These are contact requests only. They are not orders, purchases or payment confirmations.</p><div id="requests"></div><h2 style="color:#ffe2a0;margin:24px 0 8px">Circular Records</h2><div id="entries"></div>
 <div class="warning">Important: This monitor reads the existing admin-controlled circular entry table. It does not receive customer buy requests, collect payments, or send Gmail alerts. The public BUY button is still Coming Soon. Do not treat these records as purchases or financial entitlements.</div>
 </section>
 </main>
@@ -77,14 +77,27 @@ async function loadEntries(){
  $('entries').innerHTML=rows.length?rows.map(x=>'<div class="entry"><div><strong>Entry #'+x.id+'</strong><div class="muted">₹'+Number(x.amount).toLocaleString('en-IN')+' · '+new Date(x.created_at).toLocaleString('en-IN')+'</div></div><span class="pill">'+x.status+'</span></div>').join(''):'<p class="muted">No circular records found yet.</p>';
  $('status').textContent='Last checked: '+new Date().toLocaleTimeString('en-IN')+' · Auto-refresh every 30 seconds.';
 }
+function safeText(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+async function loadRequests(){
+ const r=await fetch(SUPABASE_URL+'/rest/v1/qzix_interest_requests?select=id,name,email,message,status,created_at&order=created_at.desc&limit=100',{headers:headers()});
+ if(!r.ok)throw new Error('Could not load information requests. Check admin access.');
+ const rows=await r.json();$('newRequestCount').textContent=rows.filter(x=>x.status==='new').length;
+ $('requests').innerHTML=rows.length?rows.map(x=>'<div class="request"><div><strong>Request #'+safeText(x.id)+' · '+safeText(x.name)+'</strong> <span class="pill">'+safeText(x.status)+'</span></div><div class="muted">'+safeText(x.email)+' · '+new Date(x.created_at).toLocaleString('en-IN')+'</div><div class="msg">'+safeText(x.message||'No message provided')+'</div>'+(x.status==='new'?'<button data-review="'+safeText(x.id)+'">Mark Reviewed</button>':'')+'</div>').join(''):'<p class="muted">No information requests received yet.</p>';
+}
+$('requests').addEventListener('click',async e=>{
+ const b=e.target.closest('[data-review]');if(!b)return;b.disabled=true;
+ try{const r=await fetch(SUPABASE_URL+'/rest/v1/qzix_interest_requests?id=eq.'+encodeURIComponent(b.dataset.review),{method:'PATCH',headers:{...headers(),Prefer:'return=minimal'},body:JSON.stringify({status:'reviewed'})});if(!r.ok)throw new Error('Could not update request status.');await loadRequests();}
+ catch(err){$('status').textContent=err.message;b.disabled=false;}
+});
+async function refreshAll(){await Promise.all([loadEntries(),loadRequests()]);}
 async function startDashboard(){
  $('loginPanel').classList.add('hidden');$('dashboard').classList.remove('hidden');
- try{await loadEntries();if(pollHandle)clearInterval(pollHandle);pollHandle=setInterval(()=>loadEntries().catch(e=>$('status').textContent=e.message),30000);}
+ try{await refreshAll();if(pollHandle)clearInterval(pollHandle);pollHandle=setInterval(()=>refreshAll().catch(e=>$('status').textContent=e.message),30000);}
  catch(e){$('status').textContent=e.message;}
 }
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();message('Signing in…');try{await login($('email').value.trim(),$('password').value);await startDashboard();}catch(err){message(err.message,'error');}});
 $('notifyBtn').addEventListener('click',async()=>{if(!('Notification'in window)){$('status').textContent='Browser notifications are not supported on this device.';return;}const p=await Notification.requestPermission();$('status').textContent=p==='granted'?'Browser notifications enabled while this page is open.':'Notifications were not enabled.';});
-$('refreshBtn').addEventListener('click',()=>loadEntries().catch(e=>$('status').textContent=e.message));
+$('refreshBtn').addEventListener('click',()=>refreshAll().catch(e=>$('status').textContent=e.message));
 $('logoutBtn').addEventListener('click',()=>{if(pollHandle)clearInterval(pollHandle);sessionStorage.removeItem('qzix_admin_token');sessionStorage.removeItem('qzix_admin_user');accessToken='';userId='';knownIds=null;$('dashboard').classList.add('hidden');$('loginPanel').classList.remove('hidden');message('You have logged out.');});
 const saved=sessionStorage.getItem('qzix_admin_token'),savedUser=sessionStorage.getItem('qzix_admin_user');
 if(saved&&savedUser){accessToken=saved;userId=savedUser;startDashboard().catch(e=>message(e.message,'error'));}
