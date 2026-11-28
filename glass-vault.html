@@ -55,7 +55,8 @@ const world=new CANNON.World({gravity:new CANNON.Vec3(0,-3.6,0)});world.broadpha
 const radius=1.78,wallCount=24;
 for(let i=0;i<wallCount;i++){const a=i/wallCount*Math.PI*2,mid=a+Math.PI/wallCount;const b=new CANNON.Body({mass:0});b.addShape(new CANNON.Box(new CANNON.Vec3(.14,.12,1.65)));b.position.set(Math.cos(mid)*radius,Math.sin(mid)*radius,0);b.quaternion.setFromEuler(0,0,mid+Math.PI/2);world.addBody(b)}
 for(const z of [-1.55,1.55]){const b=new CANNON.Body({mass:0});b.addShape(new CANNON.Plane());b.position.z=z;b.quaternion.setFromEuler(z<0?Math.PI/2:-Math.PI/2,0,0);world.addBody(b)}
-// Illustrative note slips begin in a compact bottom-up pile, like paper notes in a real money box.\nconst values=[10,20,15,25,5,25], meshes=[], bodies=[];
+// Illustrative note slips begin in a compact bottom-up pile, like paper notes in a real money box.
+const values=[10,20,15,25,5,25], meshes=[], bodies=[];
 function texture(pct,i){
  const c=document.createElement('canvas');c.width=768;c.height=384;const x=c.getContext('2d');
  const palettes=[['#ffe36e','#f6a800'],['#73e6ff','#087bd6'],['#ff9cba','#e93478'],['#c9a2ff','#7138c8'],['#75f0c4','#079b83'],['#ffbd83','#e85a36']];
