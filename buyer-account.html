@@ -5,12 +5,13 @@
 </style></head><body><main>
 <header class="top"><b style="color:#ffe2a0;letter-spacing:1px">QZIX CIRCULAR · BUYER ACCOUNT</b><a href="./">← Dashboard</a></header>
 <section class="hero"><span class="pill">ACCOUNT PREVIEW · NOT ACTIVE</span><h1>My Circular Account</h1><p class="muted">This is a preview of the proposed buyer record. No purchase has been made or verified, and no financial balance, profit or payout is available.</p></section>
+<section class="panel" id="loginPanel"><h2>Secure Gmail Login</h2><p class="muted">Use your existing verified QZIX email account. This page does not offer public signup or collect payments.</p><form id="accountLoginForm"><label for="accountEmail" class="muted">Email address</label><input id="accountEmail" type="email" autocomplete="username" required placeholder="Your registered Gmail address" style="width:100%;padding:12px;border-radius:9px;border:1px solid #405875;background:#091628;color:#fff;margin:6px 0 12px"><label for="accountPassword" class="muted">Password</label><input id="accountPassword" type="password" autocomplete="current-password" required placeholder="QZIX account password" style="width:100%;padding:12px;border-radius:9px;border:1px solid #405875;background:#091628;color:#fff;margin:6px 0 12px"><button id="accountLoginButton" type="submit" style="padding:12px 16px;border:0;border-radius:9px;background:#f5c66d;color:#172238;font-weight:900">LOGIN WITH EMAIL</button></form><p id="accountAuthStatus" class="muted" role="status">Not signed in. No payment or purchase action is available here.</p><div id="accountSession" hidden><div class="rule">Signed in as <b id="signedInEmail"></b><br>Buyer Profile ID: <b id="signedInBuyerId"></b></div><button id="accountLogoutButton" type="button" style="padding:10px 14px;border:1px solid #806b3e;border-radius:9px;background:transparent;color:#ffe2a0;font-weight:800">SIGN OUT</button></div></section>
 <section class="panel"><h2>Buyer Record</h2><div class="grid">
-<div class="item"><small>Buyer ID</small><b>Not assigned</b></div>
-<div class="item"><small>Total circular share</small><b>0% recorded</b></div>
-<div class="item"><small>Verified purchase amount</small><b>₹0</b></div>
-<div class="item"><small>Priority across all levels</small><b>Not assigned</b></div>
-<div class="item"><small>Purchase date & time</small><b>—</b></div>
+<div class="item"><small>Buyer Profile ID</small><b id="buyerProfileId">Login required</b></div>
+<div class="item"><small>Verified circular share</small><b>Not recorded</b></div>
+<div class="item"><small>Verified purchase amount</small><b>Not available</b></div>
+<div class="item"><small>All-level priority</small><b>Not assigned</b></div>
+<div class="item"><small>Verified purchase date & time</small><b>Not recorded</b></div>
 <div class="item"><small>Verified level(s)</small><b>None</b></div>
 </div></section>
 <section class="panel"><h2>All-Level Priority Register — Proposed Rule</h2>
@@ -23,5 +24,42 @@
 <div class="item"><small>Purchase / payment</small><b>OFF</b></div><div class="item"><small>Profit / payout</small><b>OFF</b></div>
 <div class="item"><small>Resale / withdrawal</small><b>OFF</b></div><div class="item"><small>Account data</small><b>Preview only</b></div>
 </div><p class="muted">This page does not collect money, accept purchase requests, connect to a payment app, create ownership, or calculate payable profit. A real buyer register and any payout arrangement must first be reviewed and approved by qualified legal, tax and financial professionals.</p></section>
-<footer>QZIX CIRCULAR · Informational preview only · No profit is guaranteed</footer>
+<footer>QZIX CIRCULAR · Profile login only · Payments and payouts remain OFF</footer>
+<script>
+(()=> {
+const URL='https://rxjrsbkqytovjqnijqek.supabase.co';
+const KEY='sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q';
+const form=document.getElementById('accountLoginForm'), email=document.getElementById('accountEmail'), password=document.getElementById('accountPassword');
+const status=document.getElementById('accountAuthStatus'), btn=document.getElementById('accountLoginButton'), session=document.getElementById('accountSession');
+const headers=token=>({'apikey':KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json'});
+function show(message){status.textContent=message;}
+function display(user,profile){document.getElementById('signedInEmail').textContent=user.email||'Verified account';document.getElementById('signedInBuyerId').textContent=profile.public_id;document.getElementById('buyerProfileId').textContent=profile.public_id;session.hidden=false;form.hidden=true;show('Signed in. This is an identity profile only; no circular purchase or payout records exist.');}
+async function loadProfile(token,user){
+ const p=await fetch(URL+'/rest/v1/qzix_v2_profiles?select=public_id,display_name,created_at&user_id=eq.'+encodeURIComponent(user.id),{headers:headers(token)});
+ if(!p.ok)throw new Error('Could not load your profile. Please try again.');
+ let rows=await p.json();
+ if(!rows.length){
+  const publicId='QZ-'+user.id.replace(/-/g,'').slice(0,10).toUpperCase();
+  const displayName=(user.email||'QZIX Buyer').split('@')[0].slice(0,60)||'QZIX Buyer';
+  const save=await fetch(URL+'/rest/v1/rpc/qzix_save_profile',{method:'POST',headers:headers(token),body:JSON.stringify({p_public_id:publicId,p_display_name:displayName})});
+  if(!save.ok)throw new Error('Profile setup could not be completed. Please contact QZIX support.');
+  rows=[{public_id:publicId,display_name:displayName}];
+ }
+ display(user,rows[0]);
+}
+form.addEventListener('submit',async e=>{
+ e.preventDefault();btn.disabled=true;btn.textContent='CHECKING…';show('Checking your email login…');
+ try{
+  const response=await fetch(URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':KEY,'Content-Type':'application/json'},body:JSON.stringify({email:email.value.trim().toLowerCase(),password:password.value})});
+  const data=await response.json();if(!response.ok)throw new Error(data.msg||data.message||'Login failed. Check your email and password.');
+  sessionStorage.setItem('qzix_buyer_access_token',data.access_token);
+  await loadProfile(data.access_token,data.user);password.value='';
+ }catch(err){sessionStorage.removeItem('qzix_buyer_access_token');show(err.message||'Login could not be completed.');}
+ finally{btn.disabled=false;btn.textContent='LOGIN WITH EMAIL';}
+});
+document.getElementById('accountLogoutButton').addEventListener('click',()=>{sessionStorage.removeItem('qzix_buyer_access_token');session.hidden=true;form.hidden=false;password.value='';document.getElementById('buyerProfileId').textContent='Login required';show('Signed out.');});
+const saved=sessionStorage.getItem('qzix_buyer_access_token');
+if(saved){fetch(URL+'/auth/v1/user',{headers:headers(saved)}).then(r=>r.ok?r.json():Promise.reject()).then(user=>loadProfile(saved,user)).catch(()=>{sessionStorage.removeItem('qzix_buyer_access_token');show('Please sign in again.');});}
+})();
+</script>
 </main></body></html>
