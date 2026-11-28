@@ -8,7 +8,7 @@
 <style>
 :root{color-scheme:dark;--bg:#060d19;--panel:#101d31;--line:#314764;--muted:#a9bad0;--gold:#f5c66d;--text:#f4f7ff}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1b3556,#060d19 65%);color:var(--text);font:15px system-ui,sans-serif;overflow-x:hidden}
-main{max-width:850px;margin:auto;padding:22px 15px 48px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}.brand{font-weight:900;letter-spacing:1.5px;color:#ffe2a0}.back{color:#ffe2a0;text-decoration:none;border:1px solid #806b3e;border-radius:10px;padding:9px 12px;font-weight:700}
+main{max-width:850px;margin:auto;padding:22px 15px 48px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}.brand{font-weight:900;letter-spacing:1.5px;color:#ffe2a0}.back{color:#ffe2a0;text-decoration:none;border:1px solid #806b3e;border-radius:10px;padding:9px 12px;font-weight:700}.upi-open{display:inline-block;margin-top:14px;padding:12px 16px;border-radius:10px;background:linear-gradient(135deg,#f5c66d,#c58b32);border:1px solid #ffe2a0;color:#172238;text-decoration:none;font-size:12px;font-weight:900;letter-spacing:.3px}
 .hero,.panel{border:1px solid var(--line);border-radius:19px;background:linear-gradient(145deg,#142b46,#0b192b);padding:22px;margin:14px 0;box-shadow:0 12px 30px #0004}
 .kicker{color:var(--gold);font-size:11px;font-weight:900;letter-spacing:2px}.hero h1{font-size:clamp(27px,6vw,40px);margin:9px 0}.muted{color:var(--muted);line-height:1.65;font-size:13px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.stat{padding:15px;border:1px solid #465d79;border-radius:14px;background:#0a1729}.stat small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px}.stat strong{display:block;color:var(--gold);font-size:25px;margin-top:6px}
@@ -23,7 +23,7 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 </head>
 <body><main>
 <header class="top"><div class="brand">QZIX CIRCULAR SYSTEM</div><a class="back" href="./">← Dashboard</a></header>
-<section class="hero"><div class="kicker">SIMPLE · STRUCTURED · TRANSPARENT</div><h1>QZIX CIRCULAR</h1><p class="muted">Explore arithmetic examples only. This page does not display live prices, request money, create a financial interest or confirm participation. No payments or participation are enabled.</p></section>
+<section class="hero"><div class="kicker">SIMPLE · STRUCTURED · TRANSPARENT</div><h1>QZIX CIRCULAR</h1><p class="muted">Explore arithmetic examples only. This page does not display live prices, request money, create a financial interest or confirm participation. No payments or participation are enabled.</p><a class="upi-open" id="upiOpenButton" href="upi://pay" aria-label="Open an installed UPI app without payment details">OPEN UPI APPS · NO PAYMENT</a><p class="muted">UPI app launch test only. No payee, amount or payment request is attached. Do not send money. Available apps and chooser behaviour depend on your phone.</p></section>
 <section class="stats" aria-label="Illustrative calculation examples">
 <div class="stat"><small>Example A · Not a price</small><strong>₹20 · 1%</strong></div>
 <div class="stat"><small>Example B · Not a price</small><strong>₹40 · 1%</strong></div>
