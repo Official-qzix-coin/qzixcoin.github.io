@@ -48,7 +48,7 @@ button.secondary{background:#12243a;color:#ffe2a0;border-color:#496384}
 (()=>{
 const SUPABASE_URL='https://rxjrsbkqytovjqnijqek.supabase.co';
 const SUPABASE_KEY='sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q';
-let accessToken='',userId='',pollHandle=null,knownIds=null;
+let accessToken='',userId='',pollHandle=null,knownIds=null,knownRequestIds=null;
 const $=id=>document.getElementById(id);
 const headers=()=>({'apikey':SUPABASE_KEY,'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'});
 function message(text,cls='muted'){ $('loginMessage').className=cls; $('loginMessage').textContent=text; }
@@ -82,6 +82,8 @@ async function loadRequests(){
  const r=await fetch(SUPABASE_URL+'/rest/v1/qzix_interest_requests?select=id,name,email,message,status,created_at&order=created_at.desc&limit=100',{headers:headers()});
  if(!r.ok)throw new Error('Could not load information requests. Check admin access.');
  const rows=await r.json();$('newRequestCount').textContent=rows.filter(x=>x.status==='new').length;
+ if(knownRequestIds!==null){const fresh=rows.filter(x=>!knownRequestIds.has(String(x.id))&&x.status==='new');if(fresh.length&&'Notification'in window&&Notification.permission==='granted'){new Notification('QZIX · New information request',{body:fresh.length+' new project information request(s). Open the Admin Monitor.'});}}
+ knownRequestIds=new Set(rows.map(x=>String(x.id)));
  $('requests').innerHTML=rows.length?rows.map(x=>'<div class="request"><div><strong>Request #'+safeText(x.id)+' · '+safeText(x.name)+'</strong> <span class="pill">'+safeText(x.status)+'</span></div><div class="muted">'+safeText(x.email)+' · '+new Date(x.created_at).toLocaleString('en-IN')+'</div><div class="msg">'+safeText(x.message||'No message provided')+'</div>'+(x.status==='new'?'<button data-review="'+safeText(x.id)+'">Mark Reviewed</button>':'')+'</div>').join(''):'<p class="muted">No information requests received yet.</p>';
 }
 $('requests').addEventListener('click',async e=>{
@@ -98,7 +100,7 @@ async function startDashboard(){
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();message('Signing in…');try{await login($('email').value.trim(),$('password').value);await startDashboard();}catch(err){message(err.message,'error');}});
 $('notifyBtn').addEventListener('click',async()=>{if(!('Notification'in window)){$('status').textContent='Browser notifications are not supported on this device.';return;}const p=await Notification.requestPermission();$('status').textContent=p==='granted'?'Browser notifications enabled while this page is open.':'Notifications were not enabled.';});
 $('refreshBtn').addEventListener('click',()=>refreshAll().catch(e=>$('status').textContent=e.message));
-$('logoutBtn').addEventListener('click',()=>{if(pollHandle)clearInterval(pollHandle);sessionStorage.removeItem('qzix_admin_token');sessionStorage.removeItem('qzix_admin_user');accessToken='';userId='';knownIds=null;$('dashboard').classList.add('hidden');$('loginPanel').classList.remove('hidden');message('You have logged out.');});
+$('logoutBtn').addEventListener('click',()=>{if(pollHandle)clearInterval(pollHandle);sessionStorage.removeItem('qzix_admin_token');sessionStorage.removeItem('qzix_admin_user');accessToken='';userId='';knownIds=null;knownRequestIds=null;$('dashboard').classList.add('hidden');$('loginPanel').classList.remove('hidden');message('You have logged out.');});
 const saved=sessionStorage.getItem('qzix_admin_token'),savedUser=sessionStorage.getItem('qzix_admin_user');
 if(saved&&savedUser){accessToken=saved;userId=savedUser;startDashboard().catch(e=>message(e.message,'error'));}
 })();
