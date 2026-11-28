@@ -42,13 +42,13 @@ const vault=new THREE.Group();scene.add(vault);
 // Thick, physically shaded crystal shell with studio reflections and visible edge highlights.
 const shellGeo=new THREE.SphereGeometry(2.05,64,48);
 const glass=new THREE.Mesh(shellGeo,new THREE.MeshPhysicalMaterial({
- color:0xffffff,metalness:0,roughness:.022,transmission:1,thickness:.035,ior:1.49,
- envMapIntensity:.65,clearcoat:.18,clearcoatRoughness:.025,
- attenuationColor:0xffffff,attenuationDistance:100,side:THREE.DoubleSide
+ color:0xffffff,metalness:0,roughness:.008,transmission:1,thickness:.006,ior:1.46,
+ envMapIntensity:.22,clearcoat:.04,clearcoatRoughness:.08,
+ attenuationColor:0xffffff,attenuationDistance:1000,side:THREE.DoubleSide
 }));vault.add(glass);
 // Very subtle acrylic edge only: keep the full sphere transparent from every viewing angle.
-const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,64,48),new THREE.MeshBasicMaterial({color:0xeaf6ff,side:THREE.BackSide,transparent:true,opacity:.004,depthWrite:false}));vault.add(innerRim);
-const edge=new THREE.Mesh(new THREE.SphereGeometry(2.058,64,48),new THREE.MeshBasicMaterial({color:0xc9e6ff,wireframe:true,transparent:true,opacity:.006,depthWrite:false}));vault.add(edge);
+const innerRim=new THREE.Mesh(new THREE.SphereGeometry(2.018,64,48),new THREE.MeshBasicMaterial({color:0xeaf6ff,side:THREE.BackSide,transparent:true,opacity:.012,depthWrite:false}));vault.add(innerRim);
+const edge=new THREE.Mesh(new THREE.SphereGeometry(2.058,64,48),new THREE.MeshBasicMaterial({color:0xc9e6ff,wireframe:true,transparent:true,opacity:.018,depthWrite:false}));vault.add(edge);
 const arc=new THREE.Mesh(new THREE.TorusGeometry(1.985,.012,8,160,Math.PI*.72),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.88}));arc.position.set(-.1,.08,.24);arc.rotation.set(.45,.2,-.5);vault.add(arc);
 const glint=new THREE.Mesh(new THREE.TorusGeometry(2.005,.006,6,140,Math.PI*.26),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.9}));glint.position.set(.04,-.02,.18);glint.rotation.set(1.1,.4,.8);vault.add(glint);
 const world=new CANNON.World({gravity:new CANNON.Vec3(0,-3.6,0)});world.broadphase=new CANNON.NaiveBroadphase();world.solver.iterations=10;world.defaultContactMaterial.friction=.24;world.defaultContactMaterial.restitution=.62;
@@ -68,7 +68,7 @@ function texture(pct,i){
  x.strokeStyle='rgba(20,35,65,.42)';x.lineWidth=3;x.strokeRect(30,30,708,324);
  // Draw ONLY the percentage in the centre: no side labels or footer text.
  x.save();x.textAlign='center';x.textBaseline='middle';x.lineJoin='round';
- let fontSize=250;
+ let fontSize=285;
  x.font='1000 '+fontSize+'px system-ui,Arial';
  while(x.measureText(pct+'%').width>690 && fontSize>100){fontSize-=5;x.font='1000 '+fontSize+'px system-ui,Arial';}
  x.lineWidth=10;x.strokeStyle='rgba(255,255,255,.98)';
@@ -78,7 +78,7 @@ function texture(pct,i){
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t
 }
 values.forEach((pct,i)=>{
- const w=.94,h=.47,d=.075;
+ const w=1.12,h=.56,d=.075;
  const group=new THREE.Group();
  const base=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:0xc6b98d,roughness:.72,metalness:.08}));
  group.add(base);
@@ -98,9 +98,9 @@ values.forEach((pct,i)=>{
  // Keep every paper note level and facing forward; physics may move it, never tilt it.
  body.fixedRotation=true;body.angularFactor.set(0,0,0);body.updateMassProperties();
  const row=Math.floor(i/2),col=i%2;
- const x=(col===0?-.49:.49)+(row%2?-.05:.05);
- const y=-1.22+row*.50;
- const z=(row%2?-.24:.24)+(col?-.06:.06);
+ const x=(col===0?-.57:.57)+(row%2?-.035:.035);
+ const y=-1.28+row*.58;
+ const z=(row%2?-.20:.20)+(col?-.04:.04);
  body.position.set(x,y,z);
  body.velocity.set(0,0,0);
  body.angularVelocity.set(0,0,0);
@@ -128,9 +128,9 @@ shakeButton.addEventListener('click',()=>{
 resetButton.addEventListener('click',()=>{
  bodies.forEach((b,i)=>{
   const row=Math.floor(i/2),col=i%2;
-  const x=(col===0?-.49:.49)+(row%2?-.05:.05);
-  const y=-1.22+row*.50;
-  const z=(row%2?-.24:.24)+(col?-.06:.06);
+  const x=(col===0?-.57:.57)+(row%2?-.035:.035);
+  const y=-1.28+row*.58;
+  const z=(row%2?-.20:.20)+(col?-.04:.04);
   b.position.set(x,y,z);
   b.quaternion.set(0,0,0,1);
   b.velocity.set(0,0,0);
