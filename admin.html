@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071426">
+<title>QZIX CIRCULAR | Admin Monitor</title>
+<style>
+:root{color-scheme:dark;--bg:#07111f;--panel:#11233a;--line:#344d6c;--gold:#f5c66d;--muted:#b6c5d8;--text:#f4f7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1b3556,#060d19 65%);color:var(--text);font:15px system-ui,sans-serif;min-height:100vh}
+main{max-width:850px;margin:auto;padding:22px 15px 50px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.brand{font-weight:900;letter-spacing:1.5px;color:#ffe2a0}.link{color:#ffe2a0;text-decoration:none;border:1px solid #806b3e;border-radius:10px;padding:9px 12px;font-weight:700}
+.panel{border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#142b46,#0b192b);padding:20px;margin:16px 0;box-shadow:0 12px 30px #0004}
+h1{font-size:clamp(25px,5vw,36px);margin:10px 0}.muted{color:var(--muted);line-height:1.6;font-size:13px}
+label{display:block;color:var(--muted);font-size:12px;margin:13px 0 6px}
+input{width:100%;padding:13px;border-radius:10px;border:1px solid #496384;background:#071526;color:white;font:inherit}
+button{padding:12px 16px;border-radius:10px;border:1px solid #806b3e;background:linear-gradient(135deg,#ffe5a0,#d9a746);color:#172238;font-weight:900;cursor:pointer;margin:12px 8px 0 0}
+button.secondary{background:#12243a;color:#ffe2a0;border-color:#496384}
+.hidden{display:none!important}.error{color:#ffb4b4}.success{color:#9de2bb}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{border:1px solid #405875;border-radius:13px;background:#09182a;padding:14px}.stat small{display:block;color:var(--muted);font-size:11px}.stat strong{font-size:25px;color:var(--gold)}
+.entry{border:1px solid #344d6c;border-radius:12px;background:#09182a;padding:13px;margin:10px 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.entry strong{color:#ffe2a0}.pill{font-size:11px;padding:4px 8px;border:1px solid #58708c;border-radius:20px;text-transform:uppercase}.warning{border-left:3px solid var(--gold);padding:10px 12px;background:#261f12;color:#f7dfaa;font-size:12px;line-height:1.55}
+@media(max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+</style>
+</head>
+<body><main>
+<div class="top"><div class="brand">QZIX CIRCULAR · ADMIN</div><a class="link" href="index.html">Back to Website</a></div>
+<section class="panel" id="loginPanel">
+<div class="muted">SECURE ADMIN ACCESS</div><h1>Admin Login</h1>
+<p class="muted">Use the existing QZIX admin Gmail/email and password. Only accounts listed in the protected admin registry can open records.</p>
+<form id="loginForm">
+<label for="email">Admin Email</label><input id="email" type="email" autocomplete="username" required>
+<label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required>
+<button type="submit">Login Securely</button>
+</form><p id="loginMessage" class="muted" aria-live="polite"></p>
+</section>
+<section class="panel hidden" id="dashboard">
+<div class="top"><div><div class="muted">LIVE RECORD MONITOR</div><h1 style="margin-top:5px">Circular Entries</h1></div><button class="secondary" id="logoutBtn">Log Out</button></div>
+<div class="stats">
+<div class="stat"><small>Pending</small><strong id="pendingCount">0</strong></div>
+<div class="stat"><small>Confirmed</small><strong id="confirmedCount">0</strong></div>
+<div class="stat"><small>Rejected</small><strong id="rejectedCount">0</strong></div>
+</div>
+<button id="notifyBtn">Enable Browser Notifications</button><button class="secondary" id="refreshBtn">Refresh Now</button>
+<p id="status" class="muted" aria-live="polite">Connecting…</p>
+<div id="entries"></div>
+<div class="warning">Important: This monitor reads the existing admin-controlled circular entry table. It does not receive customer buy requests, collect payments, or send Gmail alerts. The public BUY button is still Coming Soon. Do not treat these records as purchases or financial entitlements.</div>
+</section>
+</main>
+<script>
+(()=>{
+const SUPABASE_URL='https://rxjrsbkqytovjqnijqek.supabase.co';
+const SUPABASE_KEY='sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q';
+let accessToken='',userId='',pollHandle=null,knownIds=null;
+const $=id=>document.getElementById(id);
+const headers=()=>({'apikey':SUPABASE_KEY,'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'});
+function message(text,cls='muted'){ $('loginMessage').className=cls; $('loginMessage').textContent=text; }
+async function login(email,password){
+ const r=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+ const data=await r.json(); if(!r.ok)throw new Error(data.msg||data.message||'Login failed. Check email and password.');
+ accessToken=data.access_token;userId=data.user.id;
+ const check=await fetch(SUPABASE_URL+'/rest/v1/qzix_v2_admins?select=user_id&user_id=eq.'+encodeURIComponent(userId),{headers:headers()});
+ if(!check.ok)throw new Error('Could not verify admin permission. Please try again.');
+ const rows=await check.json();if(!rows.length)throw new Error('This email is not listed as a QZIX admin.');
+ sessionStorage.setItem('qzix_admin_token',accessToken);sessionStorage.setItem('qzix_admin_user',userId);
+}
+async function loadEntries(){
+ const r=await fetch(SUPABASE_URL+'/rest/v1/qzix_circular_entries?select=id,amount,status,created_at,confirmed_at&order=created_at.desc&limit=100',{headers:headers()});
+ if(!r.ok)throw new Error('Could not load records. Your admin session may have expired.');
+ const rows=await r.json();
+ const pending=rows.filter(x=>x.status==='pending').length;
+ $('pendingCount').textContent=pending;$('confirmedCount').textContent=rows.filter(x=>x.status==='confirmed').length;$('rejectedCount').textContent=rows.filter(x=>x.status==='rejected').length;
+ if(knownIds!==null){
+  const fresh=rows.filter(x=>!knownIds.has(String(x.id))&&x.status==='pending');
+  if(fresh.length&&'Notification'in window&&Notification.permission==='granted'){
+   new Notification('QZIX CIRCULAR · New pending record',{body:fresh.length+' new pending circular record(s). Open Admin Monitor to review.'});
+  }
+ }
+ knownIds=new Set(rows.map(x=>String(x.id)));
+ $('entries').innerHTML=rows.length?rows.map(x=>'<div class="entry"><div><strong>Entry #'+x.id+'</strong><div class="muted">₹'+Number(x.amount).toLocaleString('en-IN')+' · '+new Date(x.created_at).toLocaleString('en-IN')+'</div></div><span class="pill">'+x.status+'</span></div>').join(''):'<p class="muted">No circular records found yet.</p>';
+ $('status').textContent='Last checked: '+new Date().toLocaleTimeString('en-IN')+' · Auto-refresh every 30 seconds.';
+}
+async function startDashboard(){
+ $('loginPanel').classList.add('hidden');$('dashboard').classList.remove('hidden');
+ try{await loadEntries();if(pollHandle)clearInterval(pollHandle);pollHandle=setInterval(()=>loadEntries().catch(e=>$('status').textContent=e.message),30000);}
+ catch(e){$('status').textContent=e.message;}
+}
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();message('Signing in…');try{await login($('email').value.trim(),$('password').value);await startDashboard();}catch(err){message(err.message,'error');}});
+$('notifyBtn').addEventListener('click',async()=>{if(!('Notification'in window)){$('status').textContent='Browser notifications are not supported on this device.';return;}const p=await Notification.requestPermission();$('status').textContent=p==='granted'?'Browser notifications enabled while this page is open.':'Notifications were not enabled.';});
+$('refreshBtn').addEventListener('click',()=>loadEntries().catch(e=>$('status').textContent=e.message));
+$('logoutBtn').addEventListener('click',()=>{if(pollHandle)clearInterval(pollHandle);sessionStorage.removeItem('qzix_admin_token');sessionStorage.removeItem('qzix_admin_user');accessToken='';userId='';knownIds=null;$('dashboard').classList.add('hidden');$('loginPanel').classList.remove('hidden');message('You have logged out.');});
+const saved=sessionStorage.getItem('qzix_admin_token'),savedUser=sessionStorage.getItem('qzix_admin_user');
+if(saved&&savedUser){accessToken=saved;userId=savedUser;startDashboard().catch(e=>message(e.message,'error'));}
+})();
+</script>
+</body></html>
