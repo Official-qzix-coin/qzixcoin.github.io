@@ -93,16 +93,19 @@ values.forEach((pct,i)=>{
  backFace.rotation.y=Math.PI;
  group.add(backFace);
  vault.add(group);meshes.push(group);
- const body=new CANNON.Body({mass:.42,linearDamping:.035,angularDamping:.055});
+ const body=new CANNON.Body({mass:.42,linearDamping:.12,angularDamping:1});
  body.addShape(new CANNON.Box(new CANNON.Vec3(w/2,h/2,d/2)));
+ // Keep every paper note level and facing forward; physics may move it, never tilt it.
+ body.fixedRotation=true;body.angularFactor.set(0,0,0);body.updateMassProperties();
  const row=Math.floor(i/2),col=i%2;
  const x=(col===0?-.49:.49)+(row%2?-.05:.05);
  const y=-1.22+row*.50;
  const z=(row%2?-.24:.24)+(col?-.06:.06);
  body.position.set(x,y,z);
- body.velocity.set((col?-.08:.08),-.06,(row%2?.04:-.04));
- body.angularVelocity.set(.025*(i+1),.018*(i-2),col?.025:-.025);
- body.updateMassProperties();world.addBody(body);bodies.push(body);
+ body.velocity.set(0,0,0);
+ body.angularVelocity.set(0,0,0);
+ body.quaternion.set(0,0,0,1);
+ world.addBody(body);bodies.push(body);
 });
 const orbit=new OrbitControls(camera,renderer.domElement);orbit.enablePan=false;orbit.enableZoom=false;orbit.enableDamping=true;orbit.dampingFactor=.07;orbit.rotateSpeed=.65;renderer.domElement.style.touchAction="pan-y";
 let automatic=true,last=performance.now(),acc=0,raf=0,visible=true,lastFrame=0;
@@ -130,9 +133,9 @@ resetButton.addEventListener('click',()=>{
   const y=-1.22+row*.50;
   const z=(row%2?-.24:.24)+(col?-.06:.06);
   b.position.set(x,y,z);
-  b.quaternion.setFromEuler(0,0,(col?-.025:.025));
-  b.velocity.set((col?-.08:.08),-.06,(row%2?.04:-.04));
-  b.angularVelocity.set(.025*(i+1),.018*(i-2),col?.025:-.025);
+  b.quaternion.set(0,0,0,1);
+  b.velocity.set(0,0,0);
+  b.angularVelocity.set(0,0,0);
   b.force.set(0,0,0);b.torque.set(0,0,0);b.wakeUp();
  });
 });
