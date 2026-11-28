@@ -6,6 +6,24 @@
 <header class="top"><b style="color:#ffe2a0;letter-spacing:1px">QZIX CIRCULAR · BUYER ACCOUNT</b><a href="./">← Dashboard</a></header>
 <section class="hero"><span class="pill">ACCOUNT PREVIEW · NOT ACTIVE</span><h1>My Circular Account</h1><p class="muted">This is a preview of the proposed buyer record. No purchase has been made or verified, and no financial balance, profit or payout is available.</p></section>
 <section class="panel" id="loginPanel"><h2>Secure Gmail Login</h2><p class="muted">Use your existing verified QZIX email account. This page does not offer public signup or collect payments.</p><form id="accountLoginForm"><label for="accountEmail" class="muted">Email address</label><input id="accountEmail" type="email" autocomplete="username" required placeholder="Your registered Gmail address" style="width:100%;padding:12px;border-radius:9px;border:1px solid #405875;background:#091628;color:#fff;margin:6px 0 12px"><label for="accountPassword" class="muted">Password</label><input id="accountPassword" type="password" autocomplete="current-password" required placeholder="QZIX account password" style="width:100%;padding:12px;border-radius:9px;border:1px solid #405875;background:#091628;color:#fff;margin:6px 0 12px"><button id="accountLoginButton" type="submit" style="padding:12px 16px;border:0;border-radius:9px;background:#f5c66d;color:#172238;font-weight:900">LOGIN WITH EMAIL</button></form><p id="accountAuthStatus" class="muted" role="status">Not signed in. No payment or purchase action is available here.</p><div id="accountSession" hidden><div class="rule">Signed in as <b id="signedInEmail"></b><br>Buyer Profile ID: <b id="signedInBuyerId"></b></div><button id="accountLogoutButton" type="button" style="padding:10px 14px;border:1px solid #806b3e;border-radius:9px;background:transparent;color:#ffe2a0;font-weight:800">SIGN OUT</button></div></section>
+<section class="panel" id="demoWorkspace" hidden>
+<h2>Demo Share Register · TEST ONLY</h2>
+<p class="muted">Add sample entries to test the account, shared all-level priority order and audit history. These figures are illustrative only. They are not purchases, money received, ownership, balances or payout entitlements.</p>
+<form id="demoRecordForm">
+<label class="muted" for="demoLevel">Demo level / label</label>
+<input id="demoLevel" maxlength="60" required placeholder="Example: Level A" style="width:100%;padding:12px;border-radius:9px;border:1px solid #405875;background:#091628;color:#fff;margin:6px 0 12px">
+<label class="muted" for="demoShare">Illustrative share percentage (0–100)</label>
+<input id="demoShare" type="number" min="0.0001" max="100" step="0.0001" required placeholder="Example: 2" style="width:100%;padding:12px;border-radius:9px;border:1px solid #405875;background:#091628;color:#fff;margin:6px 0 12px">
+<label class="muted" for="demoAmount">Illustrative amount (₹) · sample only</label>
+<input id="demoAmount" type="number" min="0" max="10000000" step="0.01" value="0" required style="width:100%;padding:12px;border-radius:9px;border:1px solid #405875;background:#091628;color:#fff;margin:6px 0 12px">
+<button id="demoAddButton" type="submit" style="padding:12px 16px;border:0;border-radius:9px;background:#f5c66d;color:#172238;font-weight:900">ADD DEMO ENTRY</button>
+</form>
+<p id="demoStatus" class="muted" role="status">Sign in to use the demo register.</p>
+<h2 style="margin-top:18px">Your Demo Records & All-Level Priority</h2>
+<div id="demoRecordsList" class="muted">No demo entries loaded.</div>
+<h2 style="margin-top:18px">Audit History</h2>
+<div id="demoAuditList" class="muted">No audit entries loaded.</div>
+</section>
 <section class="panel"><h2>Buyer Record</h2><div class="grid">
 <div class="item"><small>Buyer Profile ID</small><b id="buyerProfileId">Login required</b></div>
 <div class="item"><small>Verified circular share</small><b>Not recorded</b></div>
@@ -33,7 +51,37 @@ const form=document.getElementById('accountLoginForm'), email=document.getElemen
 const status=document.getElementById('accountAuthStatus'), btn=document.getElementById('accountLoginButton'), session=document.getElementById('accountSession');
 const headers=token=>({'apikey':KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json'});
 function show(message){status.textContent=message;}
-function display(user,profile){document.getElementById('signedInEmail').textContent=user.email||'Verified account';document.getElementById('signedInBuyerId').textContent=profile.public_id;document.getElementById('buyerProfileId').textContent=profile.public_id;session.hidden=false;form.hidden=true;show('Signed in. This is an identity profile only; no circular purchase or payout records exist.');}
+let activeToken='',activeUser=null;
+function display(user,profile,token){activeToken=token;activeUser=user;document.getElementById('signedInEmail').textContent=user.email||'Verified account';document.getElementById('signedInBuyerId').textContent=profile.public_id;document.getElementById('buyerProfileId').textContent=profile.public_id;session.hidden=false;form.hidden=true;document.getElementById('demoWorkspace').hidden=false;show('Signed in. Demo records only; no real purchases or payouts.');loadDemoRecords();}
+async function loadDemoRecords(){
+ const list=document.getElementById('demoRecordsList'), audit=document.getElementById('demoAuditList');
+ list.textContent='Loading demo records…';audit.textContent='Loading audit history…';
+ try{
+  const [rr,ar]=await Promise.all([
+   fetch(URL+'/rest/v1/rpc/qzix_demo_my_priority',{method:'POST',headers:headers(activeToken),body:'{}'}),
+   fetch(URL+'/rest/v1/qzix_demo_audit_log?select=record_id,action,detail,occurred_at&user_id=eq.'+encodeURIComponent(activeUser.id)+'&order=occurred_at.desc&limit=50',{headers:headers(activeToken)})
+  ]);
+  if(!rr.ok||!ar.ok)throw new Error('Demo records could not be loaded.');
+  const rows=await rr.json(), logs=await ar.json();
+  list.replaceChildren();
+  if(!rows.length){list.textContent='No demo entries yet. Add a clearly labelled test entry above.';}
+  rows.forEach(r=>{const el=document.createElement('div');el.className='rule';el.textContent='DEMO #'+r.record_id+' · Priority '+r.demo_priority+' · '+r.level_label+' · '+r.share_percent+'% · Illustrative ₹'+r.illustrative_amount+' · '+new Date(r.created_at).toLocaleString();list.appendChild(el);});
+  audit.replaceChildren();
+  if(!logs.length){audit.textContent='No audit entries yet.';}
+  logs.forEach(a=>{const el=document.createElement('div');el.className='rule';el.textContent=a.action+' · Demo #'+a.record_id+' · '+new Date(a.occurred_at).toLocaleString()+' · '+a.detail;audit.appendChild(el);});
+ }catch(e){list.textContent=e.message;audit.textContent='Audit history unavailable.';}
+}
+document.getElementById('demoRecordForm').addEventListener('submit',async e=>{
+ e.preventDefault();const b=document.getElementById('demoAddButton'),s=document.getElementById('demoStatus');
+ b.disabled=true;s.textContent='Saving clearly marked demo entry…';
+ try{
+  const payload={user_id:activeUser.id,level_label:document.getElementById('demoLevel').value.trim(),share_percent:Number(document.getElementById('demoShare').value),illustrative_amount:Number(document.getElementById('demoAmount').value),record_type:'DEMO'};
+  const r=await fetch(URL+'/rest/v1/qzix_demo_share_records',{method:'POST',headers:{...headers(activeToken),'Prefer':'return=minimal'},body:JSON.stringify(payload)});
+  if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.message||'Could not save demo entry.');}
+  document.getElementById('demoRecordForm').reset();document.getElementById('demoAmount').value='0';s.textContent='Demo entry saved. It is not a real purchase or payment.';await loadDemoRecords();
+ }catch(err){s.textContent=err.message||'Demo entry failed.';}
+ finally{b.disabled=false;}
+});
 async function loadProfile(token,user){
  const p=await fetch(URL+'/rest/v1/qzix_v2_profiles?select=public_id,display_name,created_at&user_id=eq.'+encodeURIComponent(user.id),{headers:headers(token)});
  if(!p.ok)throw new Error('Could not load your profile. Please try again.');
@@ -45,7 +93,7 @@ async function loadProfile(token,user){
   if(!save.ok)throw new Error('Profile setup could not be completed. Please contact QZIX support.');
   rows=[{public_id:publicId,display_name:displayName}];
  }
- display(user,rows[0]);
+ display(user,rows[0],token);
 }
 form.addEventListener('submit',async e=>{
  e.preventDefault();btn.disabled=true;btn.textContent='CHECKING…';show('Checking your email login…');
@@ -57,7 +105,7 @@ form.addEventListener('submit',async e=>{
  }catch(err){sessionStorage.removeItem('qzix_buyer_access_token');show(err.message||'Login could not be completed.');}
  finally{btn.disabled=false;btn.textContent='LOGIN WITH EMAIL';}
 });
-document.getElementById('accountLogoutButton').addEventListener('click',()=>{sessionStorage.removeItem('qzix_buyer_access_token');session.hidden=true;form.hidden=false;password.value='';document.getElementById('buyerProfileId').textContent='Login required';show('Signed out.');});
+document.getElementById('accountLogoutButton').addEventListener('click',()=>{sessionStorage.removeItem('qzix_buyer_access_token');session.hidden=true;form.hidden=false;document.getElementById('demoWorkspace').hidden=true;activeToken='';activeUser=null;password.value='';document.getElementById('buyerProfileId').textContent='Login required';show('Signed out.');});
 const saved=sessionStorage.getItem('qzix_buyer_access_token');
 if(saved){fetch(URL+'/auth/v1/user',{headers:headers(saved)}).then(r=>r.ok?r.json():Promise.reject()).then(user=>loadProfile(saved,user)).catch(()=>{sessionStorage.removeItem('qzix_buyer_access_token');show('Please sign in again.');});}
 })();
