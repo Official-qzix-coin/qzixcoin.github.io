@@ -18,19 +18,18 @@ label{display:block;margin:14px 0 6px;color:#ffe2a0;font-size:13px;font-weight:7
 footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 @media(max-width:560px){main{padding:15px 11px 35px}.hero,.panel{padding:17px}.stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:span 2}.levels{grid-template-columns:1fr}}
 
-.progress-card{margin:14px 0 22px;padding:17px;border:1px solid #806b3e;border-radius:15px;background:linear-gradient(145deg,#192b43,#0b192b)}.progress-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.progress-head strong{color:var(--gold);font-size:22px}.progress-track{height:12px;background:#26384f;border:1px solid #49617e;border-radius:99px;overflow:hidden;margin:12px 0 8px}.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#c38c35,#ffe2a0);border-radius:99px;transition:width .35s ease}.progress-note{color:var(--muted);font-size:11px;line-height:1.5}
+
 </style>
 </head>
 <body><main>
 <header class="top"><div class="brand">QZIX CIRCULAR SYSTEM</div><a class="back" href="./">← Dashboard</a></header>
-<section class="hero"><div class="kicker">SIMPLE · STRUCTURED · TRANSPARENT</div><h1>QZIX CIRCULAR</h1><p class="muted">Explore the circular levels and percentage examples. This page explains the proposed structure only; it does not create a financial interest or confirm participation.</p></section>
-<section class="stats" aria-label="Circular reference values">
-<div class="stat"><small>Current Circular Reference</small><strong>₹20 · 1%</strong></div>
-<div class="stat"><small>Next Planned Reference</small><strong>₹40 · 1%</strong></div>
-<div class="stat"><small>Minimum Amount Example</small><strong>₹20</strong></div>
+<section class="hero"><div class="kicker">SIMPLE · STRUCTURED · TRANSPARENT</div><h1>QZIX CIRCULAR</h1><p class="muted">Explore arithmetic examples only. This page does not display live prices, request money, create a financial interest or confirm participation. No payments or participation are enabled.</p></section>
+<section class="stats" aria-label="Illustrative calculation examples">
+<div class="stat"><small>Example A · Not a price</small><strong>₹20 · 1%</strong></div>
+<div class="stat"><small>Example B · Not a price</small><strong>₹40 · 1%</strong></div>
+<div class="stat"><small>Calculation Example</small><strong>₹20</strong></div>
 </section>
-<section class="progress-card" aria-live="polite"><div class="progress-head"><span><b>Admin-confirmed progress</b><div class="progress-note">Confirmed participation progress · Illustrative tracker only</div></span><strong id="circularProgressValue">0.00%</strong></div><div class="progress-track" role="progressbar" aria-label="Admin-confirmed circular progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="circularProgressFill"></div></div><div class="progress-note" id="circularProgressAmount">₹0 confirmed of ₹2,000 example target. Pending and rejected entries are excluded.</div></section>
-<section class="panel"><h2>Illustrative Circular Levels</h2><p class="muted">The examples below show a proposed progression. They are not live market prices, guaranteed values, or promised returns.</p>
+<section class="panel"><h2>Illustrative Circular Levels</h2><p class="muted">The examples below are arithmetic illustrations only. They are not live prices, offers, amounts payable, guaranteed values or promised returns.</p>
 <div class="levels"><div class="level"><b>₹20 · 1%</b><span>Current illustrative level</span></div><div class="level"><b>₹40 · 1%</b><span>Next illustrative level</span></div><div class="level"><b>₹2,000</b><span>Example 100% reference value at ₹20</span></div><div class="level"><b>₹4,000</b><span>Example 100% reference value at ₹40</span></div></div>
 </section>
 <section class="panel"><h2>Percentage Calculator</h2><p class="muted">Enter an amount to see what percentage it represents of the selected illustrative circular value.</p>
@@ -45,7 +44,5 @@ footer{text-align:center;color:#8294ad;font-size:11px;margin-top:22px}
 const amount=document.getElementById('amount'),basis=document.getElementById('basis'),result=document.getElementById('result');
 function calculate(){const a=Number(amount.value),b=Number(basis.value);if(!Number.isFinite(a)||a<0||!b){result.textContent='Enter a valid non-negative amount.';return}result.textContent='₹'+a.toLocaleString('en-IN',{maximumFractionDigits:2})+' represents '+(a/b*100).toFixed(2)+'% of ₹'+b.toLocaleString('en-IN')+'.'}
 amount.addEventListener('input',calculate);basis.addEventListener('change',calculate);calculate();
-</script><script>
-(()=>{const url='https://rxjrsbkqytovjqnijqek.supabase.co/rest/v1/qzix_circular_progress?select=confirmed_amount,target_amount,progress_percent';const key='sb_publishable_La3xzuyCRI96ubrMhQj4XQ_Ofd55K-q';async function refreshCircularProgress(){try{const r=await fetch(url,{headers:{apikey:key,Authorization:'Bearer '+key}});if(!r.ok)throw new Error('Progress unavailable');const rows=await r.json();const d=rows&&rows[0];if(!d)return;const p=Math.max(0,Math.min(100,Number(d.progress_percent)||0));const amount=Number(d.confirmed_amount)||0;const target=Number(d.target_amount)||2000;const value=document.getElementById('circularProgressValue');const fill=document.getElementById('circularProgressFill');const amountText=document.getElementById('circularProgressAmount');if(value)value.textContent=p.toFixed(2)+'%';if(fill)fill.style.width=p+'%';const track=document.querySelector('[role="progressbar"]');if(track)track.setAttribute('aria-valuenow',String(p));if(amountText)amountText.textContent='₹'+amount.toLocaleString('en-IN',{maximumFractionDigits:2})+' confirmed of ₹'+target.toLocaleString('en-IN')+' example target. Pending and rejected entries are excluded.';}catch(e){const amountText=document.getElementById('circularProgressAmount');if(amountText)amountText.textContent='Live progress could not be loaded. Please refresh later.';}}refreshCircularProgress();setInterval(refreshCircularProgress,30000);})();
 </script>
 </body></html>
