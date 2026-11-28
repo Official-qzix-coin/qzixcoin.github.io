@@ -121,9 +121,8 @@ autoButton.addEventListener('click',()=>{
 shakeButton.addEventListener('click',()=>{
  bodies.forEach((b)=>{
   b.applyImpulse(new CANNON.Vec3((Math.random()-.5)*1.25,.45+Math.random()*.85,(Math.random()-.5)*.9),b.position);
-  b.angularVelocity.x+=(Math.random()-.5)*2.2;
-  b.angularVelocity.y+=(Math.random()-.5)*2.2;
-  b.angularVelocity.z+=(Math.random()-.5)*2.2;
+  b.angularVelocity.set(0,0,0);
+  b.quaternion.set(0,0,0,1);
  });
 });
 resetButton.addEventListener('click',()=>{
@@ -142,7 +141,8 @@ resetButton.addEventListener('click',()=>{
 function syncNoteMeshes(){
  bodies.forEach((b,i)=>{
   meshes[i].position.set(b.position.x,b.position.y,b.position.z);
-  meshes[i].quaternion.set(b.quaternion.x,b.quaternion.y,b.quaternion.z,b.quaternion.w);
+  // Keep note artwork upright and facing the viewer; never inherit physics-body tilt.
+  meshes[i].quaternion.set(0,0,0,1);
  });
 }
 function stopLoop(){if(raf){cancelAnimationFrame(raf);raf=0}}
